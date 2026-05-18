@@ -1,0 +1,21 @@
+.page { max-width: 600px; margin: 0 auto; text-align: center; }
+.breadcrumb { text-align: left; margin-bottom: var(--space-xl); font-size: 0.9rem; }
+.breadcrumb a { color: var(--color-text-secondary); }
+.notFound { color: var(--color-text-secondary); padding: var(--space-3xl); }
+.link { color: var(--color-accent-dark); }
+
+.result { margin-bottom: var(--space-2xl); }
+.symbol { font-size: 4rem; line-height: 1; margin-bottom: var(--space-md); }
+.name { font-size: 2.5rem; letter-spacing: 0.3em; margin-bottom: var(--space-xs); }
+.id { color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: var(--space-lg); }
+
+.verdict { background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 8px; padding: var(--space-xl); margin-top: var(--space-xl); }
+.judgment { font-family: var(--font-heading); font-size: 1.15rem; line-height: 2; margin-bottom: var(--space-sm); }
+.meaning { color: var(--color-text-secondary); margin-bottom: 0; }
+.image { color: var(--color-text-secondary); font-style: italic; margin-top: var(--space-md); }
+
+.actions { display: flex; gap: var(--space-md); justify-content: center; }
+.detailLink { padding: 10px 28px; background: var(--color-accent); color: #fff; border-radius: 6px; font-family: var(--font-heading); }
+.detailLink:hover { background: var(--color-accent-dark); color: #fff; }
+.retryLink { padding: 10px 28px; border: 1px solid var(--color-border); color: var(--color-text-secondary); border-radius: 6px; font-family: var(--font-heading); }
+.retryLink:hover { background: var(--color-bg-dark); }

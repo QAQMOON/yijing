@@ -1,0 +1,80 @@
+.page { max-width: 700px; margin: 0 auto; text-align: center; }
+.back { display: inline-block; color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--space-xl); }
+.title { font-size: 2rem; letter-spacing: 0.3em; margin-bottom: var(--space-md); }
+.divider { width: 40px; height: 1px; background: var(--color-accent); margin: 0 auto var(--space-2xl); }
+
+.plateContainer {
+  position: relative;
+  width: 380px;
+  height: 380px;
+  margin: 0 auto var(--space-2xl);
+}
+
+.plateContainer > div {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-areas:
+    "c0 c1 c2 c3"
+    "c11 . . c4"
+    "c10 . . c5"
+    "c9 c8 c7 c6";
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  padding: 8px;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.empty { visibility: hidden; }
+
+/* Heaven plate - outer */
+.heavenRing { padding: 4px; }
+.heavenCell {
+  background: rgba(184,146,42,0.08);
+  border: 1px solid var(--color-accent);
+  font-size: 0.85rem;
+  color: var(--color-accent-dark);
+}
+
+/* General ring - middle */
+.generalRing { padding: 32px; }
+.generalCell {
+  background: rgba(28,20,16,0.03);
+  border: 1px solid var(--color-border);
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* Earth plate - inner */
+.earthRing { padding: 58px; }
+.earthCell {
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.legend { display: flex; gap: var(--space-xl); justify-content: center; margin-bottom: var(--space-2xl); }
+.legendItem { display: flex; align-items: center; gap: var(--space-xs); font-size: 0.8rem; color: var(--color-text-secondary); }
+.dotH { width: 10px; height: 10px; border-radius: 50%; background: rgba(184,146,42,0.3); border: 1px solid var(--color-accent); }
+.dotG { width: 10px; height: 10px; border-radius: 50%; background: rgba(28,20,16,0.05); border: 1px solid var(--color-border); }
+.dotE { width: 10px; height: 10px; border-radius: 50%; background: var(--color-bg-light); border: 1px solid var(--color-border); }
+
+.infoCard { background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 8px; padding: var(--space-xl); text-align: left; }
+.infoCard h3 { font-size: 1rem; color: var(--color-accent-dark); margin-bottom: var(--space-md); }
+.infoCard p { color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 0; }
+
+@media (max-width: 480px) {
+  .plateContainer { width: 300px; height: 300px; }
+  .generalRing { padding: 24px; }
+  .earthRing { padding: 46px; }
+}

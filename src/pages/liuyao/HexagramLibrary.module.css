@@ -1,0 +1,9 @@
+.page { max-width: var(--max-width); margin: 0 auto; text-align: center; }
+.title { font-size: 2rem; letter-spacing: 0.3em; margin-bottom: var(--space-sm); }
+.subtitle { color: var(--color-text-secondary); margin-bottom: var(--space-lg); }
+.divider { width: 40px; height: 1px; background: var(--color-accent); margin: 0 auto var(--space-xl); }
+.search { width: 100%; max-width: 400px; padding: 10px 16px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg-light); font-family: var(--font-body); font-size: 0.95rem; color: var(--color-text-primary); outline: none; margin-bottom: var(--space-xl); transition: border-color 0.2s; }
+.search:focus { border-color: var(--color-accent); }
+.search::placeholder { color: var(--color-text-muted); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-md); }
+.empty { color: var(--color-text-muted); padding: var(--space-2xl); }

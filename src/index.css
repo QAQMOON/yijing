@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-bg: #f5f1e8;
+  --color-bg-light: #faf8f3;
+  --color-bg-dark: #e8e2d4;
+  --color-text-primary: #1c1410;
+  --color-text-secondary: #8a7d6e;
+  --color-text-muted: #bfb8a8;
+  --color-accent: #b8922a;
+  --color-accent-light: #d4b86a;
+  --color-accent-dark: #9a7a20;
+  --color-border: #ddd6c8;
+  --color-shadow: rgba(0, 0, 0, 0.06);
+
+  --font-heading: "Noto Serif SC", "STSong", "SimSun", "Songti SC", serif;
+  --font-body: "Noto Serif SC", "STSong", "Georgia", serif;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  --max-width: 1200px;
+  --content-width: 800px;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+h1 { font-size: 2rem; font-weight: 700; letter-spacing: 0.05em; }
+h2 { font-size: 1.5rem; font-weight: 600; letter-spacing: 0.03em; }
+h3 { font-size: 1.25rem; font-weight: 600; }
+h4 { font-size: 1.1rem; font-weight: 600; }
+
+p { margin-bottom: var(--space-md); }
+
+a {
+  color: var(--color-accent-dark);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover { color: var(--color-accent); }
+
+button {
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+img { max-width: 100%; height: auto; }
+
+::selection {
+  background: var(--color-accent-light);
+  color: var(--color-text-primary);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-text-muted); border-radius: 3px; }

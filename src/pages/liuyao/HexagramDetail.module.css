@@ -1,0 +1,20 @@
+.page { max-width: 700px; margin: 0 auto; }
+.back { display: inline-block; color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--space-xl); }
+.back:hover { color: var(--color-accent); }
+.notFound { text-align: center; color: var(--color-text-secondary); padding: var(--space-3xl); }
+.header { text-align: center; margin-bottom: var(--space-2xl); }
+.symbol { font-size: 4rem; line-height: 1; margin-bottom: var(--space-md); }
+.name { font-size: 2.5rem; letter-spacing: 0.3em; margin-bottom: var(--space-md); }
+.id { display: block; font-size: 0.8rem; font-weight: 400; color: var(--color-text-muted); margin-top: var(--space-xs); }
+.trigrams { color: var(--color-text-secondary); margin-top: var(--space-sm); font-family: var(--font-heading); }
+.section { background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 8px; padding: var(--space-xl); margin-bottom: var(--space-lg); }
+.section h3 { font-size: 1rem; color: var(--color-accent-dark); margin-bottom: var(--space-md); letter-spacing: 0.1em; }
+.judgment { font-family: var(--font-heading); font-size: 1.15rem; line-height: 2; margin-bottom: var(--space-sm); }
+.meaning { color: var(--color-text-secondary); font-size: 0.95rem; margin-bottom: 0; }
+.imageText { color: var(--color-text-secondary); font-style: italic; line-height: 1.8; }
+.yaoList { display: flex; flex-direction: column-reverse; gap: var(--space-sm); }
+.yaoItem { display: flex; align-items: baseline; gap: var(--space-md); padding: var(--space-sm) var(--space-md); border-radius: 4px; }
+.yaoYang { background: rgba(28,20,16,0.03); }
+.yaoYin { background: rgba(28,20,16,0.01); }
+.yaoPos { font-family: var(--font-heading); font-size: 0.85rem; color: var(--color-accent-dark); min-width: 24px; }
+.yaoText { font-size: 0.95rem; color: var(--color-text-primary); }

@@ -1,0 +1,31 @@
+.page { max-width: 700px; margin: 0 auto; }
+.header { text-align: center; }
+.title { font-size: 2rem; letter-spacing: 0.3em; margin-bottom: var(--space-sm); }
+.subtitle { color: var(--color-text-secondary); }
+.divider { width: 40px; height: 1px; background: var(--color-accent); margin: var(--space-lg) auto var(--space-2xl); }
+
+.toolbar { display: flex; gap: var(--space-sm); justify-content: flex-end; margin-bottom: var(--space-lg); }
+.toolBtn { padding: 6px 14px; border: 1px solid var(--color-border); background: transparent; color: var(--color-text-secondary); border-radius: 4px; font-family: var(--font-heading); font-size: 0.8rem; cursor: pointer; }
+.toolBtn:hover { background: var(--color-bg-dark); }
+
+.list { display: flex; flex-direction: column; gap: var(--space-sm); }
+.item { display: flex; justify-content: space-between; align-items: center; padding: var(--space-md) var(--space-lg); background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 8px; gap: var(--space-md); flex-wrap: wrap; }
+.itemLeft { display: flex; align-items: center; gap: var(--space-md); flex-wrap: wrap; }
+.date { font-size: 0.85rem; color: var(--color-text-muted); font-family: var(--font-heading); min-width: 80px; }
+.hexName { font-family: var(--font-heading); font-size: 1rem; font-weight: 600; color: var(--color-text-primary); }
+.hexName:hover { color: var(--color-accent); }
+.type { font-size: 0.75rem; color: var(--color-text-muted); background: var(--color-bg-dark); padding: 2px 8px; border-radius: 10px; }
+
+.itemRight { display: flex; align-items: center; gap: var(--space-sm); }
+.noteInput { width: 140px; padding: 4px 8px; border: 1px solid transparent; border-radius: 4px; background: transparent; font-family: var(--font-body); font-size: 0.85rem; color: var(--color-text-secondary); outline: none; }
+.noteInput:focus { border-color: var(--color-border); background: var(--color-bg); }
+.noteInput::placeholder { color: var(--color-text-muted); }
+
+.delBtn { width: 24px; height: 24px; border: none; background: transparent; color: var(--color-text-muted); font-size: 1.1rem; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+.delBtn:hover { color: #c0392b; background: rgba(192,57,43,0.08); }
+
+.empty { text-align: center; padding: var(--space-3xl) 0; }
+.emptyIcon { font-size: 3rem; color: var(--color-text-muted); margin-bottom: var(--space-md); }
+.emptyHint { color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: var(--space-xl); }
+.emptyBtn { display: inline-block; padding: 10px 28px; background: var(--color-accent); color: #fff; border-radius: 6px; font-family: var(--font-heading); }
+.emptyBtn:hover { color: #fff; background: var(--color-accent-dark); }

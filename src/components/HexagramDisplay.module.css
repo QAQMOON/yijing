@@ -1,0 +1,75 @@
+.hexagram {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-md) 0;
+}
+
+.line {
+  transition: all 0.3s;
+}
+
+/* Yang line: solid bar */
+.yang {
+  background: var(--color-text-primary);
+}
+
+/* Yin line: two short bars with gap */
+.yin {
+  background: transparent;
+  position: relative;
+}
+
+.yin::before,
+.yin::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  background: var(--color-text-primary);
+}
+
+.normal .line {
+  width: 120px;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.normal .yin::before,
+.normal .yin::after {
+  width: 48px;
+  height: 8px;
+}
+
+.normal .yin::before { left: 0; }
+.normal .yin::after { right: 0; }
+
+.large .line {
+  width: 180px;
+  height: 12px;
+  border-radius: 6px;
+}
+
+.large .yin::before,
+.large .yin::after {
+  width: 72px;
+  height: 12px;
+}
+
+.large .yin::before { left: 0; }
+.large .yin::after { right: 0; }
+
+.small .line {
+  width: 60px;
+  height: 5px;
+  border-radius: 2.5px;
+}
+
+.small .yin::before,
+.small .yin::after {
+  width: 24px;
+  height: 5px;
+}
+
+.small .yin::before { left: 0; }
+.small .yin::after { right: 0; }

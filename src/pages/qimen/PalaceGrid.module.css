@@ -1,0 +1,88 @@
+.page { max-width: 700px; margin: 0 auto; text-align: center; }
+.back { display: inline-block; color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--space-xl); }
+.title { font-size: 2rem; letter-spacing: 0.3em; margin-bottom: var(--space-sm); }
+.subtitle { color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--space-lg); }
+.divider { width: 40px; height: 1px; background: var(--color-accent); margin: 0 auto var(--space-2xl); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: var(--space-md);
+  max-width: 540px;
+  margin: 0 auto var(--space-2xl);
+  aspect-ratio: 1;
+}
+
+.palace {
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.center {
+  opacity: 0.5;
+}
+
+.palaceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.palaceName {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.palaceNum {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-heading);
+}
+
+.palaceBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.label {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+}
+
+.val {
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+}
+
+.stem {
+  color: var(--color-accent-dark);
+  font-weight: 600;
+}
+
+.infoCard { background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 8px; padding: var(--space-xl); text-align: left; }
+.infoCard h3 { font-size: 1rem; color: var(--color-accent-dark); margin-bottom: var(--space-md); }
+.infoCard p { color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 0; }
+
+@media (max-width: 480px) {
+  .grid { max-width: 360px; }
+  .palace { padding: var(--space-sm); }
+  .detailRow { font-size: 0.7rem; }
+}

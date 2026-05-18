@@ -1,0 +1,17 @@
+import { Link } from 'react-router-dom';
+import HexagramDisplay from './HexagramDisplay.jsx';
+import styles from './HexagramCard.module.css';
+
+export default function HexagramCard({ hexagram }) {
+  return (
+    <Link to={`/liuyao/hexagram/${hexagram.id}`} className={styles.card}>
+      <div className={styles.symbol}>{hexagram.unicode}</div>
+      <HexagramDisplay lines={hexagram.lines} size="small" />
+      <div className={styles.info}>
+        <span className={styles.id}>{hexagram.id}</span>
+        <span className={styles.name}>{hexagram.name}</span>
+      </div>
+      <p className={styles.meaning}>{hexagram.meaning}</p>
+    </Link>
+  );
+}
