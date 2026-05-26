@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import styles from './NotFound.module.css';
 
@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <div className={styles.page}>
       <Helmet>
-        <title>页面未找到 — 易理</title>
+        <title>页面未找到 — 易解</title>
       </Helmet>
       <div className={styles.code}>404</div>
       <h1 className={styles.title}>此页无卦</h1>

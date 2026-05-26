@@ -1,32 +1,161 @@
-.page { max-width: 600px; margin: 0 auto; text-align: center; }
+.page { max-width: 980px; margin: 0 auto; }
 .backLink { display: inline-block; color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--space-xl); }
-.error { color: var(--color-text-secondary); padding: var(--space-3xl); }
-.back { color: var(--color-accent-dark); }
+.error { color: var(--color-text-secondary); padding: var(--space-3xl); text-align: center; }
+.back { color: var(--color-accent-dark); display: block; text-align: center; }
 
-.header { margin-bottom: var(--space-xl); }
-.birthDate { color: var(--color-text-secondary); font-family: var(--font-heading); }
+.topInfo {
+  display: grid;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-2xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+.infoLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  color: var(--color-text-secondary);
+}
+.infoLine > span {
+  width: 72px;
+  flex: 0 0 auto;
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+}
+.infoLine strong {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+.infoLine em {
+  color: var(--color-text-muted);
+  font-style: normal;
+  font-size: 0.86rem;
+}
 
 .pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-2xl); }
-
-.pillar { background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 8px; padding: var(--space-lg) var(--space-sm); }
-.pillar:first-child { border-color: var(--color-accent); }
-
-.pillarName { font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: var(--space-sm); letter-spacing: 0.1em; }
-
-.stemBranch { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-bottom: var(--space-xs); }
-
-.char { font-family: var(--font-heading); font-size: 1.6rem; line-height: 1.3; }
-.stem { color: var(--color-accent-dark); }
+.pillar {
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--space-lg) var(--space-md);
+  min-height: 360px;
+}
+.dayPillar { border-color: var(--color-accent); box-shadow: inset 0 0 0 1px rgba(184, 146, 42, 0.28); }
+.pillarTop { display: flex; align-items: center; justify-content: space-between; min-height: 28px; margin-bottom: var(--space-sm); color: var(--color-text-muted); font-size: 0.8rem; letter-spacing: 0.1em; }
+.pillarTop i { padding: 2px 8px; border-radius: 999px; background: var(--color-accent); color: #fff; font-style: normal; font-size: 0.72rem; letter-spacing: 0; }
+.tenGod { min-height: 24px; color: var(--color-accent-dark); font-size: 0.85rem; text-align: center; }
+.stemBranch { display: flex; flex-direction: column; align-items: center; gap: 0; margin: var(--space-xs) 0; }
+.stem,
+.branch { font-family: var(--font-heading); font-size: 2.3rem; line-height: 1.2; color: var(--color-accent-dark); }
 .branch { color: var(--color-text-primary); }
+.full { text-align: center; font-family: var(--font-heading); font-size: 1.15rem; color: var(--color-text-primary); margin-bottom: var(--space-md); }
+.metaList { display: grid; gap: var(--space-xs); margin: 0; padding-top: var(--space-sm); border-top: 1px solid var(--color-border); }
+.metaList div { display: grid; grid-template-columns: 42px 1fr; gap: var(--space-xs); align-items: start; }
+.metaList dt { color: var(--color-text-muted); font-size: 0.74rem; }
+.metaList dd { margin: 0; color: var(--color-text-secondary); font-size: 0.78rem; line-height: 1.5; }
 
-.full { font-family: var(--font-heading); font-size: 1.1rem; color: var(--color-text-primary); }
+.section { margin-bottom: var(--space-2xl); }
+.sectionHead { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-md); margin-bottom: var(--space-md); }
+.sectionHead h2 { font-size: 1.15rem; color: var(--color-accent-dark); }
+.sectionHead p { margin: 0; color: var(--color-text-muted); font-size: 0.82rem; }
 
-.dayMaster { font-family: var(--font-heading); font-size: 2rem; color: var(--color-accent-dark); margin-bottom: var(--space-sm); }
+.luckGrid { display: grid; grid-template-columns: repeat(8, minmax(92px, 1fr)); gap: var(--space-sm); }
+.luckCard {
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-light);
+  text-align: center;
+}
+.luckAge { min-height: 22px; color: var(--color-text-muted); font-size: 0.74rem; }
+.luckGod { color: var(--color-accent-dark); font-size: 0.78rem; }
+.luckChars { display: flex; flex-direction: column; gap: 0; margin: var(--space-xs) 0; }
+.luckChars strong { font-family: var(--font-heading); font-size: 1.55rem; line-height: 1.15; color: var(--color-text-primary); }
+.luckCard span { color: var(--color-text-secondary); font-size: 0.78rem; }
+.luckCard small { color: var(--color-text-muted); font-size: 0.72rem; }
 
-.infoCard { background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 8px; padding: var(--space-xl); margin-bottom: var(--space-lg); text-align: left; }
-.infoCard h3 { font-size: 1rem; color: var(--color-accent-dark); margin-bottom: var(--space-md); }
-.info { color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 0; }
+.flowYearPanel {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+}
+.flowTitle { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-md); margin-bottom: var(--space-md); }
+.flowTitle h3 { color: var(--color-accent-dark); font-size: 1rem; }
+.flowTitle p { margin: 0; color: var(--color-text-muted); font-size: 0.82rem; }
+.flowScroller { overflow-x: auto; padding-bottom: var(--space-xs); }
+.flowGrid { min-width: 980px; display: grid; grid-template-columns: repeat(10, minmax(88px, 1fr)); gap: var(--space-xs); }
+.flowColumn {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-light);
+  overflow: hidden;
+}
+.flowColumnHead {
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-dark);
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+  font-size: 0.86rem;
+  text-align: center;
+}
+.flowItem {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  grid-template-areas:
+    "age gz"
+    "year gz";
+  align-items: center;
+  gap: 0 4px;
+  min-height: 40px;
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(221, 214, 200, 0.62);
+}
+.flowItem:last-child { border-bottom: 0; }
+.flowItem span { grid-area: age; color: var(--color-text-muted); font-size: 0.75rem; line-height: 1.2; }
+.flowItem strong { grid-area: gz; color: var(--color-text-primary); font-family: var(--font-heading); font-size: 0.95rem; line-height: 1.2; text-align: center; }
+.flowItem small { grid-area: year; color: var(--color-text-secondary); font-size: 0.72rem; line-height: 1.2; }
 
-@media (max-width: 480px) {
+.shenShaList {
+  display: grid;
+  gap: var(--space-sm);
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--space-lg);
+}
+.shenShaRow { display: grid; grid-template-columns: 96px 1fr; gap: var(--space-md); align-items: start; }
+.shenShaRow strong { color: var(--color-accent-dark); font-family: var(--font-heading); }
+.shenShaRow strong span { margin-left: var(--space-xs); color: var(--color-text-primary); }
+.shenShaRow div { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.shenShaRow i {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--color-bg-dark);
+  color: var(--color-text-secondary);
+  font-style: normal;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 980px) {
   .pillars { grid-template-columns: repeat(2, 1fr); }
+  .luckGrid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .infoLine { align-items: flex-start; flex-direction: column; gap: var(--space-xs); }
+  .infoLine > span { width: auto; }
+  .pillars { grid-template-columns: 1fr; }
+  .luckGrid { grid-template-columns: repeat(2, 1fr); }
+  .flowTitle { align-items: flex-start; flex-direction: column; gap: var(--space-xs); }
+  .flowGrid { min-width: 900px; }
+  .shenShaRow { grid-template-columns: 1fr; gap: var(--space-xs); }
 }

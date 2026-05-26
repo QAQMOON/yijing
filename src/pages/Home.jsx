@@ -1,39 +1,35 @@
 import { Helmet } from 'react-helmet-async';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import HexagramDisplay from '../components/HexagramDisplay.jsx';
 import ToolCard from '../components/ToolCard.jsx';
 import SaveReading from '../components/SaveReading.jsx';
 import { useReadingHistory } from '../hooks/useReadingHistory.js';
 import { getDailyHexagramIndex, formatDateCN } from '../utils/dailyHexagram.js';
 import { HEXAGRAMS } from '../data/hexagrams.js';
+import { BRAND_NAME, getRandomBrandTagline } from '../data/siteConfig.js';
+import { getHexagramFullName } from '../utils/liuyaoMeta.js';
 import styles from './Home.module.css';
 
 export default function Home() {
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => { setHydrated(true); }, []);
-
   const { saveReading } = useReadingHistory();
 
   const hexagram = useMemo(() => {
     const idx = getDailyHexagramIndex();
     return HEXAGRAMS[idx];
   }, []);
-
-  if (!hydrated) {
-    return <div className={styles.shell}><div className={styles.heroSkeleton} /></div>;
-  }
+  const tagline = useMemo(() => getRandomBrandTagline(), []);
 
   return (
     <div className={styles.home}>
       <Helmet>
-        <title>易理 · 排盘 — 三式合参</title>
+        <title>{BRAND_NAME} · {tagline}</title>
       </Helmet>
 
       {/* Hero — Daily Hexagram */}
       <section className={styles.hero}>
+        <p className={styles.brandLine}>{BRAND_NAME} · {tagline}</p>
         <p className={styles.date}>{formatDateCN()} · 今日一卦</p>
-        <div className={styles.hexagramSymbol}>{hexagram.unicode}</div>
-        <h1 className={styles.hexagramName}>{hexagram.name}</h1>
+        <h1 className={styles.hexagramName}>{getHexagramFullName(hexagram)}</h1>
         <HexagramDisplay lines={hexagram.lines} size="large" />
         <p className={styles.judgment}>{hexagram.judgment}</p>
         {hexagram.image && (
@@ -49,7 +45,7 @@ export default function Home() {
       {/* Divider */}
       <div className={styles.divider}>
         <span className={styles.dividerLine} />
-        <span className={styles.dividerText}>三 式 · 合 参</span>
+        <span className={styles.dividerText}>{tagline}</span>
         <span className={styles.dividerLine} />
       </div>
 

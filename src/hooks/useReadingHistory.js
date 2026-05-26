@@ -1,16 +1,16 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 const STORAGE_KEY = 'yijing-readings';
 
 export function useReadingHistory() {
-  const [readings, setReadings] = useState([]);
-
-  useEffect(() => {
+  const [readings, setReadings] = useState(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) setReadings(JSON.parse(stored));
-    } catch { /* ignore */ }
-  }, []);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const persist = useCallback((newReadings) => {
     setReadings(newReadings);

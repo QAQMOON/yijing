@@ -9,8 +9,6 @@ export function getDailyHexagramIndex(date = new Date()) {
 }
 
 export function formatDateCN(date = new Date()) {
-  const stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  const branches = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   const y = date.getFullYear();
   const m = date.getMonth() + 1;
   const d = date.getDate();

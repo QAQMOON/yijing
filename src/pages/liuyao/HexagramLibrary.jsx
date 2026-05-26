@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import HexagramCard from '../../components/HexagramCard.jsx';
 import { HEXAGRAMS } from '../../data/hexagrams.js';
+import { getHexagramFullName } from '../../utils/liuyaoMeta.js';
 import styles from './HexagramLibrary.module.css';
 
 export default function HexagramLibrary() {
@@ -11,6 +12,7 @@ export default function HexagramLibrary() {
     if (!search.trim()) return HEXAGRAMS;
     const q = search.trim();
     return HEXAGRAMS.filter(h =>
+      getHexagramFullName(h).includes(q) ||
       h.name.includes(q) || h.meaning.includes(q) || h.judgment.includes(q) ||
       h.upperTrigram.includes(q) || h.lowerTrigram.includes(q) ||
       String(h.id) === q
@@ -19,7 +21,7 @@ export default function HexagramLibrary() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>六十四卦 — 易理</title></Helmet>
+      <Helmet><title>六十四卦 — 易解</title></Helmet>
       <h1 className={styles.title}>六十 四 卦</h1>
       <p className={styles.subtitle}>文王六十四卦序</p>
       <div className={styles.divider} />

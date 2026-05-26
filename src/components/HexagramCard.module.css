@@ -15,12 +15,6 @@
   transform: translateY(-2px);
 }
 
-.symbol {
-  font-size: 2rem;
-  margin-bottom: var(--space-sm);
-  line-height: 1;
-}
-
 .info {
   display: flex;
   align-items: center;

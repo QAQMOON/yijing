@@ -1,14 +1,41 @@
-export function tossThreeCoins() {
-  const coins = [
-    Math.random() < 0.5 ? 3 : 2,
-    Math.random() < 0.5 ? 3 : 2,
-    Math.random() < 0.5 ? 3 : 2,
-  ];
+import { HEXAGRAMS } from '../data/hexagrams.js';
+
+const LINE_LABELS = { 6:'老阴', 7:'少阳', 8:'少阴', 9:'老阳' };
+
+function buildLine(coins) {
   const sum = coins[0] + coins[1] + coins[2];
   const yinYang = sum % 2 === 0 ? 0 : 1;
   const isChanging = sum === 6 || sum === 9;
-  const labels = { 6:'老阴', 7:'少阳', 8:'少阴', 9:'老阳' };
-  return { value: sum, yinYang, isChanging, label: labels[sum], coins };
+  return { value: sum, yinYang, isChanging, label: LINE_LABELS[sum], coins };
+}
+
+function seededRandom(seed) {
+  let value = seed >>> 0;
+  return () => {
+    value = (value + 0x6D2B79F5) >>> 0;
+    let next = value;
+    next = Math.imul(next ^ (next >>> 15), next | 1);
+    next ^= next + Math.imul(next ^ (next >>> 7), next | 61);
+    return ((next ^ (next >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seedFromDate(date) {
+  return (
+    date.getFullYear() * 100000000 +
+    (date.getMonth() + 1) * 1000000 +
+    date.getDate() * 10000 +
+    date.getHours() * 100 +
+    date.getMinutes()
+  );
+}
+
+export function tossThreeCoins() {
+  return buildLine([
+    Math.random() < 0.5 ? 3 : 2,
+    Math.random() < 0.5 ? 3 : 2,
+    Math.random() < 0.5 ? 3 : 2,
+  ]);
 }
 
 export function performReading() {
@@ -22,18 +49,27 @@ export function performReading() {
   return { lines, details };
 }
 
+export function performTimeReading(date = new Date()) {
+  const random = seededRandom(seedFromDate(date));
+  const lines = [];
+  const details = [];
+
+  for (let i = 0; i < 6; i += 1) {
+    const coins = [
+      random() < 0.5 ? 3 : 2,
+      random() < 0.5 ? 3 : 2,
+      random() < 0.5 ? 3 : 2,
+    ];
+    const result = buildLine(coins);
+    lines.push(result.yinYang);
+    details.push(result);
+  }
+
+  return { lines, details, date };
+}
+
 export function linesToHexagramId(lines) {
   const lineStr = lines.join('');
-  const lookup = {
-    '111111':1,'000000':2,'100010':3,'010001':4,'111010':5,'010111':6,'010000':7,'000010':8,
-    '111011':9,'110111':10,'111000':11,'000111':12,'101111':13,'111101':14,'001000':15,
-    '000100':16,'100110':17,'011001':18,'110000':19,'000011':20,'100101':21,'101001':22,
-    '000001':23,'100000':24,'100111':25,'111001':26,'100001':27,'011110':28,'010010':29,
-    '101101':30,'001110':31,'011100':32,'001111':33,'111100':34,'000101':35,'101000':36,
-    '101011':37,'110101':38,'001010':39,'010100':40,'110001':41,'100011':42,'111110':43,
-    '011111':44,'000110':45,'011000':46,'010110':47,'011010':48,'101110':49,'011101':50,
-    '100100':51,'001001':52,'001011':53,'110100':54,'101100':55,'001101':56,'011011':57,
-    '110110':58,'110010':59,'110011':60,'110011':60,'001100':62,'101010':63,'010101':64,
-  };
-  return lookup[lineStr] || 1;
+  const hexagram = HEXAGRAMS.find((item) => item.lines.join('') === lineStr);
+  return hexagram?.id || 1;
 }

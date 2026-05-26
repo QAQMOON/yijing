@@ -1,8 +1,9 @@
-import { useRef } from 'react';
+﻿import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useReadingHistory } from '../hooks/useReadingHistory.js';
 import { HEXAGRAMS } from '../data/hexagrams.js';
+import { getHexagramFullName } from '../utils/liuyaoMeta.js';
 import styles from './ReadingHistory.module.css';
 
 export default function ReadingHistory() {
@@ -23,7 +24,7 @@ export default function ReadingHistory() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>我的卦历 — 易理</title></Helmet>
+      <Helmet><title>我的卦历 — 易解</title></Helmet>
       <div className={styles.header}>
         <h1 className={styles.title}>我的卦历</h1>
         <p className={styles.subtitle}>排卦记录 · 日积月累</p>
@@ -52,7 +53,7 @@ export default function ReadingHistory() {
                   <div className={styles.itemLeft}>
                     <span className={styles.date}>{reading.date}</span>
                     <Link to={`/liuyao/hexagram/${reading.hexagramId}`} className={styles.hexName}>
-                      {hex ? `${hex.unicode} ${hex.name}` : `第${reading.hexagramId}卦`}
+                      {hex ? getHexagramFullName(hex) : `第${reading.hexagramId}卦`}
                     </Link>
                     <span className={styles.type}>{reading.type === 'daily' ? '每日一卦' : '摇卦'}</span>
                   </div>

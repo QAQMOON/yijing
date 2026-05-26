@@ -173,7 +173,7 @@ export const HEXAGRAMS = [
   { id:58, name:'兑', unicode:'䷹', meaning:'喜悦·交流', judgment:'亨。利贞。', lines:[1,1,0,1,1,0], upperTrigram:'兑', lowerTrigram:'兑',
     image:'丽泽，兑。君子以朋友讲习。',
     yaoText:['和兑，吉。','孚兑，吉，悔亡。','来兑，凶。','商兑未宁，介疾有喜。','孚于剥，有厉。','引兑。'] },
-  { id:59, name:'涣', unicode:'䷺', meaning:'涣散·离散', judgment:'亨。王假有庙。利涉大川，利贞。', lines:[1,1,0,0,1,0], upperTrigram:'巽', lowerTrigram:'坎',
+  { id:59, name:'涣', unicode:'䷺', meaning:'涣散·离散', judgment:'亨。王假有庙。利涉大川，利贞。', lines:[0,1,0,0,1,1], upperTrigram:'巽', lowerTrigram:'坎',
     image:'风行水上，涣。先王以享于帝立庙。',
     yaoText:['用拯马壮，吉。','涣奔其机，悔亡。','涣其躬，无悔。','涣其群，元吉。涣有丘，匪夷所思。','涣汗其大号，涣王居，无咎。','涣其血，去逖出，无咎。'] },
   { id:60, name:'节', unicode:'䷻', meaning:'节制·节度', judgment:'亨。苦节不可贞。', lines:[1,1,0,0,1,0], upperTrigram:'坎', lowerTrigram:'兑',

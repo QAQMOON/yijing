@@ -1,7 +1,8 @@
-import { useParams, Link } from 'react-router-dom';
+﻿import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import HexagramDisplay from '../../components/HexagramDisplay.jsx';
 import { HEXAGRAMS } from '../../data/hexagrams.js';
+import { getHexagramFullName } from '../../utils/liuyaoMeta.js';
 import styles from './HexagramDetail.module.css';
 
 export default function HexagramDetail() {
@@ -17,13 +18,14 @@ export default function HexagramDetail() {
     );
   }
 
+  const fullName = getHexagramFullName(hex);
+
   return (
     <div className={styles.page}>
-      <Helmet><title>{hex.name}卦 — 易理</title></Helmet>
+      <Helmet><title>{fullName} — 易解</title></Helmet>
       <Link to="/liuyao/hexagrams" className={styles.back}>← 六十四卦</Link>
       <div className={styles.header}>
-        <div className={styles.symbol}>{hex.unicode}</div>
-        <h1 className={styles.name}>{hex.name}<span className={styles.id}>第{hex.id}卦</span></h1>
+        <h1 className={styles.name}>{fullName}<span className={styles.id}>第{hex.id}卦</span></h1>
         <HexagramDisplay lines={hex.lines} size="large" />
         <p className={styles.trigrams}>{hex.lowerTrigram}下{hex.upperTrigram}上</p>
       </div>

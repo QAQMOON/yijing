@@ -1,3 +1,4 @@
+import { BRAND_NAME } from '../data/siteConfig.js';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -9,7 +10,7 @@ export default function Footer() {
           易与天地准，故能弥纶天地之道
         </p>
         <p className={styles.copy}>
-          © {new Date().getFullYear()} 易理 · 三式合参
+          © {new Date().getFullYear()} {BRAND_NAME} · 卦命合参
         </p>
       </div>
     </footer>

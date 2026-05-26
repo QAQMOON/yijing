@@ -4,6 +4,11 @@
 .subtitle { color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--space-lg); }
 .divider { width: 40px; height: 1px; background: var(--color-accent); margin: 0 auto var(--space-2xl); }
 
+.metaGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-sm); max-width: 540px; margin: 0 auto var(--space-xl); }
+.metaGrid div { background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 8px; padding: var(--space-sm); display: flex; flex-direction: column; }
+.metaGrid span { font-size: 0.72rem; color: var(--color-text-muted); }
+.metaGrid strong { font-family: var(--font-heading); color: var(--color-accent-dark); }
+
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -82,6 +87,7 @@
 .infoCard p { color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 0; }
 
 @media (max-width: 480px) {
+  .metaGrid { grid-template-columns: repeat(2, 1fr); }
   .grid { max-width: 360px; }
   .palace { padding: var(--space-sm); }
   .detailRow { font-size: 0.7rem; }
