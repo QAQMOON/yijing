@@ -8,8 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node scripts/baziCalc.test.mjs",
-    "test:bazi": "node scripts/baziCalc.test.mjs"
+    "test": "node scripts/baziCalc.test.mjs && node scripts/dailyHexagram.test.mjs",
+    "test:bazi": "node scripts/baziCalc.test.mjs",
+    "test:daily": "node scripts/dailyHexagram.test.mjs"
   },
   "dependencies": {
     "lunar-javascript": "^1.7.7",
