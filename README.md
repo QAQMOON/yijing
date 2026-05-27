@@ -15,9 +15,7 @@
 
 ## 页面效果
 
-| 首页 | 紫微斗数输入 | 紫微斗数排盘 |
-| --- | --- | --- |
-| ![首页](docs/assets/home.png) | ![紫微斗数输入](docs/assets/ziwei-input.png) | ![紫微斗数排盘](docs/assets/ziwei-chart.png) |
+![奇门遁甲起局页面](docs/assets/qimen-home.png)
 
 ## 本地开发
 

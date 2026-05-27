@@ -67,7 +67,7 @@ function CenterPanel({ chart }) {
 
   return (
     <section className={styles.centerPanel}>
-      <p className={styles.systemTitle}>元亨利贞网紫微斗数在线排盘系统</p>
+      <p className={styles.systemTitle}>紫微斗数</p>
       <div className={styles.coreGrid}>
         <span>盘类：{chart.plateTypeText}</span>
         <span>{chart.gender}命</span>
@@ -103,7 +103,7 @@ export default function ZiWeiChart() {
       <div className={styles.divider} />
 
       <div className={styles.frame}>
-        <div className={styles.frameTitle}>元亨利贞网紫微斗数在线排盘系统</div>
+        <div className={styles.frameTitle}>紫微斗数</div>
         <div className={styles.chartGrid}>
           {chart.palaces.map((palace) => <PalaceCell key={palace.index} palace={palace} />)}
           <CenterPanel chart={chart} />
