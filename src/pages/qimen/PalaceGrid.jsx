@@ -1,52 +1,103 @@
-﻿import { Helmet } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { Link, useSearchParams } from 'react-router-dom';
 import { calculateQiMen } from '../../utils/qimenCalc.js';
 import { dateFromSearchParams, formatDateTimeCN } from '../../utils/dateTime.js';
 import styles from './PalaceGrid.module.css';
 
-const GRID_ORDER = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+const METHOD_LABELS = {
+  rotating: '转盘奇门',
+  flying: '飞盘奇门',
+};
+
+const JU_METHOD_LABELS = {
+  chaibu: '拆补无闰法',
+  zhirun: '超接置闰法',
+};
+
+function MetaRow({ label, children }) {
+  return (
+    <div className={styles.metaRow}>
+      <span>{label}</span>
+      <div>{children}</div>
+    </div>
+  );
+}
 
 export default function PalaceGrid() {
   const [params] = useSearchParams();
   const date = dateFromSearchParams(params);
-  const chart = calculateQiMen(date);
+  const plate = params.get('plate') || 'rotating';
+  const juMethod = params.get('juMethod') || 'chaibu';
+  const chart = calculateQiMen(date, {
+    method: METHOD_LABELS[plate] || '转盘奇门',
+    juMethod: JU_METHOD_LABELS[juMethod] || '拆补无闰法',
+  });
 
   return (
     <div className={styles.page}>
       <Helmet><title>奇门九宫 — 易解</title></Helmet>
       <Link to="/qimen" className={styles.back}>← 奇门遁甲</Link>
 
-      <h1 className={styles.title}>奇门九宫格</h1>
-      <p className={styles.subtitle}>{formatDateTimeCN(date)} · {chart.direction}{chart.ju}局</p>
+      <h1 className={styles.title}>奇门遁甲排盘</h1>
+      <p className={styles.subtitle}>{chart.direction}{chart.ju}局 · {chart.yuan} · {chart.dutyStar}值符 / {chart.dutyDoor}值使</p>
       <div className={styles.divider} />
 
-      <div className={styles.metaGrid}>
-        <div><span>值符</span><strong>{chart.dutyStar}</strong></div>
-        <div><span>值使</span><strong>{chart.dutyDoor}</strong></div>
-        <div><span>日柱</span><strong>{chart.dayPillar.full}</strong></div>
-        <div><span>时支</span><strong>{chart.hourBranch}</strong></div>
-      </div>
+      <section className={styles.metaPanel} aria-label="奇门排盘信息">
+        <MetaRow label="方式">
+          <strong>{chart.method}</strong>
+          <strong>{chart.juMethod}</strong>
+        </MetaRow>
+        <MetaRow label="时间">
+          <strong>{formatDateTimeCN(date)}</strong>
+        </MetaRow>
+        <MetaRow label="农历">
+          <strong>{chart.lunarText}</strong>
+        </MetaRow>
+        <MetaRow label="干支">
+          <strong>{chart.pillars.year.full}</strong>
+          <strong>{chart.pillars.month.full}</strong>
+          <strong>{chart.pillars.day.full}</strong>
+          <strong>{chart.pillars.hour.full}</strong>
+        </MetaRow>
+        <MetaRow label="旬空">
+          <strong>{chart.xun.voidBranches}</strong>
+          <span>{chart.xun.head}旬首为{chart.xun.chiefStem}</span>
+        </MetaRow>
+        <MetaRow label="节气">
+          <span>上一节气：{chart.termText.previous}</span>
+          <span>下一节气：{chart.termText.next}</span>
+        </MetaRow>
+        <MetaRow label="局盘">
+          <strong>{chart.termName}{chart.yuan}</strong>
+          <strong>{chart.direction}{chart.ju}局</strong>
+          <span>值符{chart.dutyStar}落{chart.dutyTarget}宫</span>
+          <span>值使{chart.dutyDoor}落{chart.dutyTarget}宫</span>
+        </MetaRow>
+      </section>
 
       <div className={styles.grid}>
-        {GRID_ORDER.map(i => (
-          <div key={i} className={`${styles.palace} ${chart.palaces[i].pos === 5 ? styles.center : ''}`}>
+        {chart.palaces.map((palace) => (
+          <div key={palace.pos} className={`${styles.palace} ${palace.pos === 5 ? styles.center : ''}`}>
             <div className={styles.palaceHeader}>
-              <span className={styles.palaceName}>{chart.palaces[i].name}</span>
-              <span className={styles.palaceNum}>{chart.palaces[i].pos} · {chart.palaces[i].direction}</span>
+              <span className={styles.palaceName}>{palace.name}{palace.pos === 5 ? '宫' : ''}</span>
+              <span className={styles.palaceNum}>{palace.pos} · {palace.direction}</span>
             </div>
             <div className={styles.palaceBody}>
-              <div className={styles.detailRow}><span className={styles.label}>门</span><span className={styles.val}>{chart.palaces[i].door}</span></div>
-              <div className={styles.detailRow}><span className={styles.label}>星</span><span className={styles.val}>{chart.palaces[i].star}</span></div>
-              <div className={styles.detailRow}><span className={styles.label}>神</span><span className={styles.val}>{chart.palaces[i].god}</span></div>
-              <div className={styles.detailRow}><span className={styles.label}>仪</span><span className={`${styles.val} ${styles.stem}`}>{chart.palaces[i].stem}</span></div>
+              <div className={styles.mainLine}>
+                <strong>{palace.god || '—'}</strong>
+                <strong>{palace.star || '—'}</strong>
+              </div>
+              <div className={styles.mainLine}>
+                <span>{palace.door || '—'}</span>
+                <span className={styles.stem}>{palace.stem || '—'}</span>
+              </div>
+              <div className={styles.detailRow}><span>神</span><b>{palace.god || '—'}</b></div>
+              <div className={styles.detailRow}><span>门</span><b>{palace.door || '—'}</b></div>
+              <div className={styles.detailRow}><span>星</span><b>{palace.star || '—'}</b></div>
+              <div className={styles.detailRow}><span>仪</span><b>{palace.stem || '—'}</b></div>
             </div>
           </div>
         ))}
-      </div>
-
-      <div className={styles.infoCard}>
-        <h3>关于奇门遁甲</h3>
-        <p>此为学习版时家奇门盘。当前按公历时间近似取阴阳遁与局数，再排八门、九星、八神与三奇六仪，适合前端排盘展示和学习参考。后续可继续接入节气、拆补置闰等精排算法。</p>
       </div>
     </div>
   );

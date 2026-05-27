@@ -1,19 +1,110 @@
-.page { max-width: 700px; margin: 0 auto; text-align: center; }
+.page { max-width: 760px; margin: 0 auto; text-align: center; }
 .title { font-size: 2.5rem; letter-spacing: 0.4em; margin-bottom: var(--space-sm); }
 .subtitle { color: var(--color-text-secondary); margin-bottom: var(--space-xl); }
 .divider { width: 40px; height: 1px; background: var(--color-accent); margin: 0 auto var(--space-xl); }
-.desc { line-height: 2; color: var(--color-text-secondary); margin-bottom: var(--space-2xl); }
-.panel { display: grid; grid-template-columns: 1fr; gap: var(--space-md); max-width: 460px; margin: 0 auto var(--space-2xl); }
-.btn { display: inline-block; padding: 11px 28px; background: var(--color-accent); color: #fff; border: 0; border-radius: 6px; font-family: var(--font-heading); font-size: 1rem; }
-.btn:hover { background: var(--color-accent-dark); color: #fff; }
-.btnOutline { display: inline-block; padding: 11px 28px; border: 1px solid var(--color-accent); background: transparent; color: var(--color-accent-dark); border-radius: 6px; font-family: var(--font-heading); font-size: 1rem; }
-.btnOutline:hover { background: var(--color-bg-dark); }
-.timeRow { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: var(--space-md); text-align: left; color: var(--color-text-secondary); font-size: 0.9rem; }
-.timeRow input { width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-bg-light); color: var(--color-text-primary); font-family: var(--font-body); }
-.timeRow input:focus { outline: none; border-color: var(--color-accent); }
-.notice { margin-top: var(--space-2xl); padding: var(--space-lg); background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 8px; }
-.notice p { color: var(--color-text-muted); margin-bottom: 0; }
+.desc { line-height: 2; color: var(--color-text-secondary); margin-bottom: var(--space-2xl); text-align: left; }
 
-@media (max-width: 520px) {
-  .timeRow { grid-template-columns: 1fr; gap: var(--space-sm); }
+.panel {
+  display: grid;
+  gap: var(--space-xl);
+  margin: 0 auto var(--space-2xl);
+  padding: var(--space-xl);
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.timeLine {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+  color: var(--color-text-secondary);
+}
+
+.rowLabel {
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+}
+
+.timeLine label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  white-space: nowrap;
+}
+
+.timeLine select {
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  padding: 0 var(--space-sm);
+}
+
+.optionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: var(--space-md) var(--space-xl);
+  max-width: 520px;
+  margin: 0 auto;
+  color: var(--color-accent-dark);
+  text-align: left;
+}
+
+.optionGrid label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.optionGrid input {
+  accent-color: var(--color-accent);
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.btn,
+.btnOutline {
+  display: inline-block;
+  min-width: 150px;
+  padding: 11px 28px;
+  border-radius: 6px;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+}
+
+.btn {
+  background: var(--color-accent);
+  color: #fff;
+  border: 1px solid var(--color-accent);
+}
+
+.btn:hover { background: var(--color-accent-dark); color: #fff; }
+
+.btnOutline {
+  border: 1px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-accent-dark);
+}
+
+.btnOutline:hover { background: var(--color-bg-dark); }
+
+@media (max-width: 560px) {
+  .page { text-align: center; }
+  .title { letter-spacing: 0.25em; text-indent: 0.25em; }
+  .panel { padding: var(--space-lg); }
+  .timeLine { align-items: stretch; flex-direction: column; }
+  .timeLine label { justify-content: space-between; }
+  .timeLine select { width: 100%; }
+  .optionGrid { grid-template-columns: 1fr; }
+  .actions { flex-direction: column; }
 }
