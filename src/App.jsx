@@ -15,6 +15,8 @@ import DaLiuRenHome from './pages/daliuren/DaLiuRenHome.jsx';
 import ThreePans from './pages/daliuren/ThreePans.jsx';
 import QiMenHome from './pages/qimen/QiMenHome.jsx';
 import PalaceGrid from './pages/qimen/PalaceGrid.jsx';
+import ZiWeiHome from './pages/ziwei/ZiWeiHome.jsx';
+import ZiWeiChart from './pages/ziwei/ZiWeiChart.jsx';
 import ReadingHistory from './pages/ReadingHistory.jsx';
 
 export default function App() {
@@ -31,6 +33,8 @@ export default function App() {
           <Route path="/bazi" element={<BaZiHome />} />
           <Route path="/bazi/chart" element={<InputBirthData />} />
           <Route path="/bazi/result" element={<BaZiChart />} />
+          <Route path="/ziwei" element={<ZiWeiHome />} />
+          <Route path="/ziwei/chart" element={<ZiWeiChart />} />
           <Route path="/daliuren" element={<DaLiuRenHome />} />
           <Route path="/daliuren/display" element={<ThreePans />} />
           <Route path="/qimen" element={<QiMenHome />} />

@@ -16,6 +16,15 @@ export const THEMES = [
   { id: 'moon', name: '月白' },
 ];
 
+export const TOOL_NAV = [
+  { to: '/liuyao', label: '六爻' },
+  { to: '/bazi', label: '八字' },
+  { to: '/ziwei', label: '紫微斗数' },
+  { to: '/daliuren', label: '大六壬' },
+  { to: '/qimen', label: '奇门遁甲' },
+  { to: '/history', label: '卦历' },
+];
+
 export function getRandomBrandTagline() {
   const index = Math.floor(Math.random() * BRAND_TAGLINES.length);
   return BRAND_TAGLINES[index];

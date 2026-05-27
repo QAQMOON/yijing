@@ -8,12 +8,14 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node scripts/baziCalc.test.mjs && node scripts/dailyHexagram.test.mjs && node scripts/qimenCalc.test.mjs",
+    "test": "node scripts/baziCalc.test.mjs && node scripts/dailyHexagram.test.mjs && node scripts/qimenCalc.test.mjs && node scripts/ziweiCalc.test.mjs",
     "test:bazi": "node scripts/baziCalc.test.mjs",
     "test:daily": "node scripts/dailyHexagram.test.mjs",
-    "test:qimen": "node scripts/qimenCalc.test.mjs"
+    "test:qimen": "node scripts/qimenCalc.test.mjs",
+    "test:ziwei": "node scripts/ziweiCalc.test.mjs"
   },
   "dependencies": {
+    "iztro": "^2.5.8",
     "lunar-javascript": "^1.7.7",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",

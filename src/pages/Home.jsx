@@ -66,6 +66,12 @@ export default function Home() {
             to="/bazi"
           />
           <ToolCard
+            icon="✶"
+            title="紫微斗数"
+            description="十二宫垣，安星布曜。参命身、大限与四化，观格局流转。"
+            to="/ziwei"
+          />
+          <ToolCard
             icon="◎"
             title="大六壬"
             description="古三式之冠。天地人三盘叠合，三传四课构建事象。"

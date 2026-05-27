@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
-import { BRAND_NAME, getRandomBrandTagline } from '../data/siteConfig.js';
+import { BRAND_NAME, TOOL_NAV, getRandomBrandTagline } from '../data/siteConfig.js';
 import { useTheme } from '../hooks/useTheme.js';
 import styles from './Header.module.css';
 
@@ -17,11 +17,11 @@ export default function Header() {
         </NavLink>
         <div className={styles.actions}>
           <nav className={styles.nav}>
-            <NavLink to="/liuyao" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>六爻</NavLink>
-            <NavLink to="/bazi" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>八字</NavLink>
-            <NavLink to="/daliuren" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>大六壬</NavLink>
-            <NavLink to="/qimen" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>奇门遁甲</NavLink>
-            <NavLink to="/history" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>卦历</NavLink>
+            {TOOL_NAV.map((item) => (
+              <NavLink key={item.to} to={item.to} className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>
+                {item.label}
+              </NavLink>
+            ))}
           </nav>
           <label className={styles.themeControl}>
             <span className={styles.themeLabel}>主题</span>
