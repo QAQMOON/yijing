@@ -16,6 +16,15 @@ const MANUAL_LINES = [
   { value: 9, line: 1, label: '老阳', detail: '阳爻发动' },
 ];
 
+const READING_META_KEYS = ['gender', 'question', 'scope', 'calendar', 'birthYear'];
+
+function appendReadingMeta(params, searchParams) {
+  READING_META_KEYS.forEach((key) => {
+    const value = searchParams.get(key);
+    if (value) params.set(key, value);
+  });
+}
+
 export default function CoinCast() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -60,7 +69,7 @@ export default function CoinCast() {
   };
 
   const castRandom = () => {
-    applyReading(performReading(), '随机起卦(赛锦囊)：三钱随机六次成卦');
+    applyReading(performReading(), '随机起卦：三钱随机六次成卦');
   };
 
   const addManualLine = (item) => {
@@ -87,6 +96,7 @@ export default function CoinCast() {
       dt: toDateTimeInputValue(castDate || new Date()),
       source: mode,
     });
+    appendReadingMeta(params, searchParams);
     navigate(`/liuyao/reading/${id}?${params.toString()}`);
   };
 
@@ -98,13 +108,13 @@ export default function CoinCast() {
     <div className={styles.page}>
       <Helmet><title>六爻起卦 — 易解</title></Helmet>
       <h1 className={styles.title}>六爻起卦</h1>
-      <p className={styles.subtitle}>电脑时间 · 随机起卦(赛锦囊) · 手动摇卦</p>
+      <p className={styles.subtitle}>电脑时间 · 随机起卦 · 手动摇卦</p>
       <div className={styles.divider} />
 
       <div className={styles.modeTabs}>
         {[
           ['time', '电脑时间'],
-          ['random', '随机起卦(赛锦囊)'],
+          ['random', '随机起卦'],
           ['manual', '手动摇卦'],
         ].map(([key, label]) => (
           <button

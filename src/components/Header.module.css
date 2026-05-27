@@ -9,6 +9,7 @@
 }
 
 .inner {
+  width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
   display: flex;
@@ -46,11 +47,13 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
+  min-width: 0;
 }
 
 .nav {
   display: flex;
   gap: var(--space-sm);
+  min-width: 0;
 }
 
 .link {
@@ -116,15 +119,26 @@
 }
 
 @media (max-width: 860px) {
+  .header {
+    padding: var(--space-md) var(--space-sm);
+  }
+
   .inner,
   .actions {
     align-items: stretch;
     flex-direction: column;
+    width: 100%;
+    min-width: 0;
   }
 
   .nav {
     flex-wrap: wrap;
     justify-content: center;
+    width: 100%;
+  }
+
+  .link {
+    padding: var(--space-xs) var(--space-sm);
   }
 
   .themeControl {

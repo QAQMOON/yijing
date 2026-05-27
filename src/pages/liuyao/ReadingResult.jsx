@@ -30,7 +30,7 @@ const LINE_VALUE_LABELS = {
 };
 const SOURCE_LABELS = {
   time: '电脑时间起卦',
-  random: '随机起卦(赛锦囊)',
+  random: '随机起卦',
   manual: '手动摇卦',
 };
 const LINE_POSITIONS = ['初', '二', '三', '四', '五', '上'];
@@ -235,6 +235,13 @@ export default function ReadingResult() {
       voidBranches,
       najiaRows,
       source: params.get('source') || '',
+      meta: {
+        gender: params.get('gender') || '',
+        question: params.get('question') || '',
+        scope: params.get('scope') || '',
+        calendar: params.get('calendar') || '',
+        birthYear: params.get('birthYear') || '',
+      },
       sixGods,
     };
   }, [id, params]);
@@ -261,6 +268,7 @@ export default function ReadingResult() {
     sixGods,
     solarTerms,
     source,
+    meta,
     values,
     voidBranches,
   } = reading;
@@ -279,6 +287,14 @@ export default function ReadingResult() {
           <span className={styles.infoLabel}>起卦方式</span>
           <strong>{SOURCE_LABELS[source] || '六爻起卦'}</strong>
         </div>
+        {(meta.question || meta.scope || meta.gender || meta.birthYear) && (
+          <div className={styles.infoRow}>
+            <span className={styles.infoLabel}>问事信息</span>
+            {meta.question && <span>占事：{meta.question}</span>}
+            {meta.scope && <span>范围：{meta.scope}</span>}
+            {(meta.gender || meta.birthYear) && <span>本人：{meta.birthYear && `${meta.birthYear}年生`}{meta.birthYear && meta.gender ? ' / ' : ''}{meta.gender}</span>}
+          </div>
+        )}
         <div className={styles.infoRow}>
           <span className={styles.infoLabel}>历法时间</span>
           <span>公历：{formatDateTimeCN(date)}</span>

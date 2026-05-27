@@ -79,7 +79,6 @@ function FlowYearTable({ years }) {
     <div className={styles.flowYearPanel}>
       <div className={styles.flowTitle}>
         <h3>流年</h3>
-        <p>从出生年起排至 100 岁，流年按当年六十甲子排列，与性别无关</p>
       </div>
       <div className={styles.flowScroller}>
         <div className={styles.flowGrid}>
@@ -136,7 +135,6 @@ export default function BaZiChart() {
           <span>起运</span>
           <strong>起运岁数：{baZi.startAgeText}</strong>
           <strong>交运时间：{baZi.transitText}</strong>
-          <em>{baZi.genderText}命 · {baZi.luckRuleText}</em>
         </div>
       </section>
 
@@ -149,7 +147,6 @@ export default function BaZiChart() {
       <section className={styles.section}>
         <div className={styles.sectionHead}>
           <h2>大运</h2>
-          <p>{baZi.directionText}，以月柱为起点每十年一运</p>
         </div>
         <div className={styles.luckGrid}>
           {baZi.luckPillars.map((item) => (
@@ -162,7 +159,6 @@ export default function BaZiChart() {
       <section className={styles.section}>
         <div className={styles.sectionHead}>
           <h2>神煞</h2>
-          <p>按年干、年支、月支、日干、日支分列</p>
         </div>
         <div className={styles.shenShaList}>
           {baZi.shenShaRows.map((row) => (
