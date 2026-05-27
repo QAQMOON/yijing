@@ -16,10 +16,8 @@
 ## 页面效果
 
 <p align="center">
-  <img src="docs/assets/qimen-home.png" width="180" alt="奇门遁甲起局页面" />
-  <img src="docs/assets/qimen-042429.png" width="180" alt="页面截图 1" />
-  <img src="docs/assets/qimen-042510.png" width="180" alt="页面截图 2" />
-  <img src="docs/assets/qimen-042549.png" width="180" alt="页面截图 3" />
-  <img src="docs/assets/qimen-042722.png" width="180" alt="页面截图 4" />
-  <img src="docs/assets/qimen-042748.png" width="180" alt="页面截图 5" />
+  <img src="docs/assets/qimen-home.png" width="170" alt="奇门遁甲起局页面" />
+  <img src="docs/assets/qimen-042429.png" width="170" alt="页面截图 1" />
+  <img src="docs/assets/qimen-042510.png" width="170" alt="页面截图 2" />
+  <img src="docs/assets/qimen-042549.png" width="170" alt="页面截图 3" />
 </p>
