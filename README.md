@@ -1,16 +1,47 @@
-# React + Vite
+# 易解
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+易解是一套面向中国术数的前端排盘站点，覆盖六爻、八字、大六壬、奇门遁甲与紫微斗数。项目采用 React + Vite 构建，目标不是做演示页，而是做能直接使用、能继续扩展的排盘工具。
 
-Currently, two official plugins are available:
+在线地址：<https://yijing-pi.vercel.app>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 主要内容
 
-## React Compiler
+- 六爻起卦与卦例阅读
+- 八字排盘与四柱命盘
+- 大六壬三盘排布
+- 奇门遁甲排盘
+- 紫微斗数在线排盘
+- 主题切换与历史记录
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 页面效果
 
-## Expanding the ESLint configuration
+| 首页 | 紫微斗数输入 | 紫微斗数排盘 |
+| --- | --- | --- |
+| ![首页](docs/assets/home.png) | ![紫微斗数输入](docs/assets/ziwei-input.png) | ![紫微斗数排盘](docs/assets/ziwei-chart.png) |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 本地开发
+
+```bash
+npm install
+npm run dev
+```
+
+## 验证命令
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+## 目录
+
+- `src/pages/` 页面
+- `src/components/` 通用组件
+- `src/utils/` 排盘与日期工具
+- `scripts/` 单元测试
+- `docs/assets/` README 截图
+
+## 说明
+
+紫微斗数排盘使用 `iztro` 作为算法底座，避免手写复杂星曜规则带来的偏差。其余术数模块继续保留项目原有的风格与交互方式。
