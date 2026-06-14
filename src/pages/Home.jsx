@@ -96,6 +96,18 @@ export default function Home() {
         </div>
       </section>
 
+      <section className={styles.matrixSection}>
+        <div className={styles.sectionHead}>
+          <h2>功能矩阵</h2>
+          <p>工具免费可用，AI 深度解读按积分消耗，三术合参作为后续付费报告。</p>
+        </div>
+        <div className={styles.cardGrid}>
+          {FEATURE_MATRIX.map((item) => (
+            <ToolCard key={item.title} {...item} />
+          ))}
+        </div>
+      </section>
+
       <section className={styles.productHero}>
         <div className={styles.heroCopy}>
           <p className={styles.brandLine}>{BRAND_NAME} · {tagline}</p>
@@ -120,18 +132,6 @@ export default function Home() {
             <span>结论、依据、建议、提醒</span>
           </div>
           <Link to="/reports" className={styles.panelLink}>进入报告历史</Link>
-        </div>
-      </section>
-
-      <section className={styles.matrixSection}>
-        <div className={styles.sectionHead}>
-          <h2>功能矩阵</h2>
-          <p>工具免费可用，AI 深度解读按积分消耗，三术合参作为后续付费报告。</p>
-        </div>
-        <div className={styles.cardGrid}>
-          {FEATURE_MATRIX.map((item) => (
-            <ToolCard key={item.title} {...item} />
-          ))}
         </div>
       </section>
 
