@@ -140,6 +140,7 @@ test('AI reading flow is saved with mocked DeepSeek response', async ({ page }) 
     const request = route.request();
     expect(request.method()).toBe('POST');
     expect(request.headers()['x-yijie-account-id']).toMatch(/^acct_/);
+    await new Promise((resolve) => setTimeout(resolve, 250));
     await route.fulfill({
       contentType: 'application/json',
       body: JSON.stringify({
@@ -159,6 +160,7 @@ test('AI reading flow is saved with mocked DeepSeek response', async ({ page }) 
   await page.goto('/liuyao/reading/1?lines=111111&values=7,7,7,7,7,7&source=random&question=%E5%B7%A5%E4%BD%9C%E9%80%89%E6%8B%A9');
   await expect(page.getByText('古籍依据会随请求传入')).toBeVisible();
   await page.getByRole('button', { name: '生成 AI 解读' }).click();
+  await expect(page.getByText('正在推演卦象，请稍候')).toBeVisible();
   await expect(page.getByText('这是 mock AI 解读')).toBeVisible();
 
   await page.goto('/reports');
@@ -199,6 +201,7 @@ test('bazi AI reading flow is saved with mocked DeepSeek response', async ({ pag
     expect(request.headers()['x-yijie-account-id']).toMatch(/^acct_/);
     expect(body.domain).toBe('bazi');
     expect(body.chart.pillars.year.full).toBeTruthy();
+    await new Promise((resolve) => setTimeout(resolve, 250));
     await route.fulfill({
       contentType: 'application/json',
       body: JSON.stringify({
@@ -219,6 +222,7 @@ test('bazi AI reading flow is saved with mocked DeepSeek response', async ({ pag
   await expect(page.getByText('八字 AI 深度解读')).toBeVisible();
   await expect(page.getByText('报告依据会随请求传入')).toBeVisible();
   await page.getByRole('button', { name: '生成八字 AI 解读' }).click();
+  await expect(page.getByText('正在推演命盘，请稍候')).toBeVisible();
   await expect(page.getByText('这是八字 mock AI 解读')).toBeVisible();
 
   await page.goto('/reports');

@@ -333,6 +333,110 @@
   color: var(--color-text-secondary);
 }
 
+.aiThinking {
+  position: relative;
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: var(--space-md);
+  align-items: center;
+  overflow: hidden;
+  padding: var(--space-md);
+  border: 1px solid rgba(184, 146, 42, 0.3);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255, 250, 240, 0.96), rgba(240, 235, 224, 0.86));
+}
+
+.aiThinking::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+  animation: aiSweep 1.9s ease-in-out infinite;
+}
+
+.aiThinkingOrb {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-bg-dark);
+}
+
+.aiThinkingOrb span {
+  --dot-x: 0;
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  animation: aiPulse 1.2s ease-in-out infinite;
+}
+
+.aiThinkingOrb span:nth-child(1) {
+  --dot-x: -11px;
+}
+
+.aiThinkingOrb span:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.aiThinkingOrb span:nth-child(3) {
+  --dot-x: 11px;
+  animation-delay: 0.36s;
+}
+
+.aiThinkingContent {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.aiThinkingContent strong {
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+}
+
+.aiThinkingContent p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+.aiThinkingSteps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.aiThinkingSteps span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: #fffdf8;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  animation: aiStep 1.5s ease-in-out infinite;
+}
+
+.aiThinkingSteps span:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.aiThinkingSteps span:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+.aiThinkingSteps span:nth-child(4) {
+  animation-delay: 0.42s;
+}
+
 .aiBasis {
   display: flex;
   flex-wrap: wrap;
@@ -413,6 +517,45 @@
   white-space: pre-wrap;
 }
 
+@keyframes aiPulse {
+  0%, 100% {
+    opacity: 0.36;
+    transform: translate(var(--dot-x), 0) scale(0.86);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(var(--dot-x), -3px) scale(1);
+  }
+}
+
+@keyframes aiSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  55%, 100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes aiStep {
+  0%, 100% {
+    color: var(--color-text-muted);
+    transform: translateY(0);
+  }
+  45% {
+    color: var(--color-accent-dark);
+    transform: translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aiThinking::before,
+  .aiThinkingOrb span,
+  .aiThinkingSteps span {
+    animation: none;
+  }
+}
+
 @media (max-width: 980px) {
   .pillars { grid-template-columns: repeat(2, 1fr); }
   .luckGrid { grid-template-columns: repeat(4, 1fr); }
@@ -434,5 +577,6 @@
   .aiControls label,
   .aiButton,
   .aiInlineLink { width: 100%; }
+  .aiThinking { grid-template-columns: 1fr; }
   .aiBasis { display: grid; }
 }

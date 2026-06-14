@@ -363,6 +363,26 @@ function BaZiAiReading({ baZi, stewardData, birthplace }) {
           </button>
         )}
 
+        {status === 'loading' && (
+          <div className={styles.aiThinking} role="status" aria-live="polite" aria-busy="true">
+            <div className={styles.aiThinkingOrb} aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
+            <div className={styles.aiThinkingContent}>
+              <strong>正在推演命盘，请稍候</strong>
+              <p>正在核对四柱、提取十神大运并组织解读报告。</p>
+              <div className={styles.aiThinkingSteps} aria-hidden="true">
+                <span>四柱</span>
+                <span>十神</span>
+                <span>大运</span>
+                <span>建议</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className={styles.aiBasis}>
           <strong>报告依据会随请求传入</strong>
           <span>四柱十神</span>

@@ -321,6 +321,26 @@ function DeepSeekReading({ payload, question }) {
           </button>
         )}
 
+        {status === 'loading' && (
+          <div className={styles.aiThinking} role="status" aria-live="polite" aria-busy="true">
+            <div className={styles.aiThinkingOrb} aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
+            <div className={styles.aiThinkingContent}>
+              <strong>正在推演卦象，请稍候</strong>
+              <p>正在校验卦盘、提取古籍依据并组织解读报告。</p>
+              <div className={styles.aiThinkingSteps} aria-hidden="true">
+                <span>卦象</span>
+                <span>动爻</span>
+                <span>纳甲</span>
+                <span>建议</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className={styles.classicBasis}>
           <strong>古籍依据会随请求传入</strong>
           <span>{payload.classicContext?.base?.title || payload.baseHex.name}</span>
