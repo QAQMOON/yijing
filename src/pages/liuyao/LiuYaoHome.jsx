@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { Lunar } from 'lunar-javascript';
 import { performReading, performTimeReading, linesToHexagramId } from '../../utils/coinCast.js';
@@ -172,7 +172,11 @@ export default function LiuYaoHome() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>六爻 — 易解</title></Helmet>
+      <Seo
+        title="六爻起卦排盘 · 纳甲与变卦 · 易解"
+        description="易解六爻工具支持电脑自动、时间起卦和手动摇卦，可填写占事范围，生成本卦、变卦、干支、六神与纳甲信息。"
+        path="/liuyao"
+      />
       <section className={styles.hero}>
         <h1 className={styles.title}>六 爻</h1>
         <p className={styles.subtitle}>以三钱摇卦，观六爻动变</p>

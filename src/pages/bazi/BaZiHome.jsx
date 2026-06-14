@@ -1,5 +1,5 @@
-﻿import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
+import Seo from '../../components/Seo.jsx';
 import styles from './BaZiHome.module.css';
 
 export default function BaZiHome() {
@@ -10,7 +10,11 @@ export default function BaZiHome() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>八字 — 易解</title></Helmet>
+      <Seo
+        title="八字排盘 · 四柱十神与大运流年 · 易解"
+        description="易解八字排盘支持按公历或农历输入生辰，以节气定年定月，展示四柱、十神、旺衰、纳音、神煞与大运流年。"
+        path="/bazi"
+      />
       <h1 className={styles.title}>八 字</h1>
       <p className={styles.subtitle}>四柱推命 · 十神生克</p>
       <div className={styles.divider} />

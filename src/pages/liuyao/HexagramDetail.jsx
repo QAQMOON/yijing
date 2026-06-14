@@ -1,5 +1,5 @@
 ﻿import { useParams, Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import HexagramDisplay from '../../components/HexagramDisplay.jsx';
 import { HEXAGRAMS } from '../../data/hexagrams.js';
 import { getHexagramFullName } from '../../utils/liuyaoMeta.js';
@@ -22,7 +22,11 @@ export default function HexagramDetail() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>{fullName} — 易解</title></Helmet>
+      <Seo
+        title={`${fullName} · 六十四卦 · 易解`}
+        description={`易解六十四卦：${fullName}，查看卦辞、象传、六爻爻辞与卦义。`}
+        path={`/liuyao/hexagram/${hex.id}`}
+      />
       <Link to="/liuyao/hexagrams" className={styles.back}>← 六十四卦</Link>
       <div className={styles.header}>
         <h1 className={styles.name}>{fullName}<span className={styles.id}>第{hex.id}卦</span></h1>

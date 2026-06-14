@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import { useNavigate } from 'react-router-dom';
 import styles from './QiMenHome.module.css';
 
@@ -75,7 +75,11 @@ export default function QiMenHome() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>奇门遁甲 — 易解</title></Helmet>
+      <Seo
+        title="奇门遁甲排盘 · 八门九星九宫 · 易解"
+        description="易解奇门遁甲工具支持按公历或四柱起局，提供转盘、飞盘、拆补无闰法与超接置闰法选项。"
+        path="/qimen"
+      />
       <h1 className={styles.title}>奇门遁甲</h1>
       <p className={styles.subtitle}>八门九星 · 择时定方</p>
       <div className={styles.divider} />

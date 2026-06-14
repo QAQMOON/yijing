@@ -1,6 +1,6 @@
 ﻿import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import Seo from '../components/Seo.jsx';
 import { useReadingHistory } from '../hooks/useReadingHistory.js';
 import { HEXAGRAMS } from '../data/hexagrams.js';
 import { getHexagramFullName } from '../utils/liuyaoMeta.js';
@@ -24,7 +24,11 @@ export default function ReadingHistory() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>我的卦历 — 易解</title></Helmet>
+      <Seo
+        title="我的卦历 · 本地排盘记录 · 易解"
+        description="易解卦历在浏览器本地保存每日一卦和六爻起卦记录，支持备注、导入和导出备份。"
+        path="/history"
+      />
       <div className={styles.header}>
         <h1 className={styles.title}>我的卦历</h1>
         <p className={styles.subtitle}>排卦记录 · 日积月累</p>

@@ -1,47 +1,58 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
-import Home from './pages/Home.jsx';
-import NotFound from './pages/NotFound.jsx';
-import LiuYaoHome from './pages/liuyao/LiuYaoHome.jsx';
-import HexagramLibrary from './pages/liuyao/HexagramLibrary.jsx';
-import HexagramDetail from './pages/liuyao/HexagramDetail.jsx';
-import CoinCast from './pages/liuyao/CoinCast.jsx';
-import ReadingResult from './pages/liuyao/ReadingResult.jsx';
-import BaZiHome from './pages/bazi/BaZiHome.jsx';
-import InputBirthData from './pages/bazi/InputBirthData.jsx';
-import BaZiChart from './pages/bazi/BaZiChart.jsx';
-import DaLiuRenHome from './pages/daliuren/DaLiuRenHome.jsx';
-import ThreePans from './pages/daliuren/ThreePans.jsx';
-import QiMenHome from './pages/qimen/QiMenHome.jsx';
-import PalaceGrid from './pages/qimen/PalaceGrid.jsx';
-import ZiWeiHome from './pages/ziwei/ZiWeiHome.jsx';
-import ZiWeiChart from './pages/ziwei/ZiWeiChart.jsx';
-import ReadingHistory from './pages/ReadingHistory.jsx';
+import LoadingSpinner from './components/LoadingSpinner.jsx';
+
+const Home = lazy(() => import('./pages/Home.jsx'));
+const NotFound = lazy(() => import('./pages/NotFound.jsx'));
+const LiuYaoHome = lazy(() => import('./pages/liuyao/LiuYaoHome.jsx'));
+const HexagramLibrary = lazy(() => import('./pages/liuyao/HexagramLibrary.jsx'));
+const HexagramDetail = lazy(() => import('./pages/liuyao/HexagramDetail.jsx'));
+const CoinCast = lazy(() => import('./pages/liuyao/CoinCast.jsx'));
+const ReadingResult = lazy(() => import('./pages/liuyao/ReadingResult.jsx'));
+const BaZiHome = lazy(() => import('./pages/bazi/BaZiHome.jsx'));
+const InputBirthData = lazy(() => import('./pages/bazi/InputBirthData.jsx'));
+const BaZiChart = lazy(() => import('./pages/bazi/BaZiChart.jsx'));
+const DaLiuRenHome = lazy(() => import('./pages/daliuren/DaLiuRenHome.jsx'));
+const ThreePans = lazy(() => import('./pages/daliuren/ThreePans.jsx'));
+const QiMenHome = lazy(() => import('./pages/qimen/QiMenHome.jsx'));
+const PalaceGrid = lazy(() => import('./pages/qimen/PalaceGrid.jsx'));
+const ZiWeiHome = lazy(() => import('./pages/ziwei/ZiWeiHome.jsx'));
+const ZiWeiChart = lazy(() => import('./pages/ziwei/ZiWeiChart.jsx'));
+const ReadingHistory = lazy(() => import('./pages/ReadingHistory.jsx'));
+const Privacy = lazy(() => import('./pages/Privacy.jsx'));
+const Roadmap = lazy(() => import('./pages/Roadmap.jsx'));
+const Terms = lazy(() => import('./pages/Terms.jsx'));
 
 export default function App() {
   return (
     <ErrorBoundary>
       <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/liuyao" element={<LiuYaoHome />} />
-          <Route path="/liuyao/hexagrams" element={<HexagramLibrary />} />
-          <Route path="/liuyao/hexagram/:id" element={<HexagramDetail />} />
-          <Route path="/liuyao/cast" element={<CoinCast />} />
-          <Route path="/liuyao/reading/:id" element={<ReadingResult />} />
-          <Route path="/bazi" element={<BaZiHome />} />
-          <Route path="/bazi/chart" element={<InputBirthData />} />
-          <Route path="/bazi/result" element={<BaZiChart />} />
-          <Route path="/ziwei" element={<ZiWeiHome />} />
-          <Route path="/ziwei/chart" element={<ZiWeiChart />} />
-          <Route path="/daliuren" element={<DaLiuRenHome />} />
-          <Route path="/daliuren/display" element={<ThreePans />} />
-          <Route path="/qimen" element={<QiMenHome />} />
-          <Route path="/qimen/display" element={<PalaceGrid />} />
-          <Route path="/history" element={<ReadingHistory />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/liuyao" element={<LiuYaoHome />} />
+            <Route path="/liuyao/hexagrams" element={<HexagramLibrary />} />
+            <Route path="/liuyao/hexagram/:id" element={<HexagramDetail />} />
+            <Route path="/liuyao/cast" element={<CoinCast />} />
+            <Route path="/liuyao/reading/:id" element={<ReadingResult />} />
+            <Route path="/bazi" element={<BaZiHome />} />
+            <Route path="/bazi/chart" element={<InputBirthData />} />
+            <Route path="/bazi/result" element={<BaZiChart />} />
+            <Route path="/ziwei" element={<ZiWeiHome />} />
+            <Route path="/ziwei/chart" element={<ZiWeiChart />} />
+            <Route path="/daliuren" element={<DaLiuRenHome />} />
+            <Route path="/daliuren/display" element={<ThreePans />} />
+            <Route path="/qimen" element={<QiMenHome />} />
+            <Route path="/qimen/display" element={<PalaceGrid />} />
+            <Route path="/history" element={<ReadingHistory />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/roadmap" element={<Roadmap />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </Layout>
     </ErrorBoundary>
   );

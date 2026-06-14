@@ -1,4 +1,5 @@
-import { BRAND_NAME } from '../data/siteConfig.js';
+import { Link } from 'react-router-dom';
+import { BRAND_NAME, FOOTER_NAV } from '../data/siteConfig.js';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -12,6 +13,11 @@ export default function Footer() {
         <p className={styles.copy}>
           © {new Date().getFullYear()} {BRAND_NAME} · 卦命合参
         </p>
+        <nav className={styles.links} aria-label="页脚链接">
+          {FOOTER_NAV.map((item) => (
+            <Link key={item.to} to={item.to}>{item.label}</Link>
+          ))}
+        </nav>
       </div>
     </footer>
   );

@@ -1,6 +1,6 @@
-import { Helmet } from 'react-helmet-async';
 import { useMemo } from 'react';
 import HexagramDisplay from '../components/HexagramDisplay.jsx';
+import Seo from '../components/Seo.jsx';
 import ToolCard from '../components/ToolCard.jsx';
 import SaveReading from '../components/SaveReading.jsx';
 import { useReadingHistory } from '../hooks/useReadingHistory.js';
@@ -21,9 +21,11 @@ export default function Home() {
 
   return (
     <div className={styles.home}>
-      <Helmet>
-        <title>{BRAND_NAME} · {tagline}</title>
-      </Helmet>
+      <Seo
+        title={`${BRAND_NAME} · ${tagline}`}
+        description="易解提供六爻起卦、八字排盘、紫微斗数、大六壬、奇门遁甲与每日一卦，适合作为传统术数文化的在线学习和排盘工具。"
+        path="/"
+      />
 
       {/* Hero — Daily Hexagram */}
       <section className={styles.hero}>

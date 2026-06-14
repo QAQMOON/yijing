@@ -1,4 +1,4 @@
-﻿import { Helmet } from 'react-helmet-async';
+﻿import Seo from '../../components/Seo.jsx';
 import { Link, useSearchParams } from 'react-router-dom';
 import { calculateDaLiuRen } from '../../utils/daliurenCalc.js';
 import { dateFromSearchParams, formatDateTimeCN } from '../../utils/dateTime.js';
@@ -11,7 +11,11 @@ export default function ThreePans() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>大六壬三盘 — 易解</title></Helmet>
+      <Seo
+        title="大六壬三盘结果 · 易解"
+        description="查看易解大六壬排盘结果，包括月将、占时、天地人三盘、十二天将、四课与三传展示。"
+        path="/daliuren/display"
+      />
       <Link to="/daliuren" className={styles.back}>← 大六壬</Link>
 
       <h1 className={styles.title}>天地人三盘</h1>

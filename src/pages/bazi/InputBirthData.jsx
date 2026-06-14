@@ -1,6 +1,6 @@
 ﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import { toDateTimeInputValue } from '../../utils/dateTime.js';
 import styles from './InputBirthData.module.css';
 
@@ -53,7 +53,11 @@ export default function InputBirthData() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>输入生辰 · 八字排盘 · 易解</title></Helmet>
+      <Seo
+        title="输入生辰 · 八字排盘 · 易解"
+        description="输入公历或农历出生时间与性别，生成易解八字四柱排盘。排盘以节气定年月，并展示大运、流年、神煞等基础信息。"
+        path="/bazi/chart"
+      />
       <h1 className={styles.title}>八字排盘</h1>
       <p className={styles.subtitle}>请输入出生日期、时辰与性别</p>
       <div className={styles.divider} />

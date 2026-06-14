@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import { useNavigate } from 'react-router-dom';
 import styles from './ZiWeiHome.module.css';
 
@@ -71,7 +71,11 @@ export default function ZiWeiHome() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>紫微斗数 — 易解</title></Helmet>
+      <Seo
+        title="紫微斗数排盘 · 十二宫与星曜四化 · 易解"
+        description="易解紫微斗数工具支持阳历或农历生日、男女命、天盘地盘人盘与闰月修正，生成十二宫星曜排盘。"
+        path="/ziwei"
+      />
       <h1 className={styles.title}>紫微斗数</h1>
       <p className={styles.subtitle}>十二宫垣 · 星曜四化</p>
       <div className={styles.divider} />

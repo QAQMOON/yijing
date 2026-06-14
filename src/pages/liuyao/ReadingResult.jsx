@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import SaveReading from '../../components/SaveReading.jsx';
 import { useReadingHistory } from '../../hooks/useReadingHistory.js';
 import { HEXAGRAMS } from '../../data/hexagrams.js';
@@ -279,7 +279,11 @@ export default function ReadingResult() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>六爻排盘 — {baseFullName}之{changedFullName} — 易解</title></Helmet>
+      <Seo
+        title={`六爻排盘 · ${baseFullName}之${changedFullName} · 易解`}
+        description={`易解六爻排盘结果：本卦${baseFullName}，变卦${changedFullName}，展示干支、六神、纳甲、动爻、卦辞与电脑解卦。`}
+        path={`/liuyao/reading/${baseHex.id}`}
+      />
       <p className={styles.breadcrumb}>← <Link to="/liuyao/cast">重新起卦</Link></p>
 
       <section className={styles.topInfoBox} aria-label="排盘基础信息">

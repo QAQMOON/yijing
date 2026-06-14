@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import { useNavigate } from 'react-router-dom';
 import { toDateTimeInputValue } from '../../utils/dateTime.js';
 import styles from './DaLiuRenHome.module.css';
@@ -19,7 +19,11 @@ export default function DaLiuRenHome() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>大六壬 — 易解</title></Helmet>
+      <Seo
+        title="大六壬排盘 · 天地人三盘 · 易解"
+        description="易解大六壬工具按时间起课，展示月将加时、天地人三盘、四课与三传，适合传统三式学习与排盘查看。"
+        path="/daliuren"
+      />
       <h1 className={styles.title}>大 六 壬</h1>
       <p className={styles.subtitle}>古三式之冠 · 天地人三盘</p>
       <div className={styles.divider} />

@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import { Link, useSearchParams } from 'react-router-dom';
 import { calculateQiMen } from '../../utils/qimenCalc.js';
 import { dateFromSearchParams, formatDateTimeCN } from '../../utils/dateTime.js';
@@ -35,7 +35,11 @@ export default function PalaceGrid() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>奇门九宫 — 易解</title></Helmet>
+      <Seo
+        title="奇门九宫排盘结果 · 易解"
+        description="查看易解奇门遁甲九宫结果，包括阴阳遁、局数、值符值使、八门、九星、八神、三奇六仪与旬空节气。"
+        path="/qimen/display"
+      />
       <Link to="/qimen" className={styles.back}>← 奇门遁甲</Link>
 
       <h1 className={styles.title}>奇门遁甲排盘</h1>

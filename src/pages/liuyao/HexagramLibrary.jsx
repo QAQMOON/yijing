@@ -1,5 +1,5 @@
 ﻿import { useState, useMemo } from 'react';
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import HexagramCard from '../../components/HexagramCard.jsx';
 import { HEXAGRAMS } from '../../data/hexagrams.js';
 import { getHexagramFullName } from '../../utils/liuyaoMeta.js';
@@ -21,7 +21,11 @@ export default function HexagramLibrary() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>六十四卦 — 易解</title></Helmet>
+      <Seo
+        title="六十四卦查询 · 文王卦序 · 易解"
+        description="易解六十四卦库支持按卦名、卦辞、含义、上下卦和序号检索，查看每一卦的卦辞、象传与爻辞。"
+        path="/liuyao/hexagrams"
+      />
       <h1 className={styles.title}>六十 四 卦</h1>
       <p className={styles.subtitle}>文王六十四卦序</p>
       <div className={styles.divider} />

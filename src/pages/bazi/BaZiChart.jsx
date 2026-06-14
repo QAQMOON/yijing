@@ -1,6 +1,6 @@
 ﻿import { useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import { calculateBaZiFromDate, calculateBaZiFromLunar } from '../../utils/baziCalc.js';
 import { dateFromSearchParams } from '../../utils/dateTime.js';
 import styles from './BaZiChart.module.css';
@@ -117,7 +117,11 @@ export default function BaZiChart() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>八字排盘 · {baZi.solarText} · 易解</title></Helmet>
+      <Seo
+        title={`八字排盘 · ${baZi.solarText} · 易解`}
+        description={`易解八字排盘结果：${baZi.solarText}，展示四柱、十神、旺衰、纳音、神煞、大运与流年。`}
+        path="/bazi/result"
+      />
       <Link to="/bazi/chart" className={styles.backLink}>← 重新排盘</Link>
 
       <section className={styles.topInfo}>

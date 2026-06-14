@@ -1,6 +1,6 @@
 ﻿import { useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import HexagramDisplay from '../../components/HexagramDisplay.jsx';
 import { performReading, performTimeReading, linesToHexagramId } from '../../utils/coinCast.js';
 import { HEXAGRAMS } from '../../data/hexagrams.js';
@@ -106,7 +106,11 @@ export default function CoinCast() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>六爻起卦 — 易解</title></Helmet>
+      <Seo
+        title="六爻起卦 · 电脑时间与手动摇卦 · 易解"
+        description="易解六爻起卦支持电脑时间、随机起卦与手动摇卦，记录六爻动静并生成本卦、变卦和纳甲排盘。"
+        path="/liuyao/cast"
+      />
       <h1 className={styles.title}>六爻起卦</h1>
       <p className={styles.subtitle}>电脑时间 · 随机起卦 · 手动摇卦</p>
       <div className={styles.divider} />

@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import Seo from '../../components/Seo.jsx';
 import { Link, useSearchParams } from 'react-router-dom';
 import { calculateZiWei, paramsToZiWeiOptions } from '../../utils/ziweiCalc.js';
 import styles from './ZiWeiChart.module.css';
@@ -96,7 +96,11 @@ export default function ZiWeiChart() {
 
   return (
     <div className={styles.page}>
-      <Helmet><title>紫微斗数排盘 — 易解</title></Helmet>
+      <Seo
+        title="紫微斗数排盘结果 · 十二宫命盘 · 易解"
+        description="查看易解紫微斗数命盘结果，包括命身十二宫、主星辅星、四化、大限、小限、流年、流月与命身主信息。"
+        path="/ziwei/chart"
+      />
       <Link to="/ziwei" className={styles.back}>← 紫微斗数</Link>
       <h1 className={styles.title}>紫微斗数排盘</h1>
       <p className={styles.subtitle}>{chart.calendarText} {chart.dateText} · {chart.gender}命 · {chart.plateTypeText}</p>

@@ -1,0 +1,88 @@
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--space-xl) 0 var(--space-2xl);
+}
+
+.eyebrow {
+  margin-bottom: var(--space-sm);
+  color: var(--color-accent-dark);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+}
+
+.title {
+  margin-bottom: var(--space-sm);
+  font-size: 2rem;
+  letter-spacing: 0.12em;
+}
+
+.updated {
+  margin-bottom: var(--space-xl);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.section {
+  padding: var(--space-lg) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.section h2 {
+  margin-bottom: var(--space-sm);
+  color: var(--color-accent-dark);
+  font-size: 1.15rem;
+}
+
+.section p,
+.section li {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+.section ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.roadmap {
+  display: grid;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.stage {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-light);
+  padding: var(--space-lg);
+}
+
+.stageHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.stageHeader h2 {
+  margin: 0;
+}
+
+.status {
+  color: var(--color-accent-dark);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding-top: var(--space-md);
+  }
+
+  .stageHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
