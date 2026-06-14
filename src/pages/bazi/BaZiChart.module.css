@@ -34,6 +34,97 @@
   font-size: 0.86rem;
 }
 
+.stewardPanel {
+  display: grid;
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-light);
+  box-shadow: 0 12px 32px var(--color-shadow);
+}
+.stewardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+.stewardHead p {
+  margin: 0 0 2px;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+.stewardHead h2 {
+  color: var(--color-accent-dark);
+  font-size: 1.1rem;
+}
+.stewardHead > span {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-bg-dark);
+  color: var(--color-accent-dark);
+  font-size: 0.78rem;
+}
+.stewardState,
+.stewardError,
+.stewardFoot {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.86rem;
+}
+.stewardError {
+  color: #b04a3b;
+}
+.stewardFacts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+.stewardFacts div {
+  display: grid;
+  gap: 3px;
+  min-height: 92px;
+  padding: var(--space-md);
+  border: 1px solid rgba(221, 214, 200, 0.74);
+  border-radius: 8px;
+  background: #fffdf8;
+}
+.stewardFacts span,
+.stewardFacts small {
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+}
+.stewardFacts strong {
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.stewardLuck {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+.stewardLuck span {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--color-bg-dark);
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+}
+.stewardLuck small {
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+}
+
 .pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); margin-bottom: var(--space-2xl); }
 .pillar {
   background: var(--color-bg-light);
@@ -153,6 +244,8 @@
 @media (max-width: 560px) {
   .infoLine { align-items: flex-start; flex-direction: column; gap: var(--space-xs); }
   .infoLine > span { width: auto; }
+  .stewardHead { align-items: flex-start; flex-direction: column; }
+  .stewardFacts { grid-template-columns: 1fr; }
   .pillars { grid-template-columns: 1fr; }
   .luckGrid { grid-template-columns: repeat(2, 1fr); }
   .flowTitle { align-items: flex-start; flex-direction: column; gap: var(--space-xs); }

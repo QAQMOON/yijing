@@ -7,7 +7,7 @@
 ## 当前功能
 
 - 六爻起卦、六十四卦查询、纳甲排盘与电脑解卦
-- 八字排盘、四柱十神、大运流年与神煞展示
+- 八字排盘、四柱十神、大运流年、神煞展示与服务端真太阳时增强
 - 紫微斗数十二宫命盘
 - 大六壬天地人三盘、四课三传展示
 - 奇门遁甲九宫排盘
@@ -53,7 +53,7 @@ npm run test:e2e
 
 `npm run build` 会先执行 Vite 构建，再运行 `scripts/prerender-static.mjs`，为公开路由生成带独立 title、description、canonical 和基础正文的静态 HTML。
 
-本地 `npm run dev` 会直接处理 `/api/liuyao-reading`；`/api/deepseek-reading` 如果本地没有配置 `DEEPSEEK_API_KEY`，会代理到线上 Vercel 接口，方便在本地预览时测试 AI 解读。若要完全本地调用 DeepSeek，请在本机环境变量或 `.env.local` 中配置服务端密钥，不要使用 `VITE_` 前缀。
+本地 `npm run dev` 会直接处理 `/api/liuyao-reading`；`/api/deepseek-reading` 如果本地没有配置 `DEEPSEEK_API_KEY`，会代理到线上 Vercel 接口，方便在本地预览时测试 AI 解读。`/api/metaphysics` 是 Vercel Python 函数，本地开发时同样代理到线上接口。若要完全本地调用 DeepSeek，请在本机环境变量或 `.env.local` 中配置服务端密钥，不要使用 `VITE_` 前缀。
 
 ## 环境变量
 
@@ -67,6 +67,8 @@ DEEPSEEK_MODEL=deepseek-chat
 ```
 
 当前账户和积分为浏览器本地体验版。正式支付前还需要准备数据库、支付商户、支付回调密钥和订单状态处理。
+
+八字服务端增强使用 `api/metaphysics.py`，并在 `api/metaphysics_core/` 中 vendored `superzhang21/metaphysics-steward` 的八字相关 MIT 子集。Vercel Python 函数依赖见 `requirements.txt`。
 
 ## 部署
 

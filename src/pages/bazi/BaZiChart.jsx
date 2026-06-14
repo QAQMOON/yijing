@@ -1,5 +1,6 @@
 ﻿import { useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Seo from '../../components/Seo.jsx';
 import { calculateBaZiFromDate, calculateBaZiFromLunar } from '../../utils/baziCalc.js';
 import { dateFromSearchParams } from '../../utils/dateTime.js';
@@ -11,6 +12,7 @@ const PILLARS = [
   ['day', '日柱'],
   ['hour', '时柱'],
 ];
+const pad = (value) => String(value).padStart(2, '0');
 
 function chartFromParams(params) {
   const gender = params.get('gender') === 'female' ? 'female' : 'male';
@@ -34,6 +36,22 @@ function chartFromParams(params) {
   }
 }
 
+function formatStewardBirthdate(date) {
+  return [
+    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
+    `${pad(date.getHours())}:${pad(date.getMinutes())}`,
+  ].join(' ');
+}
+
+function getApiError(data, fallback, status) {
+  const code = data?.error?.code;
+  const suffix = code ? `（${code}）` : '';
+  if (typeof data?.error === 'string') return `${data.error}${suffix}`;
+  if (data?.error?.message) return `${data.error.message}${suffix}`;
+  if (status) return `${fallback}（HTTP ${status}）`;
+  return fallback;
+}
+
 function PillarCard({ label, pillar, isDay }) {
   return (
     <article className={`${styles.pillar} ${isDay ? styles.dayPillar : ''}`}>
@@ -54,6 +72,62 @@ function PillarCard({ label, pillar, isDay }) {
         <div><dt>纳音</dt><dd>{pillar.nayin}</dd></div>
       </dl>
     </article>
+  );
+}
+
+function StewardPanel({ status, data, error }) {
+  const config = data?.config;
+  const yun = data?.bazi?.yun;
+  const daYun = yun?.da_yun?.slice(0, 8) || [];
+
+  return (
+    <section className={styles.stewardPanel}>
+      <div className={styles.stewardHead}>
+        <div>
+          <p>Metaphysics Steward</p>
+          <h2>服务端增强</h2>
+        </div>
+        <span>{status === 'ready' ? '已校正' : '校验中'}</span>
+      </div>
+
+      {status === 'loading' && (
+        <p className={styles.stewardState}>正在校验真太阳时、经度与精确起运。</p>
+      )}
+
+      {status === 'error' && (
+        <p className={styles.stewardError}>{error}</p>
+      )}
+
+      {status === 'ready' && config && (
+        <>
+          <div className={styles.stewardFacts}>
+            <div>
+              <span>出生地</span>
+              <strong>{config.birthplace.name}</strong>
+              <small>东经 {config.birthplace.longitude}°</small>
+            </div>
+            <div>
+              <span>真太阳时</span>
+              <strong>{config.trueSolarTime}</strong>
+              <small>民用时 {config.inputTime}</small>
+            </div>
+            <div>
+              <span>精确起运</span>
+              <strong>{yun?.start_desc || '待校验'}</strong>
+              <small>{yun?.start_time || config.lunarDate}</small>
+            </div>
+          </div>
+          <div className={styles.stewardLuck} aria-label="服务端大运">
+            {daYun.map((item) => (
+              <span key={`${item.index}-${item.pillar}`}>
+                {item.pillar}<small>{item.start_age}岁</small>
+              </span>
+            ))}
+          </div>
+          <p className={styles.stewardFoot}>这层数据会作为八字 AI 报告的排盘依据，不替换当前浏览器排盘。</p>
+        </>
+      )}
+    </section>
   );
 }
 
@@ -104,7 +178,53 @@ function FlowYearTable({ years }) {
 
 export default function BaZiChart() {
   const [params] = useSearchParams();
-  const baZi = useMemo(() => chartFromParams(params), [params]);
+  const paramsKey = params.toString();
+  const baZi = useMemo(() => chartFromParams(new URLSearchParams(paramsKey)), [paramsKey]);
+  const [stewardStatus, setStewardStatus] = useState('idle');
+  const [stewardData, setStewardData] = useState(null);
+  const [stewardError, setStewardError] = useState('');
+  const gender = params.get('gender') === 'female' ? 'female' : 'male';
+  const birthplace = params.get('birthplace') || '120.0';
+
+  useEffect(() => {
+    if (!baZi) return undefined;
+
+    const controller = new AbortController();
+    queueMicrotask(() => {
+      if (controller.signal.aborted) return;
+      setStewardStatus('loading');
+      setStewardData(null);
+      setStewardError('');
+    });
+
+    fetch('/api/metaphysics', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Yijie-Client': 'browser',
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        mode: 'bazi',
+        birthdate: formatStewardBirthdate(baZi.solarDate),
+        sex: gender,
+        birthplace,
+      }),
+    })
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(getApiError(data, '服务端增强暂不可用', response.status));
+        setStewardData(data);
+        setStewardStatus('ready');
+      })
+      .catch((err) => {
+        if (err.name === 'AbortError') return;
+        setStewardError(err.message || '服务端增强暂不可用');
+        setStewardStatus('error');
+      });
+
+    return () => controller.abort();
+  }, [baZi, birthplace, gender]);
 
   if (!baZi || baZi.solarDate.getFullYear() < 1900 || baZi.solarDate.getFullYear() > 2100) {
     return (
@@ -141,6 +261,8 @@ export default function BaZiChart() {
           <strong>交运时间：{baZi.transitText}</strong>
         </div>
       </section>
+
+      <StewardPanel status={stewardStatus} data={stewardData} error={stewardError} />
 
       <section className={styles.pillars}>
         {PILLARS.map(([key, label]) => (

@@ -84,6 +84,46 @@ test('local account can sign in and top up demo credits', async ({ page }) => {
   await expect(page.getByRole('link', { name: /76积分/ })).toBeVisible();
 });
 
+test('bazi result loads metaphysics steward enhancement', async ({ page }) => {
+  let requestBody;
+  await page.route('**/api/metaphysics', async (route) => {
+    const request = route.request();
+    requestBody = request.postDataJSON();
+    expect(request.method()).toBe('POST');
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        provider: 'metaphysics-steward',
+        mode: 'bazi',
+        config: {
+          inputTime: '1990-05-08 12:00',
+          trueSolarTime: '1990-05-08 11:49',
+          birthplace: { name: '北京', longitude: 116.4, source: 'city' },
+          sex: '男',
+          lunarDate: '一九九〇年四月十四',
+        },
+        bazi: {
+          yun: {
+            start_desc: '9年7个月0天起运',
+            start_time: '1999-12-08 11:49:10',
+            da_yun: [
+              { index: 1, pillar: '壬午', start_age: 10 },
+              { index: 2, pillar: '癸未', start_age: 20 },
+            ],
+          },
+        },
+      }),
+    });
+  });
+
+  await page.goto('/bazi/result?dt=1990-05-08T12%3A00&calendar=solar&gender=male&birthplace=%E5%8C%97%E4%BA%AC&mode=custom');
+  await expect(page.getByText('服务端增强')).toBeVisible();
+  await expect(page.getByText('1990-05-08 11:49')).toBeVisible();
+  await expect(page.getByText('9年7个月0天起运')).toBeVisible();
+  expect(requestBody.birthplace).toBe('北京');
+  expect(requestBody.mode).toBe('bazi');
+});
+
 test('AI reading flow is saved with mocked DeepSeek response', async ({ page }) => {
   await page.route('**/api/liuyao-reading', async (route) => {
     await route.fulfill({

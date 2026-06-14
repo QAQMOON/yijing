@@ -57,7 +57,7 @@ function localApiPlugin() {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const pathname = new URL(req.url || '/', 'http://localhost').pathname
-        if (pathname !== '/api/liuyao-reading' && pathname !== '/api/deepseek-reading') {
+        if (!['/api/liuyao-reading', '/api/deepseek-reading', '/api/metaphysics'].includes(pathname)) {
           next()
           return
         }
@@ -65,6 +65,11 @@ function localApiPlugin() {
         try {
           if (pathname === '/api/liuyao-reading') {
             await liuyaoReadingHandler(req, res)
+            return
+          }
+
+          if (pathname === '/api/metaphysics') {
+            await proxyToProduction(req, res, pathname)
             return
           }
 

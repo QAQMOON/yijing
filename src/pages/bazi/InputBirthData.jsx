@@ -5,6 +5,7 @@ import { toDateTimeInputValue } from '../../utils/dateTime.js';
 import styles from './InputBirthData.module.css';
 
 const pad = (value) => String(value).padStart(2, '0');
+const PLACE_OPTIONS = ['北京', '上海', '广州', '深圳', '杭州', '成都', '重庆', '武汉', '西安', '南京', '乌鲁木齐', '拉萨'];
 
 export default function InputBirthData() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function InputBirthData() {
   const [gender, setGender] = useState('male');
   const [calendar, setCalendar] = useState('solar');
   const [dateTime, setDateTime] = useState(toDateTimeInputValue(now));
+  const [birthplace, setBirthplace] = useState('北京');
   const [lunar, setLunar] = useState({
     year: now.getFullYear(),
     month: now.getMonth() + 1,
@@ -20,14 +22,17 @@ export default function InputBirthData() {
     minute: now.getMinutes(),
   });
 
-  const buildGenderParam = () => `gender=${gender}`;
+  const buildCommonParams = () => ({
+    gender,
+    birthplace: birthplace.trim() || '120.0',
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (calendar === 'lunar') {
       const params = new URLSearchParams({
         calendar: 'lunar',
-        gender,
+        ...buildCommonParams(),
         ly: lunar.year,
         lm: lunar.month,
         ld: lunar.day,
@@ -39,12 +44,24 @@ export default function InputBirthData() {
       return;
     }
 
-    navigate(`/bazi/result?dt=${encodeURIComponent(dateTime)}&calendar=solar&${buildGenderParam()}&mode=custom`);
+    const params = new URLSearchParams({
+      calendar: 'solar',
+      ...buildCommonParams(),
+      dt: dateTime,
+      mode: 'custom',
+    });
+    navigate(`/bazi/result?${params.toString()}`);
   };
 
   const useCurrentTime = () => {
     const current = new Date();
-    navigate(`/bazi/result?dt=${encodeURIComponent(toDateTimeInputValue(current))}&calendar=solar&${buildGenderParam()}&mode=now`);
+    const params = new URLSearchParams({
+      calendar: 'solar',
+      ...buildCommonParams(),
+      dt: toDateTimeInputValue(current),
+      mode: 'now',
+    });
+    navigate(`/bazi/result?${params.toString()}`);
   };
 
   const updateLunar = (key, value) => {
@@ -116,13 +133,30 @@ export default function InputBirthData() {
           </div>
         )}
 
+        <div className={styles.row}>
+          <label className={styles.label}>出生地</label>
+          <div>
+            <input
+              type="text"
+              className={styles.input}
+              value={birthplace}
+              list="birthplace-options"
+              placeholder="北京 或 116.4"
+              onChange={e => setBirthplace(e.target.value)}
+            />
+            <datalist id="birthplace-options">
+              {PLACE_OPTIONS.map((place) => <option key={place} value={place} />)}
+            </datalist>
+          </div>
+        </div>
+
         <div className={styles.actions}>
           <button type="submit" className={styles.btn}>自定义排盘</button>
           <button type="button" className={styles.btnGhost} onClick={useCurrentTime}>使用当前时间</button>
         </div>
       </form>
 
-      <p className={styles.note}>年份范围：1900 - 2100。性别用于判定大运顺逆，排盘以节气定年定月。</p>
+      <p className={styles.note}>年份范围：1900 - 2100。出生地用于服务端真太阳时校正，可填城市名或经度。</p>
     </div>
   );
 }
