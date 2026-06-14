@@ -26,6 +26,7 @@ function ReportCard({ report, onDelete }) {
       </div>
       <h2>{report.title || 'AI 解读报告'}</h2>
       {report.question && <p className={styles.question}>占事：{report.question}</p>}
+      {!report.question && report.focusLabel && <p className={styles.question}>重点：{report.focusLabel}</p>}
       <p>{preview}{preview.length >= 140 ? '...' : ''}</p>
       <details className={styles.reportDetail}>
         <summary>查看全文</summary>
@@ -59,6 +60,7 @@ export default function Reports() {
         </div>
         <div className={styles.heroActions}>
           <Link to="/liuyao/cast">生成六爻报告</Link>
+          <Link to="/bazi/chart">生成八字报告</Link>
           <Link to="/pricing">查看积分</Link>
         </div>
       </section>

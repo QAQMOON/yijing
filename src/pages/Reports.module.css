@@ -64,17 +64,17 @@
   white-space: nowrap;
 }
 
+.heroActions a {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: 0 var(--space-lg);
+}
+
 .heroActions a:first-child,
 .empty a {
   border: 1px solid var(--color-accent);
   background: var(--color-accent);
   color: #fff;
-  padding: 0 var(--space-lg);
-}
-
-.heroActions a:last-child {
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
   padding: 0 var(--space-lg);
 }
 

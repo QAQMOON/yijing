@@ -165,3 +165,63 @@ test('AI reading flow is saved with mocked DeepSeek response', async ({ page }) 
   await expect(page.getByText('乾为天之乾为天')).toBeVisible();
   await expect(page.getByText('这是 mock AI 解读').first()).toBeVisible();
 });
+
+test('bazi AI reading flow is saved with mocked DeepSeek response', async ({ page }) => {
+  await page.route('**/api/metaphysics', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        config: {
+          inputTime: '1990-05-08 12:00',
+          trueSolarTime: '1990-05-08 11:49',
+          birthplace: { name: '北京', longitude: 116.4, source: 'city' },
+          sex: '男',
+          lunarDate: '一九九〇年四月十四',
+        },
+        bazi: {
+          yun: {
+            start_desc: '9年7个月0天起运',
+            start_time: '1999-12-08 11:49:10',
+            da_yun: [
+              { index: 1, pillar: '壬午', start_age: 10 },
+              { index: 2, pillar: '癸未', start_age: 20 },
+            ],
+          },
+        },
+      }),
+    });
+  });
+
+  await page.route('**/api/deepseek-reading', async (route) => {
+    const request = route.request();
+    const body = request.postDataJSON();
+    expect(request.method()).toBe('POST');
+    expect(request.headers()['x-yijie-account-id']).toMatch(/^acct_/);
+    expect(body.domain).toBe('bazi');
+    expect(body.chart.pillars.year.full).toBeTruthy();
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        provider: 'deepseek',
+        model: 'mock-model',
+        text: '【结论】这是八字 mock AI 解读。\n\n【依据】依据传入的四柱、十神和大运上下文。',
+        cost: 2,
+      }),
+    });
+  });
+
+  await page.goto('/account');
+  await page.getByLabel('手机号或邮箱').fill('bazi-ai@example.com');
+  await page.getByLabel('称呼').fill('八字 AI 测试');
+  await page.getByRole('button', { name: '登录并领取积分' }).click();
+
+  await page.goto('/bazi/result?dt=1990-05-08T12%3A00&calendar=solar&gender=male&birthplace=%E5%8C%97%E4%BA%AC&mode=custom');
+  await expect(page.getByText('八字 AI 深度解读')).toBeVisible();
+  await expect(page.getByText('报告依据会随请求传入')).toBeVisible();
+  await page.getByRole('button', { name: '生成八字 AI 解读' }).click();
+  await expect(page.getByText('这是八字 mock AI 解读')).toBeVisible();
+
+  await page.goto('/reports');
+  await expect(page.getByText('八字 AI 解读')).toBeVisible();
+  await expect(page.getByText('这是八字 mock AI 解读').first()).toBeVisible();
+});

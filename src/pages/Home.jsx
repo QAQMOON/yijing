@@ -26,7 +26,7 @@ const FEATURE_MATRIX = [
     description: '以节气定年月，展示四柱、十神、旺衰、纳音、神煞与大运。',
     to: '/bazi',
     meta: '免费排盘',
-    tags: ['十神', '大运'],
+    tags: ['AI 解读', '大运'],
   },
   {
     icon: '星',

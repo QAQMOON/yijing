@@ -104,8 +104,9 @@ function normalizePayload(payload) {
     throw new ValidationError('请求内容格式无效');
   }
 
-  if (payload.domain !== 'liuyao') {
-    throw new ValidationError('当前 AI 解读先支持六爻排盘');
+  const domain = ['liuyao', 'bazi'].includes(payload.domain) ? payload.domain : '';
+  if (!domain) {
+    throw new ValidationError('当前 AI 解读暂不支持该排盘类型');
   }
 
   const chart = payload.chart;
@@ -113,15 +114,19 @@ function normalizePayload(payload) {
     throw new ValidationError('缺少排盘上下文');
   }
 
-  if (!chart.baseHex?.name || !chart.changedHex?.name) {
+  if (domain === 'liuyao' && (!chart.baseHex?.name || !chart.changedHex?.name)) {
     throw new ValidationError('缺少本卦或变卦信息');
+  }
+
+  if (domain === 'bazi' && (!chart.pillars?.year?.full || !chart.pillars?.month?.full || !chart.pillars?.day?.full || !chart.pillars?.hour?.full)) {
+    throw new ValidationError('缺少八字四柱信息');
   }
 
   const style = ['plain', 'scholar'].includes(payload.style) ? payload.style : 'plain';
   const depth = ['brief', 'full'].includes(payload.depth) ? payload.depth : 'brief';
 
   return {
-    domain: 'liuyao',
+    domain,
     style,
     depth,
     question: cleanText(payload.question, 160),
@@ -208,18 +213,29 @@ function checkRateLimit(requester) {
   };
 }
 
-function buildSystemPrompt({ style, depth }) {
+function buildSystemPrompt({ domain, style, depth }) {
   const styleGuide = style === 'scholar'
-    ? '用较严谨的术语解释卦象、纳甲、动爻与干支关系，但每段都要给出白话落点。'
+    ? '用较严谨的术语解释原理，但每段都要给出白话落点。'
     : '用通俗中文解释，少用术语；必须让没有术数基础的人也能看懂。';
   const depthGuide = depth === 'full'
-    ? '输出较完整，包含【结论】【古籍依据】【卦盘分析】【行动建议】【风险提醒】【后续观察】六部分。'
-    : '输出精简，控制在五段以内，包含【结论】【古籍依据】【建议】。';
+    ? '输出较完整，包含【结论】【依据】【排盘分析】【行动建议】【风险提醒】【后续观察】六部分。'
+    : '输出精简，控制在五段以内，包含【结论】【依据】【建议】。';
+  const domainGuide = domain === 'bazi'
+    ? [
+        '你是“易解”的八字解读助手。',
+        '你只根据用户提供的八字排盘上下文做传统文化解读和决策参考，不做绝对化断言。',
+        '分析时优先使用四柱、日主、十神、五行生克、旺衰、纳音、神煞、大运流年和真太阳时校准信息。',
+        '不得编造用户未提供的出生信息、神煞、古籍原文或现实经历。',
+      ]
+    : [
+        '你是“易解”的六爻解读助手。',
+        '你只根据用户提供的六爻排盘上下文做传统文化解读和决策参考，不做绝对化断言。',
+        '分析时优先使用卦辞、彖传、象传、爻辞、动爻、纳甲、六亲、世应、月日空亡和干支信息。',
+        '古籍依据只能引用用户提供的卦辞、彖传、象传、爻辞和排盘信息；没有提供的内容，不得编造书名或原文。',
+      ];
 
   return [
-    '你是“易解”的六爻解读助手。',
-    '你只根据用户提供的排盘上下文做文化解读和决策参考，不做绝对化断言。',
-    '古籍依据只能引用用户提供的卦辞、彖传、象传、爻辞和排盘信息。没有提供的内容，不得编造书名或原文。',
+    ...domainGuide,
     '不得声称能替代医疗、法律、投资、心理咨询等专业服务。',
     '遇到婚恋、健康、财务等敏感问题，要给出稳妥建议和风险提示。',
     styleGuide,
@@ -230,6 +246,21 @@ function buildSystemPrompt({ style, depth }) {
 
 function buildUserPrompt(payload) {
   const { chart, question } = payload;
+  if (payload.domain === 'bazi') {
+    return JSON.stringify({
+      focus: question || chart.focus || '综合解读',
+      calendar: chart.calendar,
+      birth: chart.birth,
+      gender: chart.gender,
+      calibration: chart.calibration || null,
+      dayMaster: chart.dayMaster,
+      pillars: chart.pillars,
+      luck: chart.luck,
+      shenSha: chart.shenSha,
+      upcomingAnnualLuck: chart.upcomingAnnualLuck,
+    }, null, 2);
+  }
+
   const rows = Array.isArray(chart.najiaRows)
     ? chart.najiaRows.map((row) => ({
         position: row.index,

@@ -2,6 +2,9 @@
 import { useSearchParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Seo from '../../components/Seo.jsx';
+import { CREDIT_COSTS } from '../../data/creditPlans.js';
+import { useAiReports } from '../../hooks/useAiReports.js';
+import { useAccount } from '../../hooks/useAccount.js';
 import { calculateBaZiFromDate, calculateBaZiFromLunar } from '../../utils/baziCalc.js';
 import { dateFromSearchParams } from '../../utils/dateTime.js';
 import styles from './BaZiChart.module.css';
@@ -11,6 +14,13 @@ const PILLARS = [
   ['month', '月柱'],
   ['day', '日柱'],
   ['hour', '时柱'],
+];
+const AI_FOCUS_OPTIONS = [
+  { value: 'overall', label: '综合命局' },
+  { value: 'career', label: '事业财运' },
+  { value: 'relationship', label: '感情家庭' },
+  { value: 'luck', label: '大运流年' },
+  { value: 'wellbeing', label: '健康习惯' },
 ];
 const pad = (value) => String(value).padStart(2, '0');
 
@@ -48,6 +58,96 @@ function getApiError(data, fallback, status) {
   if (data?.error?.message) return data.error.message;
   if (status) return fallback;
   return fallback;
+}
+
+function compactPillar(pillar) {
+  return {
+    full: pillar.full,
+    stem: pillar.stem,
+    branch: pillar.branch,
+    tenGod: pillar.tenGod,
+    fiveElementText: pillar.fiveElementText,
+    hiddenText: pillar.hiddenText,
+    prosperity: pillar.prosperity,
+    nayin: pillar.nayin,
+  };
+}
+
+function compactLuck(item) {
+  return {
+    startAge: item.startAge,
+    full: item.full,
+    tenGod: item.tenGod,
+    prosperity: item.prosperity,
+    nayin: item.nayin,
+  };
+}
+
+function buildUpcomingAnnualLuck(annualLuck) {
+  const currentYear = new Date().getFullYear();
+  const firstIndex = annualLuck.findIndex((item) => item.year >= currentYear);
+  const start = firstIndex >= 0 ? firstIndex : Math.max(0, annualLuck.length - 8);
+  return annualLuck.slice(start, start + 8).map((item) => ({
+    year: item.year,
+    virtualAge: item.virtualAge,
+    full: item.full,
+    tenGod: item.tenGod,
+    prosperity: item.prosperity,
+    nayin: item.nayin,
+  }));
+}
+
+function buildBaZiAiPayload({ baZi, stewardData, birthplace, focusLabel }) {
+  const config = stewardData?.config;
+  const yun = stewardData?.bazi?.yun;
+
+  return {
+    focus: focusLabel,
+    birth: {
+      solarText: baZi.solarText,
+      lunarText: baZi.lunarText,
+      birthplace,
+    },
+    gender: baZi.genderText,
+    calendar: {
+      previousTermText: baZi.previousTermText,
+      nextTermText: baZi.nextTermText,
+      luckRuleText: baZi.luckRuleText,
+      startAgeText: baZi.startAgeText,
+      transitText: baZi.transitText,
+      voidBranches: baZi.voidBranches,
+    },
+    calibration: config ? {
+      inputTime: config.inputTime,
+      trueSolarTime: config.trueSolarTime,
+      birthplace: config.birthplace,
+      preciseStart: yun?.start_desc || '',
+      preciseStartTime: yun?.start_time || '',
+      daYun: (yun?.da_yun || []).slice(0, 8).map((item) => ({
+        pillar: item.pillar,
+        startAge: item.start_age,
+      })),
+    } : null,
+    dayMaster: baZi.dayMaster,
+    pillars: {
+      year: compactPillar(baZi.year),
+      month: compactPillar(baZi.month),
+      day: compactPillar(baZi.day),
+      hour: compactPillar(baZi.hour),
+    },
+    luck: {
+      rule: baZi.luckRuleText,
+      startAge: baZi.startAgeText,
+      transit: baZi.transitText,
+      daYun: baZi.luckPillars.map(compactLuck),
+    },
+    shenSha: baZi.shenShaRows.map((row) => ({
+      label: row.label,
+      base: row.base,
+      items: row.items,
+    })),
+    upcomingAnnualLuck: buildUpcomingAnnualLuck(baZi.annualLuck),
+  };
 }
 
 function PillarCard({ label, pillar, isDay }) {
@@ -131,6 +231,158 @@ function StewardPanel({ status, data, error }) {
           <p className={styles.stewardFoot}>校准结果用于核对时辰、大运和后续 AI 报告依据。</p>
         </>
       )}
+    </section>
+  );
+}
+
+function BaZiAiReading({ baZi, stewardData, birthplace }) {
+  const { account, refundCredits, spendCredits } = useAccount();
+  const { saveReport } = useAiReports();
+  const [focus, setFocus] = useState('overall');
+  const [style, setStyle] = useState('plain');
+  const [depth, setDepth] = useState('brief');
+  const [status, setStatus] = useState('idle');
+  const [result, setResult] = useState('');
+  const [error, setError] = useState('');
+  const cost = CREDIT_COSTS.aiReading;
+  const focusLabel = AI_FOCUS_OPTIONS.find((item) => item.value === focus)?.label || '综合命局';
+  const payload = useMemo(() => buildBaZiAiPayload({
+    baZi,
+    stewardData,
+    birthplace,
+    focusLabel,
+  }), [baZi, birthplace, focusLabel, stewardData]);
+  const reportTitle = `${payload.pillars.year.full}${payload.pillars.month.full}${payload.pillars.day.full}${payload.pillars.hour.full} 八字报告`;
+
+  const requestReading = async () => {
+    let charged = false;
+    setError('');
+    setStatus('loading');
+
+    try {
+      spendCredits(cost, '八字 AI 深度解读');
+      charged = true;
+
+      const response = await fetch('/api/deepseek-reading', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Yijie-Client': 'browser',
+          ...(account?.id ? { 'X-Yijie-Account-Id': account.id } : {}),
+        },
+        body: JSON.stringify({
+          domain: 'bazi',
+          chart: payload,
+          question: focusLabel,
+          style,
+          depth,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(getApiError(data, 'AI 解读失败', response.status));
+      setResult(data.text);
+      saveReport({
+        domain: 'bazi',
+        domainLabel: '八字 AI 解读',
+        title: reportTitle,
+        focusLabel,
+        style,
+        depth,
+        provider: data.provider,
+        model: data.model,
+        cost: data.cost || cost,
+        text: data.text,
+        chart: payload,
+      });
+      setStatus('ready');
+    } catch (err) {
+      if (charged) refundCredits(cost, 'AI 解读失败退回');
+      setError(err.message || 'AI 解读失败');
+      setStatus('error');
+    }
+  };
+
+  return (
+    <section className={styles.aiReadingSection}>
+      <div className={styles.aiReadingHead}>
+        <div>
+          <h2>八字 AI 深度解读</h2>
+          <p>结合四柱、十神、旺衰、大运流年与真太阳时校准生成参考报告。</p>
+        </div>
+        <span className={styles.costBadge}>{cost} 积分/次</span>
+      </div>
+
+      <div className={styles.aiReadingCard}>
+        <div className={styles.aiControls}>
+          <label>
+            <span>解读重点</span>
+            <select value={focus} onChange={(event) => setFocus(event.target.value)}>
+              {AI_FOCUS_OPTIONS.map((item) => (
+                <option key={item.value} value={item.value}>{item.label}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>解读风格</span>
+            <select value={style} onChange={(event) => setStyle(event.target.value)}>
+              <option value="plain">通俗版</option>
+              <option value="scholar">严谨版</option>
+            </select>
+          </label>
+          <label>
+            <span>篇幅</span>
+            <select value={depth} onChange={(event) => setDepth(event.target.value)}>
+              <option value="brief">精简</option>
+              <option value="full">完整</option>
+            </select>
+          </label>
+        </div>
+
+        {!account && (
+          <div className={styles.aiNotice}>
+            <p>登录后可使用 AI 解读，新账户赠送试用积分。</p>
+            <Link to="/account" className={styles.aiInlineLink}>去登录</Link>
+          </div>
+        )}
+
+        {account && account.credits < cost && (
+          <div className={styles.aiNotice}>
+            <p>当前积分不足，需要 {cost} 积分。</p>
+            <Link to="/pricing" className={styles.aiInlineLink}>购买积分</Link>
+          </div>
+        )}
+
+        {account && account.credits >= cost && (
+          <button
+            className={styles.aiButton}
+            type="button"
+            disabled={status === 'loading'}
+            onClick={requestReading}
+          >
+            {status === 'loading' ? '正在生成' : '生成八字 AI 解读'}
+          </button>
+        )}
+
+        <div className={styles.aiBasis}>
+          <strong>报告依据会随请求传入</strong>
+          <span>四柱十神</span>
+          <span>旺衰纳音</span>
+          <span>神煞大运</span>
+          <span>{stewardData?.config ? '真太阳时校准' : '基础排盘'}</span>
+        </div>
+
+        {status === 'error' && (
+          <p className={styles.aiError}>{error}</p>
+        )}
+
+        {status === 'ready' && result && (
+          <article className={styles.aiResult}>
+            {result.split(/\n{2,}/).map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </article>
+        )}
+      </div>
     </section>
   );
 }
@@ -301,6 +553,8 @@ export default function BaZiChart() {
           ))}
         </div>
       </section>
+
+      <BaZiAiReading baZi={baZi} stewardData={stewardData} birthplace={birthplace} />
 
     </div>
   );
