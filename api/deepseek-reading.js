@@ -222,8 +222,8 @@ function buildSystemPrompt({ domain, style, depth }) {
         ? '输出较完整，包含【信息核对】【结论】【依据】【排盘分析】【行动建议】【风险提醒】【后续观察】七部分。'
         : '输出精简，控制在六段以内，包含【信息核对】【结论】【依据】【建议】。')
     : (depth === 'full'
-        ? '输出较完整，包含【结论】【依据】【排盘分析】【行动建议】【风险提醒】【后续观察】六部分。'
-        : '输出精简，控制在五段以内，包含【结论】【依据】【建议】。');
+        ? '输出较完整，包含【信息核对】【结论】【依据】【排盘分析】【行动建议】【风险提醒】【后续观察】七部分。'
+        : '输出精简，控制在六段以内，包含【信息核对】【结论】【依据】【建议】。');
   const domainGuide = domain === 'bazi'
     ? [
         '你是“易解”的八字解读助手。',
@@ -239,8 +239,14 @@ function buildSystemPrompt({ domain, style, depth }) {
     : [
         '你是“易解”的六爻解读助手。',
         '你只根据用户提供的六爻排盘上下文做传统文化解读和决策参考，不做绝对化断言。',
-        '分析时优先使用卦辞、彖传、象传、爻辞、动爻、纳甲、六亲、世应、月日空亡和干支信息。',
+        '在正式解读前，必须先在内部确认资料是否完整：本卦、变卦、六爻动静、动爻、起卦日期、起卦方式、起卦人性别、出生年或年龄、所测问题、占事范围、干支、月日空亡、纳甲、六亲、六神、世应信息。若本卦、变卦、六爻动静、起卦时间或所测问题等核心信息缺失，先输出【需要补充的信息】，不要强行断。',
+        '如果卦盘完整但性别、出生年、占事范围或世应等辅助信息缺失，可以继续解读，但必须在【信息核对】中说明“以下按当前卦盘参考”，并提示补充后可细化。',
+        '分析时先明确用户问事方向，识别事业、婚姻、健康、财运、合作、出行、学业、失物等类别，再按六爻专业步骤推进。',
+        '专业步骤必须包括：先看本卦与变卦的总体气象，再看动爻主事与变化方向，再看世应用神和六亲取象，再看月建日辰、空亡、冲合生克，再看六神和纳甲作为辅证，最后结合卦辞、彖传、象传、爻辞落到现实建议。',
+        '结论要比普通闲聊更明确：可以使用“较有利、阻力偏大、宜守不宜进、可先试探、短期不宜强求、需要等条件成熟”等清楚判断，避免只说“可能、也许、看情况”。但不得把推断说成百分百确定。',
+        '针对用户所问事项，要给出现实可执行建议，并说明这些建议对应的卦象、动爻、用神、六亲、月日或古籍依据。',
         '古籍依据只能引用用户提供的卦辞、彖传、象传、爻辞和排盘信息；没有提供的内容，不得编造书名或原文。',
+        '不得编造用户未提供的性别、年龄、起卦背景、现实经历、世应标记、用神关系或古籍原文。',
       ];
 
   return [
@@ -275,16 +281,26 @@ function buildUserPrompt(payload) {
     ? chart.najiaRows.map((row) => ({
         position: row.index,
         sixGod: row.sixGod,
+        hiddenSpirit: row.hiddenSpirit || '',
         relative: row.relative,
         line: row.baseLineText,
         changedLine: row.changedLineText,
+        changedRelative: row.changedRelative || '',
         mark: row.mark,
         moving: row.isMoving,
       }))
     : [];
+  const meta = chart.meta || {};
 
   return JSON.stringify({
     question: question || chart.meta?.question || '',
+    meta,
+    querent: {
+      gender: meta.gender || '',
+      birthYear: meta.birthYear || '',
+      scope: meta.scope || '',
+      calendar: meta.calendar || '',
+    },
     baseHex: chart.baseHex,
     changedHex: chart.changedHex,
     classicContext: chart.classicContext || null,
@@ -292,6 +308,7 @@ function buildUserPrompt(payload) {
     movingLines: chart.movingLines,
     values: chart.values,
     date: chart.date,
+    source: chart.source || '',
     lunarDate: chart.lunarDate,
     pillars: chart.pillars,
     voidBranches: chart.voidBranches,
