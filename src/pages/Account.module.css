@@ -1,0 +1,238 @@
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.loginPanel,
+.summaryPanel,
+.usagePanel,
+.ledgerPanel {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-light);
+  box-shadow: 0 12px 32px var(--color-shadow);
+}
+
+.loginPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  gap: var(--space-2xl);
+  align-items: center;
+  padding: var(--space-2xl);
+}
+
+.kicker {
+  margin-bottom: var(--space-sm);
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+}
+
+.lead,
+.identifier,
+.usagePanel p,
+.empty {
+  color: var(--color-text-secondary);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.field span {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.field input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #fffdf8;
+  color: var(--color-text-primary);
+  font: inherit;
+  padding: 0 var(--space-md);
+}
+
+.field input:focus {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 2px;
+}
+
+.error {
+  margin: 0;
+  color: #b94d3f;
+  font-size: 0.9rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border-radius: 6px;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+}
+
+.primaryButton {
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+  padding: 0 var(--space-lg);
+}
+
+.primaryButton:hover {
+  background: var(--color-accent-dark);
+  color: #fff;
+}
+
+.secondaryButton {
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  padding: 0 var(--space-lg);
+}
+
+.secondaryButton:hover {
+  background: var(--color-bg-dark);
+}
+
+.accountGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  gap: var(--space-lg);
+}
+
+.summaryPanel,
+.usagePanel,
+.ledgerPanel {
+  padding: var(--space-xl);
+}
+
+.summaryPanel {
+  align-self: start;
+}
+
+.creditBox {
+  display: grid;
+  gap: var(--space-xs);
+  margin: var(--space-xl) 0;
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.creditBox span {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.creditBox strong {
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.summaryActions {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.usagePanel {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.usageItem {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.usageItem span {
+  color: var(--color-text-secondary);
+}
+
+.usageItem strong {
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+}
+
+.ledgerPanel {
+  grid-column: 2;
+}
+
+.ledgerList {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.ledgerRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.ledgerRow div,
+.ledgerAmount {
+  display: grid;
+  gap: 2px;
+}
+
+.ledgerRow strong {
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+}
+
+.ledgerRow span {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.ledgerAmount {
+  min-width: 76px;
+  text-align: right;
+}
+
+.ledgerAmount strong {
+  color: var(--color-accent-dark);
+}
+
+@media (max-width: 820px) {
+  .loginPanel,
+  .accountGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .loginPanel,
+  .summaryPanel,
+  .usagePanel,
+  .ledgerPanel {
+    padding: var(--space-lg);
+  }
+
+  .ledgerPanel {
+    grid-column: auto;
+  }
+}

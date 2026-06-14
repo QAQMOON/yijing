@@ -88,17 +88,17 @@ export default function PalaceGrid() {
             </div>
             <div className={styles.palaceBody}>
               <div className={styles.mainLine}>
-                <strong>{palace.god || '—'}</strong>
-                <strong>{palace.star || '—'}</strong>
+                <strong>{palace.god || '无'}</strong>
+                <strong>{palace.star || '无'}</strong>
               </div>
               <div className={styles.mainLine}>
-                <span>{palace.door || '—'}</span>
-                <span className={styles.stem}>{palace.stem || '—'}</span>
+                <span>{palace.door || '无'}</span>
+                <span className={styles.stem}>{palace.stem || '无'}</span>
               </div>
-              <div className={styles.detailRow}><span>神</span><b>{palace.god || '—'}</b></div>
-              <div className={styles.detailRow}><span>门</span><b>{palace.door || '—'}</b></div>
-              <div className={styles.detailRow}><span>星</span><b>{palace.star || '—'}</b></div>
-              <div className={styles.detailRow}><span>仪</span><b>{palace.stem || '—'}</b></div>
+              <div className={styles.detailRow}><span>神</span><b>{palace.god || '无'}</b></div>
+              <div className={styles.detailRow}><span>门</span><b>{palace.door || '无'}</b></div>
+              <div className={styles.detailRow}><span>星</span><b>{palace.star || '无'}</b></div>
+              <div className={styles.detailRow}><span>仪</span><b>{palace.stem || '无'}</b></div>
             </div>
           </div>
         ))}

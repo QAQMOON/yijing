@@ -1,12 +1,14 @@
 import { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import { BRAND_NAME, TOOL_NAV, getRandomBrandTagline } from '../data/siteConfig.js';
+import { useAccount } from '../hooks/useAccount.js';
 import { useTheme } from '../hooks/useTheme.js';
 import styles from './Header.module.css';
 
 export default function Header() {
   const tagline = useMemo(() => getRandomBrandTagline(), []);
   const { themeId, setThemeId, themes } = useTheme();
+  const { account } = useAccount();
 
   return (
     <header className={styles.header}>
@@ -36,6 +38,12 @@ export default function Header() {
               ))}
             </select>
           </label>
+          <NavLink
+            to="/account"
+            className={({ isActive }) => isActive ? `${styles.accountLink} ${styles.activeAccount}` : styles.accountLink}
+          >
+            {account ? `${account.credits}积分` : '登录'}
+          </NavLink>
         </div>
       </div>
     </header>

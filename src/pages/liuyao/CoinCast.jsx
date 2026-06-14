@@ -200,7 +200,7 @@ export default function CoinCast() {
       <div className={styles.progress}>
         {[0,1,2,3,4,5].map(i => (
           <div key={i} className={`${styles.dot} ${i < phase ? styles.dotFilled : ''} ${i === phase - 1 ? styles.dotLatest : ''}`}>
-            {i < lines.length ? (lines[i] === 1 ? '—' : '- -') : i + 1}
+            {i < lines.length ? (lines[i] === 1 ? '阳' : '阴') : i + 1}
           </div>
         ))}
       </div>

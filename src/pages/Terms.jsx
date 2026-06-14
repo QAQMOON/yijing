@@ -6,7 +6,7 @@ export default function Terms() {
     <div className={styles.page}>
       <Seo
         title="服务条款 · 易解"
-        description="易解服务条款说明工具站使用边界、内容性质、用户责任、未来 AI 解读与积分付费功能的基本原则。"
+        description="易解服务条款说明工具站使用边界、AI 解读内容性质、体验账号、积分扣减和后续付费功能的基本原则。"
         path="/terms"
       />
       <p className={styles.eyebrow}>TERMS</p>
@@ -15,7 +15,7 @@ export default function Terms() {
 
       <section className={styles.section}>
         <h2>服务说明</h2>
-        <p>易解是面向中国术数文化的在线工具站，提供六爻、八字、紫微斗数、大六壬、奇门遁甲等排盘与资料查看功能。当前内容用于传统文化学习、个人记录和工具体验。</p>
+        <p>易解是面向中国术数文化的在线工具站，提供六爻、八字、紫微斗数、大六壬、奇门遁甲等排盘与资料查看功能，并提供 DeepSeek AI 解读体验。当前内容用于传统文化学习、个人记录和工具体验。</p>
       </section>
 
       <section className={styles.section}>
@@ -33,8 +33,8 @@ export default function Terms() {
       </section>
 
       <section className={styles.section}>
-        <h2>未来付费功能</h2>
-        <p>后续接入登录、DeepSeek AI 解读和积分付费后，会补充积分购买、消耗、退款、异常订单、报告保存、账户注销等细则。付费规则上线前会在产品内明确展示。</p>
+        <h2>积分与支付</h2>
+        <p>AI 深度解读按次消耗积分。当前体验账号和演示充值保存在浏览器本地，不代表真实收款或真实订单。接入正式支付后，会补充积分购买、消耗、退款、异常订单、报告保存、账户注销等细则。</p>
       </section>
 
       <section className={styles.section}>

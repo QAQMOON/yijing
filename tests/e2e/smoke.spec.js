@@ -8,6 +8,8 @@ const PUBLIC_ROUTES = [
   { path: '/ziwei', title: /紫微斗数排盘/, h1: /紫微斗数/ },
   { path: '/daliuren', title: /大六壬排盘/, h1: /大\s*六\s*壬/ },
   { path: '/qimen', title: /奇门遁甲排盘/, h1: /奇门遁甲/ },
+  { path: '/account', title: /我的账户/, h1: /登录易解/ },
+  { path: '/pricing', title: /积分套餐/, h1: /AI 解读按次消耗积分/ },
   { path: '/privacy', title: /隐私政策/, h1: /隐私政策/ },
   { path: '/terms', title: /服务条款/, h1: /服务条款/ },
   { path: '/roadmap', title: /产品路线/, h1: /产品路线/ },
@@ -28,7 +30,7 @@ test.describe('public route smoke', () => {
 
       await expect(page).toHaveTitle(route.title);
       await expect(page.locator('h1').first()).toContainText(route.h1);
-      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /易解|六爻|八字|紫微|奇门|大六壬|隐私|服务|产品路线/);
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /易解|六爻|八字|紫微|奇门|大六壬|隐私|服务|产品路线|积分|账户/);
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /^https:\/\/yijing-pi\.vercel\.app/);
 
       const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
@@ -58,4 +60,23 @@ test('footer legal links work', async ({ page }) => {
   await page.getByRole('link', { name: '服务条款' }).click();
   await expect(page).toHaveURL(/\/terms$/);
   await expect(page.locator('h1')).toContainText('服务条款');
+});
+
+test('local account can sign in and top up demo credits', async ({ page }) => {
+  await page.goto('/account');
+  await page.waitForLoadState('networkidle');
+
+  await page.getByLabel('手机号或邮箱').fill('13800000000');
+  await page.getByLabel('称呼').fill('易解测试');
+  await page.getByRole('button', { name: '登录并领取积分' }).click();
+
+  await expect(page.locator('h1')).toContainText('易解测试');
+  await expect(page.getByText('可用积分')).toBeVisible();
+  await expect(page.getByRole('link', { name: /8积分/ })).toBeVisible();
+
+  await page.goto('/pricing');
+  await page.getByRole('button', { name: '演示充值' }).nth(1).click();
+
+  await expect(page.getByText('已为当前体验账号增加 68 积分。')).toBeVisible();
+  await expect(page.getByRole('link', { name: /76积分/ })).toBeVisible();
 });

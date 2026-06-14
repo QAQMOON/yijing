@@ -120,6 +120,32 @@
   outline-offset: 2px;
 }
 
+.accountLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  height: 32px;
+  padding: 0 var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: #fffdf8;
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.accountLink:hover {
+  border-color: var(--color-accent-light);
+  color: var(--color-accent-dark);
+}
+
+.activeAccount {
+  border-color: var(--color-accent);
+  background: var(--color-bg-dark);
+}
+
 @media (max-width: 860px) {
   .header {
     padding: var(--space-sm) var(--space-sm);
@@ -131,6 +157,7 @@
     align-items: center;
     gap: var(--space-sm);
     width: 100%;
+    max-width: 100%;
     min-width: 0;
   }
 
@@ -159,7 +186,7 @@
     flex-wrap: nowrap;
     gap: var(--space-xs);
     justify-content: flex-start;
-    width: calc(100vw - 16px);
+    width: 100%;
     max-width: 100%;
     overflow-x: auto;
     padding: var(--space-xs) 0 2px;
@@ -181,7 +208,7 @@
     justify-content: flex-end;
     justify-self: end;
     margin-left: 0;
-    margin-right: var(--space-sm);
+    margin-right: 70px;
     padding-left: 0;
     border-left: 0;
     max-width: 60px;
@@ -196,5 +223,18 @@
     min-width: 56px;
     padding: 0 2px;
     font-size: 0.75rem;
+  }
+
+  .accountLink {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    min-width: 58px;
+    max-width: 66px;
+    height: 32px;
+    overflow: hidden;
+    padding: 0 var(--space-xs);
+    font-size: 0.75rem;
+    text-overflow: ellipsis;
   }
 }

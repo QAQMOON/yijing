@@ -49,6 +49,18 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://yijing-pi.vercel.app/account</loc>
+    <lastmod>2026-06-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://yijing-pi.vercel.app/pricing</loc>
+    <lastmod>2026-06-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
     <loc>https://yijing-pi.vercel.app/privacy</loc>
     <lastmod>2026-06-14</lastmod>
     <changefreq>monthly</changefreq>

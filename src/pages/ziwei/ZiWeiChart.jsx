@@ -22,7 +22,7 @@ function StarList({ stars, tone }) {
 }
 
 function PalaceCell({ palace }) {
-  const decadalRange = palace.decadal?.range?.join('—') || '';
+  const decadalRange = palace.decadal?.range?.join('至') || '';
   const firstAges = palace.ages?.slice(0, 3).join('、') || '';
 
   return (

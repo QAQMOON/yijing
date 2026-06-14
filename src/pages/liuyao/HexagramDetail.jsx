@@ -36,7 +36,7 @@ export default function HexagramDetail() {
       <div className={styles.section}>
         <h3>卦辞</h3>
         <p className={styles.judgment}>{hex.judgment}</p>
-        <p className={styles.meaning}>— {hex.meaning}</p>
+        <p className={styles.meaning}>{hex.meaning}</p>
       </div>
       {hex.image && (
         <div className={styles.section}>

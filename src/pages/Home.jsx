@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import HexagramDisplay from '../components/HexagramDisplay.jsx';
 import Seo from '../components/Seo.jsx';
 import ToolCard from '../components/ToolCard.jsx';
@@ -27,7 +28,7 @@ export default function Home() {
         path="/"
       />
 
-      {/* Hero — Daily Hexagram */}
+      {/* Daily Hexagram */}
       <section className={styles.hero}>
         <p className={styles.brandLine}>{BRAND_NAME} · {tagline}</p>
         <p className={styles.date}>{formatDateCN()} · 今日一卦</p>
@@ -42,6 +43,17 @@ export default function Home() {
           onSave={(data) => saveReading({ type: 'daily', hexagramId: hexagram.id, ...data })}
           hexagram={hexagram}
         />
+      </section>
+
+      <section className={styles.appPanel}>
+        <div>
+          <h2>AI 解读与积分账户</h2>
+          <p>登录后可在六爻结果页调用 DeepSeek 生成深度解读，新账户赠送体验积分。</p>
+        </div>
+        <div className={styles.appActions}>
+          <Link to="/account">登录账户</Link>
+          <Link to="/pricing">查看套餐</Link>
+        </div>
       </section>
 
       {/* Divider */}

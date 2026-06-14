@@ -2,6 +2,8 @@
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import Seo from '../../components/Seo.jsx';
 import SaveReading from '../../components/SaveReading.jsx';
+import { CREDIT_COSTS } from '../../data/creditPlans.js';
+import { useAccount } from '../../hooks/useAccount.js';
 import { useReadingHistory } from '../../hooks/useReadingHistory.js';
 import { HEXAGRAMS } from '../../data/hexagrams.js';
 import { ZHOUYI_TEXT } from '../../data/zhouyiText.js';
@@ -96,7 +98,7 @@ function ZhouyiBlock({ hexagram, title }) {
     <section className={styles.textSection}>
       <h2>{title}</h2>
       <article className={styles.classicBlock}>
-        <h3>《周易》—— {fullName} {hexagram.upperTrigram}上{hexagram.lowerTrigram}下</h3>
+        <h3>《周易》：{fullName} {hexagram.upperTrigram}上{hexagram.lowerTrigram}下</h3>
         <p>{hexagram.judgment}</p>
         <p><strong>彖曰：</strong>{zhouyi.tuan || '彖传原文待补录。'}</p>
         <p><strong>象曰：</strong>{zhouyi.image || hexagram.image || '象传原文待补录。'}</p>
@@ -126,7 +128,7 @@ function NajiaTable({ rows }) {
           {[...rows].reverse().map((row) => (
             <tr key={row.index} className={row.isMoving ? styles.najiaMoving : ''}>
               <td>{row.sixGod}</td>
-              <td>{row.hiddenSpirit || '—'}</td>
+              <td>{row.hiddenSpirit || '无'}</td>
               <td>{row.relative}</td>
               <td>{LINE_NAMES[row.index]}</td>
               <td className={styles.lineSymbol}>{row.baseLineText}</td>
@@ -189,6 +191,115 @@ function ExternalReading({ payload }) {
             </p>
           </details>
         ))}
+      </div>
+    </section>
+  );
+}
+
+function DeepSeekReading({ payload, question }) {
+  const { account, refundCredits, spendCredits } = useAccount();
+  const [style, setStyle] = useState('plain');
+  const [depth, setDepth] = useState('brief');
+  const [status, setStatus] = useState('idle');
+  const [result, setResult] = useState('');
+  const [error, setError] = useState('');
+  const cost = CREDIT_COSTS.aiReading;
+
+  const requestReading = async () => {
+    let charged = false;
+    setError('');
+    setStatus('loading');
+
+    try {
+      spendCredits(cost, '六爻 AI 深度解读');
+      charged = true;
+
+      const response = await fetch('/api/deepseek-reading', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          domain: 'liuyao',
+          chart: payload,
+          question,
+          style,
+          depth,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'AI 解读失败');
+      setResult(data.text);
+      setStatus('ready');
+    } catch (err) {
+      if (charged) refundCredits(cost, 'AI 解读失败退回');
+      setError(err.message || 'AI 解读失败');
+      setStatus('error');
+    }
+  };
+
+  return (
+    <section className={styles.deepSeekSection}>
+      <div className={styles.deepSeekHead}>
+        <div>
+          <h2>AI 深度解读</h2>
+          <p>调用 DeepSeek 结合卦象、动爻、干支、纳甲生成参考解读。</p>
+        </div>
+        <span className={styles.costBadge}>{cost} 积分/次</span>
+      </div>
+
+      <div className={styles.deepSeekCard}>
+        <div className={styles.aiControls}>
+          <label>
+            <span>解读风格</span>
+            <select value={style} onChange={(event) => setStyle(event.target.value)}>
+              <option value="plain">通俗版</option>
+              <option value="scholar">严谨版</option>
+            </select>
+          </label>
+          <label>
+            <span>篇幅</span>
+            <select value={depth} onChange={(event) => setDepth(event.target.value)}>
+              <option value="brief">精简</option>
+              <option value="full">完整</option>
+            </select>
+          </label>
+        </div>
+
+        {!account && (
+          <div className={styles.aiNotice}>
+            <p>登录后可使用 AI 解读，新账户赠送体验积分。</p>
+            <Link to="/account" className={styles.aiInlineLink}>去登录</Link>
+          </div>
+        )}
+
+        {account && account.credits < cost && (
+          <div className={styles.aiNotice}>
+            <p>当前积分不足，需要 {cost} 积分。</p>
+            <Link to="/pricing" className={styles.aiInlineLink}>购买积分</Link>
+          </div>
+        )}
+
+        {account && account.credits >= cost && (
+          <button
+            className={styles.aiButton}
+            type="button"
+            disabled={status === 'loading'}
+            onClick={requestReading}
+          >
+            {status === 'loading' ? '正在生成' : '生成 AI 解读'}
+          </button>
+        )}
+
+        {status === 'error' && (
+          <p className={styles.aiError}>{error}</p>
+        )}
+
+        {status === 'ready' && result && (
+          <article className={styles.deepSeekResult}>
+            {result.split(/\n{2,}/).map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </article>
+        )}
       </div>
     </section>
   );
@@ -276,6 +387,43 @@ export default function ReadingResult() {
   const baseFullName = getHexagramFullName(baseHex);
   const changedFullName = getHexagramFullName(changedHex);
   const shenshaText = shensha.map((item) => `${item.name}：${item.value}`).join(' / ');
+  const readingPayload = {
+    baseHex: {
+      id: baseHex.id,
+      name: baseFullName,
+      meaning: baseHex.meaning,
+      judgment: baseHex.judgment,
+    },
+    changedHex: {
+      id: changedHex.id,
+      name: changedFullName,
+      meaning: changedHex.meaning,
+      judgment: changedHex.judgment,
+    },
+    meta,
+    palace: getHexagramPalace(baseHex.id),
+    movingLines: movingIndexes.map((index) => LINE_NAMES[index]),
+    values,
+    lines,
+    source,
+    date: formatDateTimeCN(date),
+    castAt: {
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+      day: date.getDate(),
+      hour: date.getHours(),
+      minute: date.getMinutes(),
+    },
+    lunarDate: formatLunarDate(date),
+    pillars: {
+      year: pillars.year.full,
+      month: pillars.month.full,
+      day: pillars.day.full,
+      hour: pillars.hour.full,
+    },
+    voidBranches,
+    najiaRows,
+  };
 
   return (
     <div className={styles.page}>
@@ -376,44 +524,9 @@ export default function ReadingResult() {
         <Link to="/liuyao/cast" className={styles.retryLink}>重新起卦</Link>
       </div>
 
-      <ExternalReading
-        payload={{
-          baseHex: {
-            id: baseHex.id,
-            name: baseFullName,
-            meaning: baseHex.meaning,
-            judgment: baseHex.judgment,
-          },
-          changedHex: {
-            id: changedHex.id,
-            name: changedFullName,
-            meaning: changedHex.meaning,
-            judgment: changedHex.judgment,
-          },
-          palace: getHexagramPalace(baseHex.id),
-          movingLines: movingIndexes.map((index) => LINE_NAMES[index]),
-          values,
-          lines,
-          source,
-          date: formatDateTimeCN(date),
-          castAt: {
-            year: date.getFullYear(),
-            month: date.getMonth() + 1,
-            day: date.getDate(),
-            hour: date.getHours(),
-            minute: date.getMinutes(),
-          },
-          lunarDate: formatLunarDate(date),
-          pillars: {
-            year: pillars.year.full,
-            month: pillars.month.full,
-            day: pillars.day.full,
-            hour: pillars.hour.full,
-          },
-          voidBranches,
-          najiaRows,
-        }}
-      />
+      <ExternalReading payload={readingPayload} />
+
+      <DeepSeekReading payload={readingPayload} question={meta.question} />
 
       <SaveReading
         onSave={(data) => saveReading({

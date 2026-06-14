@@ -32,6 +32,7 @@ export const TOOL_NAV = [
 ];
 
 export const FOOTER_NAV = [
+  { to: '/pricing', label: '积分套餐' },
   { to: '/privacy', label: '隐私政策' },
   { to: '/terms', label: '服务条款' },
   { to: '/roadmap', label: '产品路线' },
@@ -47,14 +48,14 @@ export const APP_ROADMAP = [
   {
     stage: '阶段二',
     title: 'DeepSeek AI 解读',
-    status: '规划中',
+    status: '当前阶段',
     points: ['服务端代理 DeepSeek API', '按卦盘上下文生成解读', '严谨版与通俗版两种输出'],
   },
   {
     stage: '阶段三',
     title: '账户与积分',
-    status: '规划中',
-    points: ['登录与用户档案', '积分消耗记录', '报告历史云端同步', '付费充值与退款规则'],
+    status: '体验版',
+    points: ['本地体验账号', '积分消耗记录', '报告历史云端同步', '付费充值与退款规则'],
   },
 ];
 
