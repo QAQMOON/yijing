@@ -2,6 +2,8 @@ import { TextDecoder } from 'node:util';
 
 const CHINA95_FORM_URL = 'https://p.china95.com/liuyao/index.asp';
 const CHINA95_RESULT_URL = 'https://p.china95.com/liuyao/liuyao.asp';
+const REQUEST_TIMEOUT_MS = 10000;
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const READING_SECTIONS = ['总体', '事业', '经商', '求名', '出外', '婚恋', '决策'];
 const VALUE_TO_CHINA95_YAO = {
   6: '0',
@@ -9,10 +11,20 @@ const VALUE_TO_CHINA95_YAO = {
   8: '2',
   9: '3',
 };
+const responseCache = new Map();
+
+class ValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}
 
 function sendJson(res, status, payload) {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   res.end(JSON.stringify(payload));
 }
 
@@ -36,15 +48,32 @@ function numberOrFallback(value, fallback) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function numberInRange(value, min, max) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= min && parsed <= max;
+}
+
 function normalizeDateParts(value) {
   const now = new Date();
-  return {
+  const date = {
     year: numberOrFallback(value?.year, now.getFullYear()),
     month: numberOrFallback(value?.month, now.getMonth() + 1),
     day: numberOrFallback(value?.day, now.getDate()),
     hour: numberOrFallback(value?.hour, now.getHours()),
     minute: numberOrFallback(value?.minute, now.getMinutes()),
   };
+
+  if (
+    !numberInRange(date.year, 1900, 2100)
+    || !numberInRange(date.month, 1, 12)
+    || !numberInRange(date.day, 1, 31)
+    || !numberInRange(date.hour, 0, 23)
+    || !numberInRange(date.minute, 0, 59)
+  ) {
+    throw new ValidationError('起卦时间参数无效');
+  }
+
+  return date;
 }
 
 function normalizeYaoValues(payload) {
@@ -60,10 +89,14 @@ function normalizeYaoValues(payload) {
 }
 
 function buildChina95Form(payload) {
+  if (!payload || typeof payload !== 'object') {
+    throw new ValidationError('请求内容格式无效');
+  }
+
   const date = normalizeDateParts(payload?.castAt);
   const yaoValues = normalizeYaoValues(payload);
   if (yaoValues.length !== 6 || yaoValues.some((value) => value === null)) {
-    throw new Error('缺少有效的六爻数据，无法提交外站排盘');
+    throw new ValidationError('缺少有效的六爻数据，无法提交外站排盘');
   }
 
   const fields = {
@@ -86,6 +119,31 @@ function buildChina95Form(payload) {
   return Object.entries(fields)
     .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
     .join('&');
+}
+
+function getCachedResult(key) {
+  const cached = responseCache.get(key);
+  if (!cached) return null;
+  if (Date.now() - cached.createdAt > CACHE_TTL_MS) {
+    responseCache.delete(key);
+    return null;
+  }
+  return cached.result;
+}
+
+function setCachedResult(key, result) {
+  responseCache.set(key, { createdAt: Date.now(), result });
+}
+
+async function fetchWithTimeout(url, options) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 function decodeHtmlEntities(text) {
@@ -168,7 +226,10 @@ function parseSections(text) {
 
 async function fetchChina95Reading(payload) {
   const body = buildChina95Form(payload);
-  const response = await fetch(CHINA95_RESULT_URL, {
+  const cached = getCachedResult(body);
+  if (cached) return cached;
+
+  const response = await fetchWithTimeout(CHINA95_RESULT_URL, {
     method: 'POST',
     headers: {
       'User-Agent': 'Mozilla/5.0 (compatible; YijingWisdom/1.0)',
@@ -185,15 +246,24 @@ async function fetchChina95Reading(payload) {
 
   const html = new TextDecoder('gb18030').decode(await response.arrayBuffer());
   const text = extractComputerReading(html);
-  return {
+  const result = {
     source: 'china95',
     sourceUrl: CHINA95_RESULT_URL,
     text,
     sections: parseSections(text),
   };
+  setCachedResult(body, result);
+  return result;
 }
 
 export default async function handler(req, res) {
+  if (req.method === 'OPTIONS') {
+    res.statusCode = 204;
+    res.setHeader('Allow', 'POST, OPTIONS');
+    res.end();
+    return;
+  }
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     sendJson(res, 405, { error: 'Method Not Allowed' });
@@ -206,7 +276,13 @@ export default async function handler(req, res) {
     const result = await fetchChina95Reading(payload);
     sendJson(res, 200, result);
   } catch (error) {
-    sendJson(res, 502, {
+    const status = error instanceof ValidationError
+      ? 400
+      : error.name === 'AbortError'
+        ? 504
+        : 502;
+
+    sendJson(res, status, {
       error: error.message || '电脑解卦抓取失败',
     });
   }

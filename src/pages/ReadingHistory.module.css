@@ -7,6 +7,7 @@
 .toolbar { display: flex; gap: var(--space-sm); justify-content: flex-end; margin-bottom: var(--space-lg); }
 .toolBtn { padding: 6px 14px; border: 1px solid var(--color-border); background: transparent; color: var(--color-text-secondary); border-radius: 4px; font-family: var(--font-heading); font-size: 0.8rem; cursor: pointer; }
 .toolBtn:hover { background: var(--color-bg-dark); }
+.message { margin: calc(var(--space-lg) * -0.5) 0 var(--space-lg); color: var(--color-accent-dark); font-size: 0.85rem; text-align: right; }
 
 .list { display: flex; flex-direction: column; gap: var(--space-sm); }
 .item { display: flex; justify-content: space-between; align-items: center; padding: var(--space-md) var(--space-lg); background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: 8px; gap: var(--space-md); flex-wrap: wrap; }

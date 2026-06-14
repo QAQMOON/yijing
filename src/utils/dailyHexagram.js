@@ -1,3 +1,5 @@
+import { getStorageItem, setStorageItem } from './safeStorage.js';
+
 const DAILY_HEXAGRAM_SEED_KEY = 'yijie-daily-hexagram-seed';
 
 function hashToIndex(key) {
@@ -24,11 +26,11 @@ function createSeed() {
 function getVisitorSeed() {
   if (typeof window === 'undefined') return 'server';
 
-  const savedSeed = window.localStorage.getItem(DAILY_HEXAGRAM_SEED_KEY);
+  const savedSeed = getStorageItem(DAILY_HEXAGRAM_SEED_KEY);
   if (savedSeed) return savedSeed;
 
   const seed = createSeed();
-  window.localStorage.setItem(DAILY_HEXAGRAM_SEED_KEY, seed);
+  setStorageItem(DAILY_HEXAGRAM_SEED_KEY, seed);
   return seed;
 }
 

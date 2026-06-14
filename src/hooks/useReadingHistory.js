@@ -1,11 +1,12 @@
 import { useState, useCallback } from 'react';
+import { getStorageItem, setStorageItem } from '../utils/safeStorage.js';
 
 const STORAGE_KEY = 'yijing-readings';
 
 export function useReadingHistory() {
   const [readings, setReadings] = useState(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = getStorageItem(STORAGE_KEY);
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
@@ -14,7 +15,7 @@ export function useReadingHistory() {
 
   const persist = useCallback((newReadings) => {
     setReadings(newReadings);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newReadings));
+    setStorageItem(STORAGE_KEY, JSON.stringify(newReadings));
   }, []);
 
   const saveReading = useCallback((reading) => {
@@ -26,7 +27,7 @@ export function useReadingHistory() {
     };
     setReadings(prev => {
       const next = [entry, ...prev];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      setStorageItem(STORAGE_KEY, JSON.stringify(next));
       return next;
     });
     return entry;

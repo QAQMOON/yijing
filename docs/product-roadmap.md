@@ -13,9 +13,10 @@
 
 - 保持六爻、八字、紫微斗数、大六壬、奇门遁甲工具可用。
 - 每个工具页维护独立 title、description、canonical。
+- 公开路由构建后生成静态 HTML，便于搜索引擎和无 JS 环境读取基础内容。
 - 补隐私政策、服务条款、产品路线页面。
 - 使用 Vercel rewrites 支持 SPA 直达路由。
-- 保持 `npm test`、`npm run lint`、`npm run build` 通过。
+- 保持 `npm test`、`npm run lint`、`npm run build`、`npm run test:e2e` 通过。
 
 ## 阶段二：DeepSeek AI 解读
 
@@ -66,6 +67,7 @@ POST /api/ai-reading
 - `npm test`
 - `npm run lint`
 - `npm run build`
+- `npm run test:e2e`
 - Vercel 环境变量已配置
 - 隐私政策和服务条款已更新到实际数据处理方式
 - DeepSeek key 未出现在前端 bundle 中

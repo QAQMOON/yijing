@@ -1,4 +1,4 @@
-﻿import { useRef } from 'react';
+﻿import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo.jsx';
 import { useReadingHistory } from '../hooks/useReadingHistory.js';
@@ -9,15 +9,16 @@ import styles from './ReadingHistory.module.css';
 export default function ReadingHistory() {
   const { readings, deleteReading, updateNote, exportJSON, importJSON } = useReadingHistory();
   const fileRef = useRef(null);
+  const [message, setMessage] = useState('');
 
   const handleImport = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     try {
       const count = await importJSON(file);
-      alert(`成功导入 ${count} 条记录`);
+      setMessage(`成功导入 ${count} 条记录`);
     } catch {
-      alert('文件格式错误');
+      setMessage('文件格式错误，请选择易解导出的 JSON 备份。');
     }
     e.target.value = '';
   };
@@ -49,6 +50,7 @@ export default function ReadingHistory() {
             <button className={styles.toolBtn} onClick={() => fileRef.current?.click()}>导入恢复</button>
             <input ref={fileRef} type="file" accept=".json" style={{display:'none'}} onChange={handleImport} />
           </div>
+          {message && <p className={styles.message} role="status">{message}</p>}
           <div className={styles.list}>
             {readings.map(reading => {
               const hex = HEXAGRAMS.find(h => h.id === reading.hexagramId);

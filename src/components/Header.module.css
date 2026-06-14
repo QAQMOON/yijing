@@ -122,30 +122,79 @@
 
 @media (max-width: 860px) {
   .header {
-    padding: var(--space-md) var(--space-sm);
+    padding: var(--space-sm) var(--space-sm);
   }
 
-  .inner,
-  .actions {
-    align-items: stretch;
-    flex-direction: column;
+  .inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: var(--space-sm);
     width: 100%;
     min-width: 0;
   }
 
+  .logo {
+    align-items: flex-start;
+    min-width: 72px;
+  }
+
+  .logoMain {
+    font-size: 1.35rem;
+  }
+
+  .logoSub {
+    max-width: 144px;
+    overflow: hidden;
+    font-size: 0.58rem;
+    text-overflow: ellipsis;
+  }
+
+  .actions {
+    display: contents;
+  }
+
   .nav {
-    flex-wrap: wrap;
-    justify-content: center;
-    width: 100%;
+    grid-column: 1 / -1;
+    flex-wrap: nowrap;
+    gap: var(--space-xs);
+    justify-content: flex-start;
+    width: calc(100vw - 16px);
+    max-width: 100%;
+    overflow-x: auto;
+    padding: var(--space-xs) 0 2px;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
   }
 
   .link {
     padding: var(--space-xs) var(--space-sm);
+    white-space: nowrap;
   }
 
   .themeControl {
-    justify-content: center;
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-end;
+    justify-self: end;
+    margin-left: 0;
+    margin-right: var(--space-sm);
     padding-left: 0;
     border-left: 0;
+    max-width: 60px;
+  }
+
+  .themeLabel {
+    display: none;
+  }
+
+  .themeSelect {
+    width: 56px;
+    min-width: 56px;
+    padding: 0 2px;
+    font-size: 0.75rem;
   }
 }

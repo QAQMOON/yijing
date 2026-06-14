@@ -1,0 +1,19 @@
+{
+  "name": "易解 · 卦命合参",
+  "short_name": "易解",
+  "description": "六爻起卦、八字排盘、紫微斗数、大六壬、奇门遁甲，传统术数文化在线工具。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f1e8",
+  "theme_color": "#f5f1e8",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

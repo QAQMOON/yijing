@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender-static.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "node scripts/baziCalc.test.mjs && node scripts/dailyHexagram.test.mjs && node scripts/qimenCalc.test.mjs && node scripts/ziweiCalc.test.mjs",
     "test:bazi": "node scripts/baziCalc.test.mjs",
     "test:daily": "node scripts/dailyHexagram.test.mjs",
     "test:qimen": "node scripts/qimenCalc.test.mjs",
-    "test:ziwei": "node scripts/ziweiCalc.test.mjs"
+    "test:ziwei": "node scripts/ziweiCalc.test.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "iztro": "^2.5.8",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.60.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",

@@ -13,6 +13,7 @@
 - 奇门遁甲九宫排盘
 - 本地卦历记录、导入与导出
 - 隐私政策、服务条款、产品路线与页面 SEO 基础
+- robots、sitemap、manifest 与公开路由静态 HTML 生成
 
 ## 产品路线
 
@@ -44,7 +45,10 @@ npm run dev
 npm test
 npm run lint
 npm run build
+npm run test:e2e
 ```
+
+`npm run build` 会先执行 Vite 构建，再运行 `scripts/prerender-static.mjs`，为公开路由生成带独立 title、description、canonical 和基础正文的静态 HTML。
 
 ## 环境变量
 
@@ -53,3 +57,5 @@ npm run build
 ## 部署
 
 项目继续使用 Vercel。`vercel.json` 已配置 SPA 路由 fallback 和基础安全头，直接访问 `/bazi`、`/privacy`、`/qimen/display` 等前端路由时会回落到 `index.html`。
+
+`public/robots.txt`、`public/sitemap.xml` 和 `public/manifest.webmanifest` 会作为真实静态文件发布，不参与 SPA fallback。
