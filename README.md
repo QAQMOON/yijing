@@ -53,6 +53,8 @@ npm run test:e2e
 
 `npm run build` 会先执行 Vite 构建，再运行 `scripts/prerender-static.mjs`，为公开路由生成带独立 title、description、canonical 和基础正文的静态 HTML。
 
+本地 `npm run dev` 会直接处理 `/api/liuyao-reading`；`/api/deepseek-reading` 如果本地没有配置 `DEEPSEEK_API_KEY`，会代理到线上 Vercel 接口，方便在本地预览时测试 AI 解读。若要完全本地调用 DeepSeek，请在本机环境变量或 `.env.local` 中配置服务端密钥，不要使用 `VITE_` 前缀。
+
 ## 环境变量
 
 复制 `.env.example` 并在本地或 Vercel 中配置实际值。DeepSeek 密钥只能放在服务端环境变量中，不要使用 `VITE_` 前缀暴露到浏览器。

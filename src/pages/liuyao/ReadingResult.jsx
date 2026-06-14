@@ -87,9 +87,12 @@ function parseExternalSections(data) {
   }, {});
 }
 
-function getApiError(data, fallback) {
-  if (typeof data?.error === 'string') return data.error;
-  if (data?.error?.message) return data.error.message;
+function getApiError(data, fallback, status) {
+  const code = data?.error?.code;
+  const suffix = code ? `（${code}）` : '';
+  if (typeof data?.error === 'string') return `${data.error}${suffix}`;
+  if (data?.error?.message) return `${data.error.message}${suffix}`;
+  if (status) return `${fallback}（HTTP ${status}）`;
   return fallback;
 }
 
@@ -238,7 +241,7 @@ function DeepSeekReading({ payload, question }) {
         }),
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(getApiError(data, 'AI 解读失败'));
+      if (!response.ok) throw new Error(getApiError(data, 'AI 解读失败', response.status));
       setResult(data.text);
       saveReport({
         domain: 'liuyao',

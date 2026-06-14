@@ -61,6 +61,12 @@ function sendError(res, error) {
     : error.name === 'AbortError'
       ? 'upstream_timeout'
       : 'upstream_error';
+  const logger = status >= 500 ? console.error : console.warn;
+  logger('[deepseek-reading]', {
+    status,
+    code,
+    message: error.message || 'AI 解读失败',
+  });
 
   sendJson(res, status, {
     error: {
