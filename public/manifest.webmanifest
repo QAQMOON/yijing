@@ -1,7 +1,7 @@
 {
   "name": "易解 · 卦命合参",
   "short_name": "易解",
-  "description": "免费排盘、古籍依据、DeepSeek AI 解读、积分账户与报告历史。",
+  "description": "免费排盘、古籍依据、AI 解读、积分账户与报告历史。",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

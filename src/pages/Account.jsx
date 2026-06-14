@@ -44,10 +44,10 @@ function LoginPanel() {
   return (
     <section className={styles.loginPanel}>
       <div>
-        <p className={styles.kicker}>体验账号</p>
+        <p className={styles.kicker}>我的账号</p>
         <h1>登录易解</h1>
         <p className={styles.lead}>
-          登录后可使用 DeepSeek AI 解读，并获得 {STARTER_CREDITS} 积分体验额度。
+          登录后可使用 AI 解读，并获得 {STARTER_CREDITS} 积分试用额度。
         </p>
       </div>
 
@@ -139,7 +139,7 @@ export default function Account() {
     <div className={styles.page}>
       <Seo
         title="我的账户 · 登录与积分 · 易解"
-        description="登录易解体验账号，查看 AI 解读积分余额、积分消耗记录与充值入口。"
+        description="登录易解账号，查看 AI 解读积分余额、积分消耗记录与充值入口。"
         path="/account"
       />
       {account ? <AccountPanel /> : <LoginPanel />}

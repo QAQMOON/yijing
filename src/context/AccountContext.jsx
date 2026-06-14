@@ -37,7 +37,7 @@ function readStoredAccount() {
       identifier: String(account.identifier),
       displayName: String(account.displayName || account.identifier),
       credits: Number.isFinite(Number(account.credits)) ? Number(account.credits) : 0,
-      plan: String(account.plan || '体验账号'),
+      plan: String(account.plan || '基础账号'),
       createdAt: account.createdAt || nowIso(),
       ledger: Array.isArray(account.ledger) ? account.ledger.slice(0, MAX_LEDGER_ITEMS) : [],
     };
@@ -76,7 +76,7 @@ function createAccount({ identifier, displayName }) {
     identifier: cleanIdentifier,
     displayName: normalizeName(displayName, cleanIdentifier),
     credits: STARTER_CREDITS,
-    plan: '体验账号',
+    plan: '基础账号',
     createdAt: nowIso(),
     ledger: [],
   };
@@ -84,7 +84,7 @@ function createAccount({ identifier, displayName }) {
   return appendLedger(account, {
     type: 'grant',
     amount: STARTER_CREDITS,
-    reason: '新账户体验积分',
+    reason: '新账户试用积分',
   });
 }
 

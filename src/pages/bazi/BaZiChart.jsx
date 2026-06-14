@@ -44,11 +44,9 @@ function formatStewardBirthdate(date) {
 }
 
 function getApiError(data, fallback, status) {
-  const code = data?.error?.code;
-  const suffix = code ? `（${code}）` : '';
-  if (typeof data?.error === 'string') return `${data.error}${suffix}`;
-  if (data?.error?.message) return `${data.error.message}${suffix}`;
-  if (status) return `${fallback}（HTTP ${status}）`;
+  if (typeof data?.error === 'string') return data.error;
+  if (data?.error?.message) return data.error.message;
+  if (status) return fallback;
   return fallback;
 }
 
@@ -79,6 +77,12 @@ function StewardPanel({ status, data, error }) {
   const config = data?.config;
   const yun = data?.bazi?.yun;
   const daYun = yun?.da_yun?.slice(0, 8) || [];
+  const statusLabel = {
+    ready: '已完成',
+    error: '暂不可用',
+    idle: '校准中',
+    loading: '校准中',
+  }[status] || '校准中';
 
   return (
     <section className={styles.stewardPanel}>
@@ -87,7 +91,7 @@ function StewardPanel({ status, data, error }) {
           <p>出生地校时</p>
           <h2>真太阳时与起运校准</h2>
         </div>
-        <span>{status === 'ready' ? '已完成' : '校准中'}</span>
+        <span>{statusLabel}</span>
       </div>
 
       {status === 'loading' && (

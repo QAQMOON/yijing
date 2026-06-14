@@ -53,7 +53,7 @@ export default function PocketTools() {
       <section className={styles.hero}>
         <p className={styles.kicker}>百宝袋</p>
         <h1>排盘前先校对时间与干支</h1>
-        <p>先做稳定的小工具：时辰换算、节气、四柱、纳音、空亡。七政四余后续单独接星历。</p>
+        <p>提供时辰换算、节气、四柱、纳音、空亡等常用小工具。七政四余会单独接入星历。</p>
       </section>
 
       <section className={styles.inputPanel}>

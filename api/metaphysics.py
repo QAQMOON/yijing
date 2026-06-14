@@ -160,13 +160,12 @@ class handler(BaseHTTPRequestHandler):
             send_json(self, 502, {
                 "error": {
                     "code": "metaphysics_error",
-                    "message": "服务端术数引擎暂时不可用",
+                    "message": "校时排盘暂时不可用，请稍后再试",
                 },
             })
 
     def do_GET(self):
         send_json(self, 200, {
-            "provider": "metaphysics-steward",
             "modes": ["bazi"],
-            "message": "POST birthdate, sex and birthplace to get structured metaphysics data.",
+            "message": "请在页面中提交出生时间、性别和出生地后查看结果。",
         })

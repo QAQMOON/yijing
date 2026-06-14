@@ -12,8 +12,8 @@ export default function Pricing() {
   const topUp = (plan) => {
     setMessage('');
     try {
-      addCredits(plan.credits, `${plan.name}体验积分`, plan.name);
-      setMessage(`已为当前体验账号增加 ${plan.credits} 积分。`);
+      addCredits(plan.credits, `${plan.name}试用积分`, plan.name);
+      setMessage(`已为当前账号增加 ${plan.credits} 积分。`);
     } catch (err) {
       setMessage(err.message || '充值失败，请先登录。');
     }
@@ -23,7 +23,7 @@ export default function Pricing() {
     <div className={styles.page}>
       <Seo
         title="积分套餐 · AI 解读付费 · 易解"
-        description="易解积分套餐页面展示 AI 解读积分包、体验额度和后续正式支付说明。"
+        description="易解积分套餐页面展示 AI 解读积分包、试用额度和购买说明。"
         path="/pricing"
       />
 
@@ -31,7 +31,7 @@ export default function Pricing() {
         <p className={styles.kicker}>积分套餐</p>
         <h1>AI 解读按次消耗积分</h1>
         <p>
-          排盘工具保持免费。AI 深度解读按次扣积分，正式支付开放前可先领取体验额度。
+          排盘工具保持免费。AI 深度解读按次扣积分，购买通道开放前可先领取试用额度。
         </p>
       </section>
 
@@ -57,7 +57,7 @@ export default function Pricing() {
       {message && <p className={styles.message}>{message}</p>}
 
       <section className={styles.setupPanel}>
-        <h2>正式支付即将开放</h2>
+        <h2>购买通道即将开放</h2>
         <div className={styles.setupGrid}>
           <div>
             <strong>支付方式</strong>

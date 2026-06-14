@@ -15,7 +15,7 @@ const PUBLIC_ROUTES = [
   { path: '/pricing', title: /积分套餐/, h1: /AI 解读按次消耗积分/ },
   { path: '/privacy', title: /隐私政策/, h1: /隐私政策/ },
   { path: '/terms', title: /服务条款/, h1: /服务条款/ },
-  { path: '/roadmap', title: /产品路线/, h1: /产品路线/ },
+  { path: '/roadmap', title: /更新计划/, h1: /更新计划/ },
 ];
 
 test.describe('public route smoke', () => {
@@ -33,7 +33,7 @@ test.describe('public route smoke', () => {
 
       await expect(page).toHaveTitle(route.title);
       await expect(page.locator('h1').first()).toContainText(route.h1);
-      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /易解|六爻|八字|紫微|奇门|大六壬|隐私|服务|产品路线|积分|账户|藏经阁|报告|百宝袋/);
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /易解|六爻|八字|紫微|奇门|大六壬|隐私|服务|更新计划|积分|账户|藏经阁|报告|百宝袋/);
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /^https:\/\/yijing-pi\.vercel\.app/);
 
       const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
@@ -65,7 +65,7 @@ test('footer legal links work', async ({ page }) => {
   await expect(page.locator('h1')).toContainText('服务条款');
 });
 
-test('local account can sign in and top up demo credits', async ({ page }) => {
+test('local account can sign in and top up trial credits', async ({ page }) => {
   await page.goto('/account');
   await page.waitForLoadState('networkidle');
 
@@ -80,7 +80,7 @@ test('local account can sign in and top up demo credits', async ({ page }) => {
   await page.goto('/pricing');
   await page.getByRole('button', { name: '领取积分' }).nth(1).click();
 
-  await expect(page.getByText('已为当前体验账号增加 68 积分。')).toBeVisible();
+  await expect(page.getByText('已为当前账号增加 68 积分。')).toBeVisible();
   await expect(page.getByRole('link', { name: /76积分/ })).toBeVisible();
 });
 

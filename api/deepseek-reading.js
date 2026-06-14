@@ -168,7 +168,7 @@ function getRequester(req) {
   if (requiredToken) {
     const auth = getHeader(req, 'authorization') || '';
     if (auth !== `Bearer ${requiredToken}`) {
-      throw new HttpError(401, 'unauthorized', '缺少有效的服务端访问令牌');
+      throw new HttpError(401, 'unauthorized', '访问验证未通过');
     }
   }
 
@@ -272,7 +272,7 @@ async function fetchWithTimeout(url, options) {
 async function requestDeepSeek(payload) {
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
-    throw new ConfigError('DeepSeek API Key 未配置');
+    throw new ConfigError('AI 解读暂未开通，请稍后再试');
   }
 
   const model = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
@@ -294,11 +294,12 @@ async function requestDeepSeek(payload) {
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new HttpError(502, 'upstream_error', data.error?.message || `DeepSeek 请求失败：HTTP ${response.status}`);
+    console.error('[deepseek-reading] upstream error', data.error || response.status);
+    throw new HttpError(502, 'upstream_error', 'AI 解读暂时不可用，请稍后再试');
   }
 
   const text = data.choices?.[0]?.message?.content?.trim();
-  if (!text) throw new HttpError(502, 'empty_upstream_response', 'DeepSeek 未返回有效解读');
+  if (!text) throw new HttpError(502, 'empty_upstream_response', 'AI 解读暂时没有返回内容，请稍后再试');
 
   return {
     provider: 'deepseek',

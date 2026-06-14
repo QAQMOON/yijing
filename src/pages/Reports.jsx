@@ -47,7 +47,7 @@ export default function Reports() {
     <div className={styles.page}>
       <Seo
         title="AI 报告历史 · 三术合参 · 易解"
-        description="易解 AI 报告历史入口，保存六爻 DeepSeek 解读，并预留八字、紫微、六爻三术合参综合报告。"
+        description="易解 AI 报告历史入口，保存六爻解读，并提供八字、紫微、六爻三术合参综合报告入口。"
         path="/reports"
       />
 
@@ -55,7 +55,7 @@ export default function Reports() {
         <div>
           <p className={styles.kicker}>AI 报告</p>
           <h1>把每一次解读沉淀成报告</h1>
-          <p>当前报告保存在本设备。账户同步开放后，可在不同设备继续查看。</p>
+          <p>报告会保存在当前设备，后续可在账号中同步查看。</p>
         </div>
         <div className={styles.heroActions}>
           <Link to="/liuyao/cast">生成六爻报告</Link>
@@ -66,7 +66,7 @@ export default function Reports() {
       <section className={styles.comboPanel}>
         <div>
           <h2>三术合参综合报告</h2>
-          <p>八字看长期结构，紫微看宫位叙事，六爻看当下问题。合参报告会成为后续付费核心。</p>
+          <p>八字看长期结构，紫微看宫位叙事，六爻看当下问题，合成一份更完整的参考报告。</p>
         </div>
         <div className={styles.comboGrid}>
           <span>八字结构</span>
@@ -77,14 +77,14 @@ export default function Reports() {
       </section>
 
       <section className={styles.cloudPanel}>
-        <h2>报告同步规划</h2>
+        <h2>报告管理</h2>
         <div>
           <span>账户同步</span>
           <span>积分保护</span>
           <span>报告归档</span>
-          <span>风控限流</span>
+          <span>异常保护</span>
         </div>
-        <p>后续将支持跨设备保存、报告找回和积分消耗记录查询。</p>
+        <p>后续支持跨设备保存、报告找回和积分消耗记录查询。</p>
       </section>
 
       <section className={styles.listSection}>

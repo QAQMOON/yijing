@@ -96,7 +96,7 @@ function buildChina95Form(payload) {
   const date = normalizeDateParts(payload?.castAt);
   const yaoValues = normalizeYaoValues(payload);
   if (yaoValues.length !== 6 || yaoValues.some((value) => value === null)) {
-    throw new ValidationError('缺少有效的六爻数据，无法提交外站排盘');
+    throw new ValidationError('缺少有效的六爻数据，请重新起卦');
   }
 
   const fields = {
@@ -185,7 +185,7 @@ function extractComputerReading(html) {
   const start = plain.indexOf('电脑解卦');
   if (start < 0) {
     const alert = html.match(/window\.alert\('([^']+)/)?.[1];
-    throw new Error(alert || '外站返回内容中未找到“电脑解卦”');
+    throw new Error(alert || '电脑解卦暂时没有返回有效内容');
   }
 
   const afterMarker = plain.slice(start);
@@ -194,7 +194,7 @@ function extractComputerReading(html) {
     .replace(/^电脑解卦[:：]\s*/, '')
     .trim();
 
-  if (!text) throw new Error('外站电脑解卦内容为空');
+  if (!text) throw new Error('电脑解卦暂时没有返回有效内容');
   return text;
 }
 
@@ -241,7 +241,8 @@ async function fetchChina95Reading(payload) {
   });
 
   if (!response.ok) {
-    throw new Error(`外站请求失败：HTTP ${response.status}`);
+    console.error('[liuyao-reading] upstream error', response.status);
+    throw new Error('电脑解卦暂时不可用，请稍后再试');
   }
 
   const html = new TextDecoder('gb18030').decode(await response.arrayBuffer());
@@ -266,7 +267,7 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    sendJson(res, 405, { error: 'Method Not Allowed' });
+    sendJson(res, 405, { error: '请在页面中提交排盘后查看解读' });
     return;
   }
 
@@ -283,7 +284,7 @@ export default async function handler(req, res) {
         : 502;
 
     sendJson(res, status, {
-      error: error.message || '电脑解卦抓取失败',
+      error: error.message || '电脑解卦暂时不可用',
     });
   }
 }

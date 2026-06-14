@@ -88,11 +88,9 @@ function parseExternalSections(data) {
 }
 
 function getApiError(data, fallback, status) {
-  const code = data?.error?.code;
-  const suffix = code ? `（${code}）` : '';
-  if (typeof data?.error === 'string') return `${data.error}${suffix}`;
-  if (data?.error?.message) return `${data.error.message}${suffix}`;
-  if (status) return `${fallback}（HTTP ${status}）`;
+  if (typeof data?.error === 'string') return data.error;
+  if (data?.error?.message) return data.error.message;
+  if (status) return fallback;
   return fallback;
 }
 
@@ -172,12 +170,12 @@ function ExternalReading({ payload }) {
           signal: controller.signal,
         });
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.error || '电脑解卦抓取失败');
+        if (!response.ok) throw new Error(data.error || '电脑解卦暂时不可用');
         setSections(parseExternalSections(data.sections));
         setStatus('ready');
       } catch (err) {
         if (err.name === 'AbortError') return;
-        setError(err.message || '电脑解卦抓取失败');
+        setError(err.message || '电脑解卦暂时不可用');
         setStatus('error');
       }
     }
@@ -190,14 +188,14 @@ function ExternalReading({ payload }) {
     <section className={styles.aiSection}>
       <h2>电脑解卦</h2>
       <div className={styles.aiCard}>
-        {status === 'loading' && <p className={styles.aiState}>正在抓取电脑解卦...</p>}
-        {status === 'error' && <p className={styles.aiState}>{error || '电脑解卦抓取失败'}</p>}
+        {status === 'loading' && <p className={styles.aiState}>正在获取电脑解卦...</p>}
+        {status === 'error' && <p className={styles.aiState}>{error || '电脑解卦暂时不可用'}</p>}
         {status !== 'error' && READING_SECTIONS.map((name, index) => (
           <details key={name} className={styles.aiDetail} open={index === 0}>
             <summary>{name}</summary>
             <p>
               {sections[name]
-                || (status === 'ready' ? '外站电脑解卦未返回本项内容。' : '等待抓取。')}
+                || (status === 'ready' ? '电脑解卦未返回本项内容。' : '等待结果。')}
             </p>
           </details>
         ))}
@@ -275,7 +273,7 @@ function DeepSeekReading({ payload, question }) {
       <div className={styles.deepSeekHead}>
         <div>
           <h2>AI 深度解读</h2>
-          <p>调用 DeepSeek 结合卦象、动爻、干支、纳甲生成参考解读。</p>
+          <p>结合卦象、动爻、干支、纳甲生成参考解读。</p>
         </div>
         <span className={styles.costBadge}>{cost} 积分/次</span>
       </div>
@@ -300,7 +298,7 @@ function DeepSeekReading({ payload, question }) {
 
         {!account && (
           <div className={styles.aiNotice}>
-            <p>登录后可使用 AI 解读，新账户赠送体验积分。</p>
+            <p>登录后可使用 AI 解读，新账户赠送试用积分。</p>
             <Link to="/account" className={styles.aiInlineLink}>去登录</Link>
           </div>
         )}

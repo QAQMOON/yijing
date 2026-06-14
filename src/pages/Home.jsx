@@ -41,7 +41,7 @@ const FEATURE_MATRIX = [
     title: '三术合参',
     description: '八字看长期结构，紫微看宫位叙事，六爻看当下问题。',
     to: '/reports',
-    meta: '付费价值点',
+    meta: '综合报告',
     tags: ['综合报告', 'AI 解读'],
   },
   {
@@ -55,7 +55,7 @@ const FEATURE_MATRIX = [
   {
     icon: '袋',
     title: '百宝袋',
-    description: '先做时辰、节气、四柱、纳音、空亡等排盘前轻工具。',
+    description: '提供时辰、节气、四柱、纳音、空亡等排盘前轻工具。',
     to: '/tools',
     meta: '小工具',
     tags: ['时辰换算', '空亡'],
@@ -75,7 +75,7 @@ export default function Home() {
     <div className={styles.home}>
       <Seo
         title="易解 · 古籍依据 AI 解读"
-        description="易解提供免费排盘、古籍依据、DeepSeek AI 解读、积分账户与报告历史，覆盖六爻、八字、紫微斗数和三术合参。"
+        description="易解提供免费排盘、古籍依据、AI 解读、积分账户与报告历史，覆盖六爻、八字、紫微斗数和三术合参。"
         path="/"
       />
 
@@ -113,7 +113,7 @@ export default function Home() {
           <p className={styles.brandLine}>{BRAND_NAME} · {tagline}</p>
           <h2>免费排盘，AI 引经据典解读</h2>
           <p className={styles.heroLead}>
-            六爻、八字、紫微先排清楚，再用 DeepSeek 生成可追溯报告。
+            六爻、八字、紫微先排清楚，再用 AI 生成可追溯报告。
           </p>
           <div className={styles.heroActions}>
             <Link to="/liuyao/cast">开始排盘</Link>
@@ -138,7 +138,7 @@ export default function Home() {
       <section className={styles.appPanel}>
         <div>
           <h2>登录、积分与 AI 解读</h2>
-          <p>体验账号可领取积分，六爻结果页已支持 DeepSeek 解读并保存报告。</p>
+          <p>登录后可领取试用积分，六爻结果页已支持 AI 解读并保存报告。</p>
         </div>
         <div className={styles.appActions}>
           <Link to="/account">登录账户</Link>

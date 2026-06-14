@@ -4,7 +4,7 @@ export const SITE_URL = 'https://yijing-pi.vercel.app';
 
 export const SITE_TITLE = '易解 · 古籍依据 AI 解读';
 
-export const SITE_DESCRIPTION = '易解是一套面向中国术数文化的在线应用，提供免费排盘、古籍依据、DeepSeek AI 解读、积分账户与报告历史。';
+export const SITE_DESCRIPTION = '易解是一套面向中国术数文化的在线应用，提供免费排盘、古籍依据、AI 解读、积分账户与报告历史。';
 
 export const SITE_OG_IMAGE = `${SITE_URL}/og-image.png`;
 
@@ -40,33 +40,32 @@ export const FOOTER_NAV = [
   { to: '/pricing', label: '积分套餐' },
   { to: '/privacy', label: '隐私政策' },
   { to: '/terms', label: '服务条款' },
-  { to: '/roadmap', label: '产品路线' },
 ];
 
 export const APP_ROADMAP = [
   {
-    stage: '阶段一',
-    title: '工具站',
-    status: '当前阶段',
-    points: ['稳定排盘工具', '公开页面可检索', '卦历记录备份', '手机端持续优化'],
+    stage: '基础功能',
+    title: '免费排盘',
+    status: '已上线',
+    points: ['稳定排盘工具', '资料页面持续完善', '卦历记录备份', '手机端持续优化'],
   },
   {
-    stage: '阶段二',
-    title: 'DeepSeek AI 解读',
-    status: '当前阶段',
+    stage: '报告服务',
+    title: 'AI 解读',
+    status: '已上线',
     points: ['按卦盘上下文生成解读', '古籍依据层', '报告历史', '额度保护'],
   },
   {
-    stage: '阶段三',
+    stage: '账户服务',
     title: '账户与积分',
-    status: '体验版',
-    points: ['体验账号', '安全积分账本', '报告历史云端同步', '付费充值与退款规则'],
+    status: '完善中',
+    points: ['账号登录', '安全积分账本', '报告历史同步', '充值与退款规则'],
   },
   {
-    stage: '阶段四',
+    stage: '综合报告',
     title: '三术合参',
-    status: '规划中',
-    points: ['八字长期结构', '紫微宫位叙事', '六爻当下问事', '综合付费报告'],
+    status: '即将开放',
+    points: ['八字长期结构', '紫微宫位叙事', '六爻当下问事', '综合报告'],
   },
 ];
 
