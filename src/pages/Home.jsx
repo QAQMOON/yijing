@@ -79,10 +79,27 @@ export default function Home() {
         path="/"
       />
 
+      <section className={styles.dailySection}>
+        <div className={styles.dailyCard}>
+          <p className={styles.date}>{formatDateCN()} · 今日一卦</p>
+          <h1 className={styles.hexagramName}>{getHexagramFullName(hexagram)}</h1>
+          <HexagramDisplay lines={hexagram.lines} size="large" />
+          <p className={styles.judgment}>{hexagram.judgment}</p>
+          {hexagram.image && (
+            <p className={styles.image}>《象》曰：{hexagram.image}</p>
+          )}
+          <p className={styles.meaning}>{hexagram.meaning}</p>
+          <SaveReading
+            onSave={(data) => saveReading({ type: 'daily', hexagramId: hexagram.id, ...data })}
+            hexagram={hexagram}
+          />
+        </div>
+      </section>
+
       <section className={styles.productHero}>
         <div className={styles.heroCopy}>
           <p className={styles.brandLine}>{BRAND_NAME} · {tagline}</p>
-          <h1>免费排盘，AI 引经据典解读</h1>
+          <h2>免费排盘，AI 引经据典解读</h2>
           <p className={styles.heroLead}>
             六爻、八字、紫微先排清楚，再用 DeepSeek 生成可追溯报告。
           </p>
@@ -142,22 +159,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={styles.dailySection}>
-        <div className={styles.dailyCard}>
-          <p className={styles.date}>{formatDateCN()} · 今日一卦</p>
-          <h2 className={styles.hexagramName}>{getHexagramFullName(hexagram)}</h2>
-          <HexagramDisplay lines={hexagram.lines} size="large" />
-          <p className={styles.judgment}>{hexagram.judgment}</p>
-          {hexagram.image && (
-            <p className={styles.image}>《象》曰：{hexagram.image}</p>
-          )}
-          <p className={styles.meaning}>{hexagram.meaning}</p>
-          <SaveReading
-            onSave={(data) => saveReading({ type: 'daily', hexagramId: hexagram.id, ...data })}
-            hexagram={hexagram}
-          />
-        </div>
-      </section>
     </div>
   );
 }

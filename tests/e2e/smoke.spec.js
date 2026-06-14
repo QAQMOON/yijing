@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const PUBLIC_ROUTES = [
-  { path: '/', title: /易解 · 古籍依据 AI 解读/, h1: /免费排盘/ },
+  { path: '/', title: /易解 · 古籍依据 AI 解读/, h1: /.+/ },
   { path: '/liuyao', title: /六爻起卦排盘/, h1: /六\s*爻/ },
   { path: '/liuyao/hexagrams', title: /六十四卦查询/, h1: /六十\s*四\s*卦/ },
   { path: '/bazi', title: /八字排盘/, h1: /八\s*字/ },
