@@ -104,7 +104,7 @@ function normalizePayload(payload) {
     throw new ValidationError('请求内容格式无效');
   }
 
-  const domain = ['liuyao', 'bazi'].includes(payload.domain) ? payload.domain : '';
+  const domain = ['liuyao', 'bazi', 'ziwei'].includes(payload.domain) ? payload.domain : '';
   if (!domain) {
     throw new ValidationError('当前 AI 解读暂不支持该排盘类型');
   }
@@ -120,6 +120,10 @@ function normalizePayload(payload) {
 
   if (domain === 'bazi' && (!chart.pillars?.year?.full || !chart.pillars?.month?.full || !chart.pillars?.day?.full || !chart.pillars?.hour?.full)) {
     throw new ValidationError('缺少八字四柱信息');
+  }
+
+  if (domain === 'ziwei' && (!Array.isArray(chart.palaces) || chart.palaces.length < 12 || !chart.lifePalace?.name)) {
+    throw new ValidationError('缺少紫微命盘宫位信息');
   }
 
   const style = ['plain', 'scholar'].includes(payload.style) ? payload.style : 'plain';
@@ -224,8 +228,9 @@ function buildSystemPrompt({ domain, style, depth }) {
     : (depth === 'full'
         ? '输出较完整，包含【信息核对】【结论】【依据】【排盘分析】【行动建议】【风险提醒】【后续观察】七部分。'
         : '输出精简，控制在六段以内，包含【信息核对】【结论】【依据】【建议】。');
-  const domainGuide = domain === 'bazi'
-    ? [
+  const domainGuide = (() => {
+    if (domain === 'bazi') {
+      return [
         '你是“易解”的八字解读助手。',
         '你只根据用户提供的八字排盘上下文做传统文化解读和决策参考，不做绝对化断言。',
         '在正式解读前，必须先在内部确认资料是否完整：公历或农历出生时间、性别、出生地或经度、四柱、日主、节气边界、大运顺逆与起运信息。若核心信息缺失，先输出“需要补充的信息”，不要强行断。',
@@ -235,8 +240,25 @@ function buildSystemPrompt({ domain, style, depth }) {
         '针对事业财运、感情家庭、大运流年、健康习惯等重点，要给出现实可执行建议，并说明这些建议对应的八字依据。',
         '涉及健康只能谈作息、压力、饮食、运动等生活习惯倾向，不得诊断疾病；涉及财务只能谈风险偏好和节奏，不得给投资指令。',
         '不得编造用户未提供的出生信息、神煞、古籍原文或现实经历。',
-      ]
-    : [
+      ];
+    }
+
+    if (domain === 'ziwei') {
+      return [
+        '你是“易解”的紫微斗数解读助手。',
+        '你只根据用户提供的紫微斗数命盘上下文做传统文化解读和决策参考，不做绝对化断言。',
+        '在正式解读前，必须先在内部确认资料是否完整：公历或农历出生时间、性别、盘类、命宫、身宫、命主身主、五行局、十二宫、主星、辅曜杂曜、四化、大限、小限、流年信息。若出生时间、性别、命宫身宫或十二宫等核心信息缺失，先输出【需要补充的信息】，不要强行断。',
+        '如果命盘完整但流年、小限、大限或部分辅曜信息缺失，可以继续解读，但必须在【信息核对】中说明“以下按当前命盘参考”，并提示补充后可细化。',
+        '分析时先明确用户关注点，识别综合命盘、事业财帛、感情婚姻、家庭田宅、迁移交友、健康习惯、大限流年等方向，再按紫微斗数专业步骤推进。',
+        '专业步骤必须包括：先看命宫与身宫定总体气质和行动方式，再看命宫三方四正，再看主星组合和庙旺平陷，再看辅曜杂曜与煞曜，再看四化禄权科忌的牵动，最后结合大限、小限、流年落到用户选择的重点。',
+        '结论要比普通闲聊更明确：可以使用“主轴较强、外缘较旺、宜主动争取、需保守布局、感情沟通压力偏大、事业适合先蓄势”等清楚判断，避免只说“可能、也许、看情况”。但不得把推断说成百分百确定。',
+        '针对用户关注点，要给出现实可执行建议，并说明这些建议对应的宫位、星曜、三方四正、四化或大限流年依据。',
+        '古籍依据只能使用“紫微斗数十二宫、星曜组合、四化飞布、三方四正”等通用术语和用户提供的命盘信息；不得编造未提供的古籍原文、星曜或现实经历。',
+        '涉及健康只能谈作息、压力、情绪、运动等生活习惯倾向，不得诊断疾病；涉及财务只能谈风险偏好和节奏，不得给投资指令。',
+      ];
+    }
+
+    return [
         '你是“易解”的六爻解读助手。',
         '你只根据用户提供的六爻排盘上下文做传统文化解读和决策参考，不做绝对化断言。',
         '在正式解读前，必须先在内部确认资料是否完整：本卦、变卦、六爻动静、动爻、起卦日期、起卦方式、起卦人性别、出生年或年龄、所测问题、占事范围、干支、月日空亡、纳甲、六亲、六神、世应信息。若本卦、变卦、六爻动静、起卦时间或所测问题等核心信息缺失，先输出【需要补充的信息】，不要强行断。',
@@ -248,6 +270,7 @@ function buildSystemPrompt({ domain, style, depth }) {
         '古籍依据只能引用用户提供的卦辞、彖传、象传、爻辞和排盘信息；没有提供的内容，不得编造书名或原文。',
         '不得编造用户未提供的性别、年龄、起卦背景、现实经历、世应标记、用神关系或古籍原文。',
       ];
+  })();
 
   return [
     ...domainGuide,
@@ -274,6 +297,30 @@ function buildUserPrompt(payload) {
       luck: chart.luck,
       shenSha: chart.shenSha,
       upcomingAnnualLuck: chart.upcomingAnnualLuck,
+    }, null, 2);
+  }
+
+  if (payload.domain === 'ziwei') {
+    return JSON.stringify({
+      focus: question || chart.focus || '综合命盘',
+      input: chart.input,
+      calendarText: chart.calendarText,
+      dateText: chart.dateText,
+      gender: chart.gender,
+      plateTypeText: chart.plateTypeText,
+      solarDate: chart.solarDate,
+      lunarDate: chart.lunarDate,
+      chineseDate: chart.chineseDate,
+      time: chart.time,
+      timeRange: chart.timeRange,
+      zodiac: chart.zodiac,
+      soul: chart.soul,
+      body: chart.body,
+      fiveElementsClass: chart.fiveElementsClass,
+      lifePalace: chart.lifePalace,
+      bodyPalace: chart.bodyPalace,
+      horoscope: chart.horoscope,
+      palaces: chart.palaces,
     }, null, 2);
   }
 

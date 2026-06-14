@@ -229,3 +229,41 @@ test('bazi AI reading flow is saved with mocked DeepSeek response', async ({ pag
   await expect(page.getByText('八字 AI 解读')).toBeVisible();
   await expect(page.getByText('这是八字 mock AI 解读').first()).toBeVisible();
 });
+
+test('ziwei AI reading flow is saved with mocked DeepSeek response', async ({ page }) => {
+  await page.route('**/api/deepseek-reading', async (route) => {
+    const request = route.request();
+    const body = request.postDataJSON();
+    expect(request.method()).toBe('POST');
+    expect(request.headers()['x-yijie-account-id']).toMatch(/^acct_/);
+    expect(body.domain).toBe('ziwei');
+    expect(body.chart.lifePalace.name).toBe('命宫');
+    expect(body.chart.palaces).toHaveLength(12);
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        provider: 'deepseek',
+        model: 'mock-model',
+        text: '【结论】这是紫微 mock AI 解读。\n\n【依据】依据传入的命身宫、星曜四化和大限流年上下文。',
+        cost: 2,
+      }),
+    });
+  });
+
+  await page.goto('/account');
+  await page.getByLabel('手机号或邮箱').fill('ziwei-ai@example.com');
+  await page.getByLabel('称呼').fill('紫微 AI 测试');
+  await page.getByRole('button', { name: '登录并领取积分' }).click();
+
+  await page.goto('/ziwei/chart?calendar=solar&year=1990&month=5&day=8&hour=12&minute=0&gender=male&astroType=heaven');
+  await expect(page.getByText('紫微 AI 深度解读')).toBeVisible();
+  await expect(page.getByText('解读依据会随请求传入')).toBeVisible();
+  await page.getByRole('button', { name: '生成紫微 AI 解读' }).click();
+  await expect(page.getByText('正在推演紫微命盘，请稍候')).toBeVisible();
+  await expect(page.getByText('这是紫微 mock AI 解读')).toBeVisible();
+
+  await page.goto('/reports');
+  await expect(page.getByText('紫微 AI 解读')).toBeVisible();
+  await expect(page.getByText('这是紫微 mock AI 解读').first()).toBeVisible();
+});

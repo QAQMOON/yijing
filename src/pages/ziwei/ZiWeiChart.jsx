@@ -1,9 +1,22 @@
 import Seo from '../../components/Seo.jsx';
+import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { calculateZiWei, paramsToZiWeiOptions } from '../../utils/ziweiCalc.js';
+import { CREDIT_COSTS } from '../../data/creditPlans.js';
+import { useAccount } from '../../hooks/useAccount.js';
+import { useAiReports } from '../../hooks/useAiReports.js';
 import styles from './ZiWeiChart.module.css';
 
 const MUTAGEN_LABELS = ['禄', '权', '科', '忌'];
+const AI_FOCUS_OPTIONS = [
+  { value: 'overall', label: '综合命盘' },
+  { value: 'career', label: '事业财帛' },
+  { value: 'relationship', label: '感情婚姻' },
+  { value: 'family', label: '家庭田宅' },
+  { value: 'travel', label: '迁移交友' },
+  { value: 'luck', label: '大限流年' },
+  { value: 'wellbeing', label: '健康习惯' },
+];
 
 function StarList({ stars, tone }) {
   if (!stars.length) return null;
@@ -90,6 +103,243 @@ function CenterPanel({ chart }) {
   );
 }
 
+function compactStar(star) {
+  return {
+    name: star.name,
+    text: star.text,
+    type: star.type,
+    scope: star.scope,
+    brightness: star.brightness,
+    mutagen: star.mutagen,
+    isMajor: star.isMajor,
+  };
+}
+
+function compactPalace(palace) {
+  if (!palace) return null;
+  return {
+    name: palace.name,
+    stemBranch: palace.stemBranch,
+    earthlyBranch: palace.earthlyBranch,
+    isBodyPalace: palace.isBodyPalace,
+    isOriginalPalace: palace.isOriginalPalace,
+    majorStars: palace.majorStars.map(compactStar),
+    minorStars: palace.minorStars.map(compactStar),
+    adjectiveStars: palace.adjectiveStars.slice(0, 12).map(compactStar),
+    dynamicStars: palace.dynamicStars.map(compactStar),
+    changsheng12: palace.changsheng12,
+    boshi12: palace.boshi12,
+    jiangqian12: palace.jiangqian12,
+    suiqian12: palace.suiqian12,
+    decadal: palace.decadal,
+    ages: palace.ages?.slice(0, 8) || [],
+  };
+}
+
+function compactHoroscope(item) {
+  if (!item) return null;
+  return {
+    heavenlyStem: item.heavenlyStem,
+    earthlyBranch: item.earthlyBranch,
+    mutagen: item.mutagen,
+    index: item.index,
+    nominalAge: item.nominalAge,
+    age: item.age,
+  };
+}
+
+function buildZiWeiPayload(chart, focusLabel) {
+  const lifePalace = chart.palaces.find((palace) => palace.name === '命宫');
+  const bodyPalace = chart.palaces.find((palace) => palace.isBodyPalace);
+  return {
+    focus: focusLabel,
+    input: chart.input,
+    calendarText: chart.calendarText,
+    dateText: chart.dateText,
+    gender: chart.gender,
+    plateTypeText: chart.plateTypeText,
+    solarDate: chart.solarDate,
+    lunarDate: chart.lunarDate,
+    chineseDate: chart.chineseDate,
+    time: chart.time,
+    timeRange: chart.timeRange,
+    zodiac: chart.zodiac,
+    soul: chart.soul,
+    body: chart.body,
+    fiveElementsClass: chart.fiveElementsClass,
+    lifePalace: compactPalace(lifePalace),
+    bodyPalace: compactPalace(bodyPalace),
+    horoscope: {
+      decadal: compactHoroscope(chart.horoscope.decadal),
+      age: compactHoroscope(chart.horoscope.age),
+      yearly: compactHoroscope(chart.horoscope.yearly),
+      monthly: compactHoroscope(chart.horoscope.monthly),
+    },
+    palaces: chart.palaces.map(compactPalace),
+  };
+}
+
+function errorMessage(payload, fallback) {
+  if (typeof payload?.error === 'string') return payload.error;
+  if (payload?.error?.message) return payload.error.message;
+  return fallback;
+}
+
+function ZiWeiAiReading({ chart }) {
+  const { account, spendCredits, refundCredits } = useAccount();
+  const { saveReport } = useAiReports();
+  const [focus, setFocus] = useState('overall');
+  const [style, setStyle] = useState('plain');
+  const [depth, setDepth] = useState('brief');
+  const [status, setStatus] = useState('idle');
+  const [result, setResult] = useState('');
+  const [error, setError] = useState('');
+  const cost = CREDIT_COSTS.aiReading;
+  const focusLabel = AI_FOCUS_OPTIONS.find((item) => item.value === focus)?.label || '综合命盘';
+  const payload = useMemo(() => buildZiWeiPayload(chart, focusLabel), [chart, focusLabel]);
+  const title = `${chart.solarDate} ${chart.gender}命紫微报告`;
+
+  const generate = async () => {
+    let spent = false;
+    setError('');
+    setStatus('loading');
+    try {
+      spendCredits(cost, '紫微 AI 深度解读');
+      spent = true;
+      const response = await fetch('/api/deepseek-reading', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Yijie-Client': 'browser',
+          ...(account?.id ? { 'X-Yijie-Account-Id': account.id } : {}),
+        },
+        body: JSON.stringify({
+          domain: 'ziwei',
+          chart: payload,
+          question: focusLabel,
+          style,
+          depth,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(errorMessage(data, 'AI 解读失败'));
+      setResult(data.text);
+      saveReport({
+        domain: 'ziwei',
+        domainLabel: '紫微 AI 解读',
+        title,
+        focusLabel,
+        style,
+        depth,
+        provider: data.provider,
+        model: data.model,
+        cost: data.cost || cost,
+        text: data.text,
+        chart: payload,
+      });
+      setStatus('ready');
+    } catch (requestError) {
+      if (spent) refundCredits(cost, 'AI 解读失败退回');
+      setError(requestError.message || 'AI 解读失败');
+      setStatus('error');
+    }
+  };
+
+  return (
+    <section className={styles.aiReadingSection}>
+      <div className={styles.aiReadingHead}>
+        <div>
+          <h2>紫微 AI 深度解读</h2>
+          <p>结合命身宫、三方四正、星曜四化、大限流年生成参考报告。</p>
+        </div>
+        <span className={styles.costBadge}>{cost} 积分/次</span>
+      </div>
+
+      <div className={styles.aiReadingCard}>
+        <div className={styles.aiControls}>
+          <label>
+            <span>解读重点</span>
+            <select value={focus} onChange={(event) => setFocus(event.target.value)}>
+              {AI_FOCUS_OPTIONS.map((item) => (
+                <option key={item.value} value={item.value}>{item.label}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>解读风格</span>
+            <select value={style} onChange={(event) => setStyle(event.target.value)}>
+              <option value="plain">通俗版</option>
+              <option value="scholar">严谨版</option>
+            </select>
+          </label>
+          <label>
+            <span>篇幅</span>
+            <select value={depth} onChange={(event) => setDepth(event.target.value)}>
+              <option value="brief">精简</option>
+              <option value="full">完整</option>
+            </select>
+          </label>
+        </div>
+
+        {!account && (
+          <div className={styles.aiNotice}>
+            <p>登录后可使用 AI 解读，新账户赠送试用积分。</p>
+            <Link to="/account" className={styles.aiInlineLink}>去登录</Link>
+          </div>
+        )}
+
+        {account && account.credits < cost && (
+          <div className={styles.aiNotice}>
+            <p>当前积分不足，需要 {cost} 积分。</p>
+            <Link to="/pricing" className={styles.aiInlineLink}>购买积分</Link>
+          </div>
+        )}
+
+        {account && account.credits >= cost && (
+          <button className={styles.aiButton} type="button" disabled={status === 'loading'} onClick={generate}>
+            {status === 'loading' ? '正在生成' : '生成紫微 AI 解读'}
+          </button>
+        )}
+
+        {status === 'loading' && (
+          <div className={styles.aiThinking} role="status" aria-live="polite" aria-busy="true">
+            <div className={styles.aiThinkingOrb} aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
+            <div className={styles.aiThinkingContent}>
+              <strong>正在推演紫微命盘，请稍候</strong>
+              <p>正在核对命身宫、三方四正、星曜四化并组织解读报告。</p>
+              <div className={styles.aiThinkingSteps} aria-hidden="true">
+                <span>命身宫</span>
+                <span>三方四正</span>
+                <span>四化</span>
+                <span>建议</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className={styles.aiBasis}>
+          <strong>解读依据会随请求传入</strong>
+          <span>命宫身宫</span>
+          <span>十二宫星曜</span>
+          <span>四化飞布</span>
+          <span>大限流年</span>
+        </div>
+
+        {status === 'error' && <p className={styles.aiError}>{error}</p>}
+        {status === 'ready' && result && (
+          <article className={styles.aiResult}>
+            {result.split(/\n{2,}/).map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+          </article>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function ZiWeiChart() {
   const [params] = useSearchParams();
   const chart = calculateZiWei(paramsToZiWeiOptions(params));
@@ -113,6 +363,8 @@ export default function ZiWeiChart() {
           <CenterPanel chart={chart} />
         </div>
       </div>
+
+      <ZiWeiAiReading chart={chart} />
     </div>
   );
 }

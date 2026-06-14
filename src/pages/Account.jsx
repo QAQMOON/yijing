@@ -99,7 +99,7 @@ function AccountPanel() {
       <section className={styles.usagePanel}>
         <h2>积分用途</h2>
         <div className={styles.usageItem}>
-          <span>六爻 AI 深度解读</span>
+          <span>六爻 / 八字 / 紫微 AI 深度解读</span>
           <strong>{CREDIT_COSTS.aiReading} 积分/次</strong>
         </div>
         <p>

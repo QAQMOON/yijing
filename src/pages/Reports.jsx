@@ -61,6 +61,7 @@ export default function Reports() {
         <div className={styles.heroActions}>
           <Link to="/liuyao/cast">生成六爻报告</Link>
           <Link to="/bazi/chart">生成八字报告</Link>
+          <Link to="/ziwei">生成紫微报告</Link>
           <Link to="/pricing">查看积分</Link>
         </div>
       </section>

@@ -138,7 +138,7 @@ export default function Home() {
       <section className={styles.appPanel}>
         <div>
           <h2>登录、积分与 AI 解读</h2>
-          <p>登录后可领取试用积分，六爻结果页已支持 AI 解读并保存报告。</p>
+          <p>登录后可领取试用积分，六爻、八字、紫微结果页已支持 AI 解读并保存报告。</p>
         </div>
         <div className={styles.appActions}>
           <Link to="/account">登录账户</Link>
