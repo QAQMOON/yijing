@@ -7,7 +7,7 @@
   display: none;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   border-top: 1px solid var(--color-border);
-  background: rgba(250, 248, 243, 0.96);
+  background: var(--color-bg);
   backdrop-filter: blur(12px);
 }
 
