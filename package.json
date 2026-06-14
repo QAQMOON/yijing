@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prerender-static.mjs",
+    "build": "node scripts/generate-sitemap.mjs && vite build && node scripts/prerender-static.mjs",
+    "sitemap": "node scripts/generate-sitemap.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "node scripts/baziCalc.test.mjs && node scripts/dailyHexagram.test.mjs && node scripts/qimenCalc.test.mjs && node scripts/ziweiCalc.test.mjs",

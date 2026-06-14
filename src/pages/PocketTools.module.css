@@ -1,0 +1,149 @@
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.hero,
+.inputPanel,
+.summaryGrid article,
+.pillarCard,
+.notePanel {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-light);
+}
+
+.hero {
+  display: grid;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+  padding: var(--space-xl);
+}
+
+.kicker,
+.summaryGrid span,
+.pillarCard span,
+.pillarCard small,
+.notePanel span {
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+  font-size: 0.86rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  letter-spacing: 0.08em;
+}
+
+.hero p,
+.summaryGrid p,
+.pillarCard p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.inputPanel {
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+}
+
+.inputPanel label {
+  display: grid;
+  gap: var(--space-xs);
+  max-width: 360px;
+}
+
+.inputPanel span {
+  color: var(--color-text-secondary);
+  font-size: 0.88rem;
+}
+
+.inputPanel input {
+  min-height: 42px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #fffdf8;
+  color: var(--color-text-primary);
+  font: inherit;
+  padding: 0 var(--space-md);
+}
+
+.inputPanel input:focus {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 2px;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.summaryGrid article,
+.pillarCard {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+}
+
+.summaryGrid strong,
+.pillarCard strong {
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+}
+
+.pillarSection {
+  margin-bottom: var(--space-xl);
+}
+
+.pillarSection h2,
+.notePanel h2 {
+  margin-bottom: var(--space-md);
+  color: var(--color-accent-dark);
+  font-size: 1.2rem;
+}
+
+.pillarGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.pillarCard {
+  background: #fffdf8;
+}
+
+.notePanel {
+  display: grid;
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+  padding: var(--space-lg);
+}
+
+.notePanel div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.notePanel span {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--color-bg-dark);
+}
+
+@media (max-width: 820px) {
+  .summaryGrid,
+  .pillarGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .summaryGrid,
+  .pillarGrid {
+    grid-template-columns: 1fr;
+  }
+}

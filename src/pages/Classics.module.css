@@ -1,0 +1,249 @@
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.hero {
+  display: grid;
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+  padding: var(--space-xl);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-light);
+}
+
+.kicker,
+.sourceCard span,
+.termCard span,
+.hexItem span,
+.compactItem span {
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: 0.08em;
+}
+
+.hero p {
+  max-width: 680px;
+  color: var(--color-text-secondary);
+}
+
+.search {
+  display: grid;
+  gap: var(--space-xs);
+  max-width: 520px;
+}
+
+.search span {
+  color: var(--color-text-secondary);
+  font-size: 0.86rem;
+}
+
+.search input {
+  min-height: 42px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #fffdf8;
+  color: var(--color-text-primary);
+  font: inherit;
+  padding: 0 var(--space-md);
+}
+
+.search input:focus {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 2px;
+}
+
+.sourceGrid,
+.termGrid,
+.hexGrid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.sourceGrid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-bottom: var(--space-2xl);
+}
+
+.sourceCard,
+.termCard,
+.hexItem,
+.panel,
+.faq details {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-light);
+}
+
+.sourceCard {
+  display: flex;
+  min-height: 250px;
+  flex-direction: column;
+  padding: var(--space-md);
+}
+
+.sourceCard h2 {
+  margin: var(--space-sm) 0;
+  font-size: 1.15rem;
+}
+
+.sourceCard p,
+.termCard p,
+.hexItem p,
+.compactItem p,
+.faq p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: auto;
+  padding-top: var(--space-md);
+}
+
+.tagRow small {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-bg-dark);
+  color: var(--color-text-secondary);
+}
+
+.section {
+  margin-bottom: var(--space-2xl);
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.sectionHead h2,
+.panel h2 {
+  color: var(--color-accent-dark);
+  font-size: 1.25rem;
+}
+
+.sectionHead a {
+  flex: 0 0 auto;
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+}
+
+.termGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.termCard,
+.hexItem {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+}
+
+.termCard h3,
+.hexItem strong,
+.compactItem strong {
+  color: var(--color-text-primary);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+}
+
+.splitSection {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.panel {
+  padding: var(--space-lg);
+}
+
+.compactGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.compactItem {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-sm);
+  border-radius: 6px;
+  background: #fffdf8;
+}
+
+.hexGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.hexItem:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-dark);
+}
+
+.faq {
+  display: grid;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-2xl);
+}
+
+.faq details {
+  padding: var(--space-md);
+}
+
+.faq summary {
+  cursor: pointer;
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+.faq p {
+  padding-top: var(--space-sm);
+}
+
+@media (max-width: 980px) {
+  .sourceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .termGrid,
+  .hexGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .hero {
+    padding: var(--space-lg);
+  }
+
+  .sourceGrid,
+  .termGrid,
+  .hexGrid,
+  .splitSection,
+  .compactGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionHead {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

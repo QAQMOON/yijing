@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="易解 古籍依据 AI 解读">
+  <rect width="1200" height="630" fill="#f5f1e8"/>
+  <rect x="64" y="64" width="1072" height="502" rx="24" fill="#faf8f3" stroke="#ddd6c8" stroke-width="2"/>
+  <rect x="94" y="94" width="1012" height="442" rx="16" fill="#fffdf8" stroke="#e8e2d4"/>
+  <text x="128" y="166" fill="#9a7a20" font-family="Songti SC, STSong, SimSun, serif" font-size="34" letter-spacing="6">易解</text>
+  <text x="128" y="282" fill="#1c1410" font-family="Songti SC, STSong, SimSun, serif" font-size="72" font-weight="700">免费排盘</text>
+  <text x="128" y="374" fill="#1c1410" font-family="Songti SC, STSong, SimSun, serif" font-size="72" font-weight="700">AI 引经据典解读</text>
+  <text x="132" y="452" fill="#8a7d6e" font-family="Songti SC, STSong, SimSun, serif" font-size="30">六爻 · 八字 · 紫微 · 三术合参</text>
+  <g transform="translate(830 150)" fill="none" stroke="#b8922a" stroke-width="12" stroke-linecap="round">
+    <path d="M0 0h190"/>
+    <path d="M0 44h82M108 44h82"/>
+    <path d="M0 88h190"/>
+    <path d="M0 132h82M108 132h82"/>
+    <path d="M0 176h82M108 176h82"/>
+    <path d="M0 220h190"/>
+  </g>
+  <g transform="translate(824 430)">
+    <rect width="210" height="54" rx="27" fill="#e8e2d4"/>
+    <text x="105" y="36" text-anchor="middle" fill="#9a7a20" font-family="Songti SC, STSong, SimSun, serif" font-size="24">古籍依据层</text>
+  </g>
+</svg>

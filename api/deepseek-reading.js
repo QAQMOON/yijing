@@ -1,41 +1,88 @@
 const DEEPSEEK_URL = 'https://api.deepseek.com/chat/completions';
 const REQUEST_TIMEOUT_MS = 25000;
 const CACHE_TTL_MS = 60 * 60 * 1000;
+const MAX_CACHE_ITEMS = 120;
 const MAX_BODY_BYTES = 128 * 1024;
 const AI_READING_COST = 2;
-const responseCache = new Map();
+const RATE_LIMIT_WINDOW_MS = Number(process.env.AI_RATE_LIMIT_WINDOW_MS || 10 * 60 * 1000);
+const RATE_LIMIT_MAX = Number(process.env.AI_RATE_LIMIT_MAX || 8);
+const DAILY_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
+const DAILY_LIMIT_MAX = Number(process.env.AI_DAILY_LIMIT_MAX || 40);
 
-class ValidationError extends Error {
-  constructor(message) {
+const globalState = globalThis.__YIJIE_DEEPSEEK_STATE__ || {
+  responseCache: new Map(),
+  rateBuckets: new Map(),
+};
+globalThis.__YIJIE_DEEPSEEK_STATE__ = globalState;
+
+class HttpError extends Error {
+  constructor(status, code, message, headers = {}) {
     super(message);
+    this.name = 'HttpError';
+    this.status = status;
+    this.code = code;
+    this.headers = headers;
+  }
+}
+
+class ValidationError extends HttpError {
+  constructor(message) {
+    super(400, 'validation_error', message);
     this.name = 'ValidationError';
   }
 }
 
-class ConfigError extends Error {
+class ConfigError extends HttpError {
   constructor(message) {
-    super(message);
+    super(503, 'service_unavailable', message);
     this.name = 'ConfigError';
   }
 }
 
-function sendJson(res, status, payload) {
+function sendJson(res, status, payload, headers = {}) {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  Object.entries(headers).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) res.setHeader(key, String(value));
+  });
   res.end(JSON.stringify(payload));
+}
+
+function sendError(res, error) {
+  const status = error instanceof HttpError
+    ? error.status
+    : error.name === 'AbortError'
+      ? 504
+      : 502;
+  const code = error instanceof HttpError
+    ? error.code
+    : error.name === 'AbortError'
+      ? 'upstream_timeout'
+      : 'upstream_error';
+
+  sendJson(res, status, {
+    error: {
+      code,
+      message: error.message || 'AI 解读失败',
+    },
+  }, error.headers || {});
 }
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
     let body = '';
+    let size = 0;
+
     req.on('data', (chunk) => {
-      body += chunk;
-      if (body.length > MAX_BODY_BYTES) {
+      size += chunk.length;
+      if (size > MAX_BODY_BYTES) {
         reject(new ValidationError('请求内容过大'));
         req.destroy();
+        return;
       }
+      body += chunk;
     });
     req.on('end', () => resolve(body));
     req.on('error', reject);
@@ -77,17 +124,82 @@ function normalizePayload(payload) {
 }
 
 function getCachedResult(key) {
-  const cached = responseCache.get(key);
+  const cached = globalState.responseCache.get(key);
   if (!cached) return null;
   if (Date.now() - cached.createdAt > CACHE_TTL_MS) {
-    responseCache.delete(key);
+    globalState.responseCache.delete(key);
     return null;
   }
   return cached.result;
 }
 
 function setCachedResult(key, result) {
-  responseCache.set(key, { createdAt: Date.now(), result });
+  if (globalState.responseCache.size >= MAX_CACHE_ITEMS) {
+    const firstKey = globalState.responseCache.keys().next().value;
+    if (firstKey) globalState.responseCache.delete(firstKey);
+  }
+  globalState.responseCache.set(key, { createdAt: Date.now(), result });
+}
+
+function getHeader(req, name) {
+  const value = req.headers[name.toLowerCase()];
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function getClientIp(req) {
+  const forwarded = getHeader(req, 'x-forwarded-for');
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return req.socket?.remoteAddress || 'unknown';
+}
+
+function getRequester(req) {
+  const accountId = cleanText(getHeader(req, 'x-yijie-account-id'), 80);
+  if (accountId && !/^acct_[a-z0-9]+_[a-z0-9]+$/i.test(accountId)) {
+    throw new HttpError(401, 'invalid_account_context', '账户上下文无效');
+  }
+
+  const requiredToken = process.env.YIJIE_API_ACCESS_TOKEN;
+  if (requiredToken) {
+    const auth = getHeader(req, 'authorization') || '';
+    if (auth !== `Bearer ${requiredToken}`) {
+      throw new HttpError(401, 'unauthorized', '缺少有效的服务端访问令牌');
+    }
+  }
+
+  return accountId ? `acct:${accountId}` : `ip:${getClientIp(req)}`;
+}
+
+function hitBucket(key, max, windowMs) {
+  const now = Date.now();
+  const current = globalState.rateBuckets.get(key);
+  if (!current || current.resetAt <= now) {
+    const next = { count: 1, resetAt: now + windowMs };
+    globalState.rateBuckets.set(key, next);
+    return { limit: max, remaining: max - 1, resetAt: next.resetAt };
+  }
+
+  if (current.count >= max) {
+    const retryAfter = Math.max(1, Math.ceil((current.resetAt - now) / 1000));
+    throw new HttpError(429, 'rate_limit_exceeded', `请求过于频繁，请 ${retryAfter} 秒后再试`, {
+      'Retry-After': retryAfter,
+      'X-RateLimit-Limit': max,
+      'X-RateLimit-Remaining': 0,
+      'X-RateLimit-Reset': Math.ceil(current.resetAt / 1000),
+    });
+  }
+
+  current.count += 1;
+  return { limit: max, remaining: max - current.count, resetAt: current.resetAt };
+}
+
+function checkRateLimit(requester) {
+  const shortWindow = hitBucket(`short:${requester}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS);
+  const dailyWindow = hitBucket(`daily:${requester}`, DAILY_LIMIT_MAX, DAILY_LIMIT_WINDOW_MS);
+  return {
+    'X-RateLimit-Limit': shortWindow.limit,
+    'X-RateLimit-Remaining': Math.min(shortWindow.remaining, dailyWindow.remaining),
+    'X-RateLimit-Reset': Math.ceil(shortWindow.resetAt / 1000),
+  };
 }
 
 function buildSystemPrompt({ style, depth }) {
@@ -95,12 +207,13 @@ function buildSystemPrompt({ style, depth }) {
     ? '用较严谨的术语解释卦象、纳甲、动爻与干支关系，但每段都要给出白话落点。'
     : '用通俗中文解释，少用术语；必须让没有术数基础的人也能看懂。';
   const depthGuide = depth === 'full'
-    ? '输出较完整，包含结论、卦象、动爻、时令、建议、提醒六部分。'
-    : '输出精简，控制在五段以内，先给结论再给依据。';
+    ? '输出较完整，包含【结论】【古籍依据】【卦盘分析】【行动建议】【风险提醒】【后续观察】六部分。'
+    : '输出精简，控制在五段以内，包含【结论】【古籍依据】【建议】。';
 
   return [
     '你是“易解”的六爻解读助手。',
     '你只根据用户提供的排盘上下文做文化解读和决策参考，不做绝对化断言。',
+    '古籍依据只能引用用户提供的卦辞、彖传、象传、爻辞和排盘信息。没有提供的内容，不得编造书名或原文。',
     '不得声称能替代医疗、法律、投资、心理咨询等专业服务。',
     '遇到婚恋、健康、财务等敏感问题，要给出稳妥建议和风险提示。',
     styleGuide,
@@ -127,6 +240,7 @@ function buildUserPrompt(payload) {
     question: question || chart.meta?.question || '',
     baseHex: chart.baseHex,
     changedHex: chart.changedHex,
+    classicContext: chart.classicContext || null,
     palace: chart.palace,
     movingLines: chart.movingLines,
     values: chart.values,
@@ -174,11 +288,11 @@ async function requestDeepSeek(payload) {
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.error?.message || `DeepSeek 请求失败：HTTP ${response.status}`);
+    throw new HttpError(502, 'upstream_error', data.error?.message || `DeepSeek 请求失败：HTTP ${response.status}`);
   }
 
   const text = data.choices?.[0]?.message?.content?.trim();
-  if (!text) throw new Error('DeepSeek 未返回有效解读');
+  if (!text) throw new HttpError(502, 'empty_upstream_response', 'DeepSeek 未返回有效解读');
 
   return {
     provider: 'deepseek',
@@ -199,34 +313,30 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    sendJson(res, 405, { error: 'Method Not Allowed' });
+    sendError(res, new HttpError(405, 'method_not_allowed', 'Method Not Allowed'));
     return;
   }
 
   try {
     const raw = await readBody(req);
     const payload = normalizePayload(raw ? JSON.parse(raw) : {});
+    const requester = getRequester(req);
     const cacheKey = JSON.stringify(payload);
     const cached = getCachedResult(cacheKey);
     if (cached) {
-      sendJson(res, 200, { ...cached, cached: true });
+      sendJson(res, 200, { ...cached, cached: true }, { 'X-Yijie-Cache': 'hit' });
       return;
     }
 
+    const rateHeaders = checkRateLimit(requester);
     const result = await requestDeepSeek(payload);
     setCachedResult(cacheKey, result);
-    sendJson(res, 200, result);
+    sendJson(res, 200, result, rateHeaders);
   } catch (error) {
-    const status = error instanceof ValidationError
-      ? 400
-      : error instanceof ConfigError
-        ? 503
-        : error.name === 'AbortError'
-          ? 504
-          : 502;
-
-    sendJson(res, status, {
-      error: error.message || 'AI 解读失败',
-    });
+    if (error instanceof SyntaxError) {
+      sendError(res, new ValidationError('请求 JSON 格式无效'));
+      return;
+    }
+    sendError(res, error);
   }
 }

@@ -18,9 +18,25 @@
 }
 
 .icon {
-  font-size: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
   margin-bottom: var(--space-md);
+  border-radius: 8px;
+  background: var(--color-bg-dark);
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
   line-height: 1;
+  font-size: 1.8rem;
+}
+
+.meta {
+  margin-bottom: var(--space-xs);
+  color: var(--color-accent-dark);
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
 }
 
 .title {
@@ -35,6 +51,22 @@
   color: var(--color-text-secondary);
   margin-bottom: 0;
   line-height: 1.6;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+
+.tags span {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-bg-dark);
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
 }
 
 .arrow {

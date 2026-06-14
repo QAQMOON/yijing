@@ -2,7 +2,14 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { canonicalFor, SEO_PAGES } from '../src/data/seoPages.js';
-import { BRAND_NAME, FOOTER_NAV, TOOL_NAV } from '../src/data/siteConfig.js';
+import {
+  BRAND_NAME,
+  FOOTER_NAV,
+  SITE_DESCRIPTION,
+  SITE_OG_IMAGE,
+  SITE_URL,
+  TOOL_NAV,
+} from '../src/data/siteConfig.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
@@ -18,9 +25,92 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function escapeJsonLd(value) {
+  return String(value).replace(/</g, '\\u003c');
+}
+
 function setTag(html, regex, replacement) {
   if (regex.test(html)) return html.replace(regex, replacement);
   return html.replace('</head>', `    ${replacement}\n  </head>`);
+}
+
+function buildStructuredData(page, canonical) {
+  const graph = [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      name: BRAND_NAME,
+      url: SITE_URL,
+      description: SITE_DESCRIPTION,
+      inLanguage: 'zh-CN',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${SITE_URL}/classics?q={search_term_string}`,
+        'query-input': 'required name=search_term_string',
+      },
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': `${SITE_URL}/#app`,
+      name: BRAND_NAME,
+      applicationCategory: 'LifestyleApplication',
+      operatingSystem: 'Web',
+      url: SITE_URL,
+      description: SITE_DESCRIPTION,
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'CNY',
+      },
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${canonical}#webpage`,
+      url: canonical,
+      name: page.title,
+      description: page.description,
+      isPartOf: { '@id': `${SITE_URL}/#website` },
+      inLanguage: 'zh-CN',
+    },
+  ];
+
+  if (page.path === '/' || page.path === '/classics') {
+    graph.push({
+      '@type': 'FAQPage',
+      '@id': `${canonical}#faq`,
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '易解的 AI 解读会直接引用古籍吗？',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '会优先使用排盘中已整理的卦辞、彖传、象传、爻辞等文本，并在报告里标出依据层。',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '古籍依据是否等于确定结论？',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '不是。古籍依据用于解释推理路径，结论仍应作为文化参考和决策辅助。',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '三术合参报告是什么？',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '三术合参把八字长期结构、紫微宫位叙事和六爻当下问事放进同一份综合报告。',
+          },
+        },
+      ],
+    });
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': graph,
+  };
 }
 
 function renderFallback(page) {
@@ -49,9 +139,17 @@ function renderPage(baseHtml, page) {
   html = setTag(html, /<meta property="og:title" content="[^"]*" \/>/, `<meta property="og:title" content="${escapeHtml(page.title)}" />`);
   html = setTag(html, /<meta property="og:description" content="[^"]*" \/>/, `<meta property="og:description" content="${escapeHtml(page.description)}" />`);
   html = setTag(html, /<meta property="og:url" content="[^"]*" \/>/, `<meta property="og:url" content="${escapeHtml(canonical)}" />`);
+  html = setTag(html, /<meta property="og:image" content="[^"]*" \/>/, `<meta property="og:image" content="${escapeHtml(SITE_OG_IMAGE)}" />`);
   html = setTag(html, /<meta name="twitter:title" content="[^"]*" \/>/, `<meta name="twitter:title" content="${escapeHtml(page.title)}" />`);
   html = setTag(html, /<meta name="twitter:description" content="[^"]*" \/>/, `<meta name="twitter:description" content="${escapeHtml(page.description)}" />`);
+  html = setTag(html, /<meta name="twitter:image" content="[^"]*" \/>/, `<meta name="twitter:image" content="${escapeHtml(SITE_OG_IMAGE)}" />`);
+  html = setTag(html, /<meta name="twitter:card" content="[^"]*" \/>/, '<meta name="twitter:card" content="summary_large_image" />');
   html = setTag(html, /<link rel="canonical" href="[^"]*" \/>/, `<link rel="canonical" href="${escapeHtml(canonical)}" />`);
+  html = setTag(
+    html,
+    /<script type="application\/ld\+json" data-yijie-jsonld="primary">[\s\S]*?<\/script>/,
+    `<script type="application/ld+json" data-yijie-jsonld="primary">${escapeJsonLd(JSON.stringify(buildStructuredData(page, canonical)))}</script>`,
+  );
   html = html.replace(/<div id="root"><\/div>/, renderFallback(page));
 
   return html;

@@ -3,6 +3,7 @@ import { useParams, Link, useSearchParams } from 'react-router-dom';
 import Seo from '../../components/Seo.jsx';
 import SaveReading from '../../components/SaveReading.jsx';
 import { CREDIT_COSTS } from '../../data/creditPlans.js';
+import { useAiReports } from '../../hooks/useAiReports.js';
 import { useAccount } from '../../hooks/useAccount.js';
 import { useReadingHistory } from '../../hooks/useReadingHistory.js';
 import { HEXAGRAMS } from '../../data/hexagrams.js';
@@ -84,6 +85,12 @@ function parseExternalSections(data) {
     acc[name] = typeof value === 'string' && value.trim() ? value.trim() : '';
     return acc;
   }, {});
+}
+
+function getApiError(data, fallback) {
+  if (typeof data?.error === 'string') return data.error;
+  if (data?.error?.message) return data.error.message;
+  return fallback;
 }
 
 function Badge({ children, tone = 'blue' }) {
@@ -198,6 +205,7 @@ function ExternalReading({ payload }) {
 
 function DeepSeekReading({ payload, question }) {
   const { account, refundCredits, spendCredits } = useAccount();
+  const { saveReport } = useAiReports();
   const [style, setStyle] = useState('plain');
   const [depth, setDepth] = useState('brief');
   const [status, setStatus] = useState('idle');
@@ -216,7 +224,11 @@ function DeepSeekReading({ payload, question }) {
 
       const response = await fetch('/api/deepseek-reading', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Yijie-Client': 'browser',
+          ...(account?.id ? { 'X-Yijie-Account-Id': account.id } : {}),
+        },
         body: JSON.stringify({
           domain: 'liuyao',
           chart: payload,
@@ -226,8 +238,27 @@ function DeepSeekReading({ payload, question }) {
         }),
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || 'AI 解读失败');
+      if (!response.ok) throw new Error(getApiError(data, 'AI 解读失败'));
       setResult(data.text);
+      saveReport({
+        domain: 'liuyao',
+        domainLabel: '六爻 AI 解读',
+        title: `${payload.baseHex.name}之${payload.changedHex.name}`,
+        question,
+        style,
+        depth,
+        provider: data.provider,
+        model: data.model,
+        cost: data.cost || cost,
+        text: data.text,
+        chart: {
+          baseHex: payload.baseHex,
+          changedHex: payload.changedHex,
+          movingLines: payload.movingLines,
+          pillars: payload.pillars,
+          classicContext: payload.classicContext,
+        },
+      });
       setStatus('ready');
     } catch (err) {
       if (charged) refundCredits(cost, 'AI 解读失败退回');
@@ -288,6 +319,12 @@ function DeepSeekReading({ payload, question }) {
             {status === 'loading' ? '正在生成' : '生成 AI 解读'}
           </button>
         )}
+
+        <div className={styles.classicBasis}>
+          <strong>古籍依据会随请求传入</strong>
+          <span>{payload.classicContext?.base?.title || payload.baseHex.name}</span>
+          <span>卦辞、彖象、动爻、纳甲、月日空亡</span>
+        </div>
 
         {status === 'error' && (
           <p className={styles.aiError}>{error}</p>
@@ -384,6 +421,7 @@ export default function ReadingResult() {
     voidBranches,
   } = reading;
   const baseZhouyi = zhouyiFor(baseHex);
+  const changedZhouyi = zhouyiFor(changedHex);
   const baseFullName = getHexagramFullName(baseHex);
   const changedFullName = getHexagramFullName(changedHex);
   const shenshaText = shensha.map((item) => `${item.name}：${item.value}`).join(' / ');
@@ -423,6 +461,26 @@ export default function ReadingResult() {
     },
     voidBranches,
     najiaRows,
+    classicContext: {
+      source: '《周易》卦辞、彖传、象传与动爻爻辞',
+      base: {
+        title: baseFullName,
+        judgment: baseHex.judgment,
+        tuan: baseZhouyi.tuan || '',
+        image: baseZhouyi.image || baseHex.image || '',
+      },
+      changed: {
+        title: changedFullName,
+        judgment: changedHex.judgment,
+        tuan: changedZhouyi.tuan || '',
+        image: changedZhouyi.image || changedHex.image || '',
+      },
+      movingLines: movingIndexes.map((index) => ({
+        name: getLinePosition(lines[index], index),
+        text: endWithPeriod(baseHex.yaoText[index]),
+        image: getLineXiang(baseHex, baseZhouyi, index),
+      })),
+    },
   };
 
   return (

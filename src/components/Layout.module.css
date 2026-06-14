@@ -11,3 +11,9 @@
   margin: 0 auto;
   padding: var(--space-xl) var(--space-lg);
 }
+
+@media (max-width: 760px) {
+  .main {
+    padding-bottom: calc(var(--space-3xl) + 70px + env(safe-area-inset-bottom));
+  }
+}

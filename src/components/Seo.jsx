@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '../data/siteConfig.js';
+import { SITE_DESCRIPTION, SITE_OG_IMAGE, SITE_TITLE, SITE_URL } from '../data/siteConfig.js';
 import { SEO_PAGES } from '../data/seoPages.js';
 
 function upsertMeta(selector, attributes) {
@@ -29,6 +29,96 @@ function normalizePath(path) {
   return path.startsWith('/') ? path : `/${path}`;
 }
 
+function upsertJsonLd(id, data) {
+  let element = document.head.querySelector(`script[data-yijie-jsonld="${id}"]`);
+  if (!element) {
+    element = document.createElement('script');
+    element.setAttribute('type', 'application/ld+json');
+    element.setAttribute('data-yijie-jsonld', id);
+    document.head.appendChild(element);
+  }
+  element.textContent = JSON.stringify(data);
+}
+
+function buildStructuredData({ canonical, description, pathname, title }) {
+  const graph = [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      name: '易解',
+      url: SITE_URL,
+      description: SITE_DESCRIPTION,
+      inLanguage: 'zh-CN',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${SITE_URL}/classics?q={search_term_string}`,
+        'query-input': 'required name=search_term_string',
+      },
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': `${SITE_URL}/#app`,
+      name: '易解',
+      applicationCategory: 'LifestyleApplication',
+      operatingSystem: 'Web',
+      url: SITE_URL,
+      description: SITE_DESCRIPTION,
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'CNY',
+      },
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${canonical}#webpage`,
+      url: canonical,
+      name: title,
+      description,
+      isPartOf: { '@id': `${SITE_URL}/#website` },
+      inLanguage: 'zh-CN',
+    },
+  ];
+
+  if (pathname === '/' || pathname === '/classics') {
+    graph.push({
+      '@type': 'FAQPage',
+      '@id': `${canonical}#faq`,
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '易解的 AI 解读会直接引用古籍吗？',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '会优先使用排盘中已整理的卦辞、彖传、象传、爻辞等文本，并在报告里标出依据层。',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '古籍依据是否等于确定结论？',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '不是。古籍依据用于解释推理路径，结论仍应作为文化参考和决策辅助。',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: '三术合参报告是什么？',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '三术合参把八字长期结构、紫微宫位叙事和六爻当下问事放进同一份综合报告。',
+          },
+        },
+      ],
+    });
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': graph,
+  };
+}
+
 export default function Seo({ title = SITE_TITLE, description = SITE_DESCRIPTION, path }) {
   useEffect(() => {
     const pathname = normalizePath(path || window.location.pathname);
@@ -45,10 +135,18 @@ export default function Seo({ title = SITE_TITLE, description = SITE_DESCRIPTION
     upsertMeta('meta[property="og:type"]', { property: 'og:type', content: 'website' });
     upsertMeta('meta[property="og:site_name"]', { property: 'og:site_name', content: '易解' });
     upsertMeta('meta[property="og:url"]', { property: 'og:url', content: canonical });
-    upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary' });
+    upsertMeta('meta[property="og:image"]', { property: 'og:image', content: SITE_OG_IMAGE });
+    upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
     upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: pageTitle });
     upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: pageDescription });
+    upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: SITE_OG_IMAGE });
     upsertCanonical(canonical);
+    upsertJsonLd('primary', buildStructuredData({
+      canonical,
+      description: pageDescription,
+      pathname,
+      title: pageTitle,
+    }));
   }, [description, path, title]);
 
   return null;

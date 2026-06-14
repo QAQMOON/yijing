@@ -24,6 +24,9 @@ const ZiWeiChart = lazy(() => import('./pages/ziwei/ZiWeiChart.jsx'));
 const ReadingHistory = lazy(() => import('./pages/ReadingHistory.jsx'));
 const Account = lazy(() => import('./pages/Account.jsx'));
 const Pricing = lazy(() => import('./pages/Pricing.jsx'));
+const Classics = lazy(() => import('./pages/Classics.jsx'));
+const Reports = lazy(() => import('./pages/Reports.jsx'));
+const PocketTools = lazy(() => import('./pages/PocketTools.jsx'));
 const Privacy = lazy(() => import('./pages/Privacy.jsx'));
 const Roadmap = lazy(() => import('./pages/Roadmap.jsx'));
 const Terms = lazy(() => import('./pages/Terms.jsx'));
@@ -51,6 +54,11 @@ export default function App() {
               <Route path="/qimen" element={<QiMenHome />} />
               <Route path="/qimen/display" element={<PalaceGrid />} />
               <Route path="/history" element={<ReadingHistory />} />
+              <Route path="/classics" element={<Classics />} />
+              <Route path="/wiki" element={<Classics />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/ai" element={<Reports />} />
+              <Route path="/tools" element={<PocketTools />} />
               <Route path="/account" element={<Account />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/privacy" element={<Privacy />} />
