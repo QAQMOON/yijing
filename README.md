@@ -7,7 +7,7 @@
 ## 当前功能
 
 - 六爻起卦、六十四卦查询、纳甲排盘与电脑解卦
-- 八字排盘、四柱十神、大运流年、神煞展示与服务端真太阳时增强
+- 八字排盘、四柱十神、大运流年、神煞展示与真太阳时校准
 - 紫微斗数十二宫命盘
 - 大六壬天地人三盘、四课三传展示
 - 奇门遁甲九宫排盘
@@ -21,7 +21,7 @@
 
 1. 工具站：稳定排盘工具、独立 SEO、Vercel 部署和合规入口。
 2. DeepSeek AI 解读：通过服务端接口调用 DeepSeek，支持严谨版和通俗版解读。
-3. 体验账号与积分：本地登录、本地积分流水、演示充值和 AI 解读扣减。
+3. 体验账号与积分：本地登录、本地积分流水、体验额度领取和 AI 解读扣减。
 4. 正式商业化：接云端数据库、支付回调、订单表、积分账本和云端报告历史。
 
 更详细的路线见 [docs/product-roadmap.md](docs/product-roadmap.md)。
@@ -68,7 +68,7 @@ DEEPSEEK_MODEL=deepseek-chat
 
 当前账户和积分为浏览器本地体验版。正式支付前还需要准备数据库、支付商户、支付回调密钥和订单状态处理。
 
-八字服务端增强使用 `api/metaphysics.py`，并在 `api/metaphysics_core/` 中 vendored `superzhang21/metaphysics-steward` 的八字相关 MIT 子集。Vercel Python 函数依赖见 `requirements.txt`。
+八字真太阳时校准使用 `api/metaphysics.py`，并在 `api/metaphysics_core/` 中 vendored `superzhang21/metaphysics-steward` 的八字相关 MIT 子集。Vercel Python 函数依赖见 `requirements.txt`。
 
 ## 部署
 

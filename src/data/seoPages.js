@@ -76,9 +76,9 @@ export const SEO_PAGES = [
   {
     path: '/reports',
     title: 'AI 报告历史 · 三术合参 · 易解',
-    description: '易解 AI 报告历史入口，保存六爻 DeepSeek 解读，并预留八字、紫微、六爻三术合参综合报告。',
+    description: '易解 AI 报告历史入口，保存六爻 DeepSeek 解读，并展示八字、紫微、六爻三术合参综合报告规划。',
     heading: 'AI 报告',
-    summary: '保存 AI 解读历史，后续接入八字、紫微、六爻三术合参付费报告。',
+    summary: '保存 AI 解读历史，逐步接入八字、紫微、六爻三术合参深度报告。',
     priority: '0.6',
   },
   {
@@ -92,17 +92,17 @@ export const SEO_PAGES = [
   {
     path: '/account',
     title: '我的账户 · 登录与积分 · 易解',
-    description: '登录易解体验账号，查看 AI 解读积分余额、积分消耗记录与充值入口。',
+    description: '登录易解体验账号，查看 AI 解读积分余额、积分消耗记录与体验额度入口。',
     heading: '我的账户',
-    summary: '登录后查看 AI 解读积分余额、积分消耗记录与充值入口。',
+    summary: '登录后查看 AI 解读积分余额、积分消耗记录与体验额度入口。',
     priority: '0.3',
   },
   {
     path: '/pricing',
     title: '积分套餐 · AI 解读付费 · 易解',
-    description: '易解积分套餐页面展示 AI 解读积分包、体验充值和后续支付接入准备事项。',
+    description: '易解积分套餐页面展示 AI 解读积分包、体验额度和正式支付开放说明。',
     heading: '积分套餐',
-    summary: '查看 AI 解读积分包、体验充值和后续支付接入准备事项。',
+    summary: '查看 AI 解读积分包、体验额度和正式支付开放说明。',
     priority: '0.3',
   },
   {
@@ -124,9 +124,9 @@ export const SEO_PAGES = [
   {
     path: '/roadmap',
     title: '产品路线 · 工具站到 DeepSeek AI 解读 · 易解',
-    description: '易解产品路线：稳定工具站、DeepSeek AI 解读体验版、本地积分账户，以及后续云端报告和正式支付接入。',
+    description: '易解产品路线：稳定排盘工具、AI 解读报告、积分账户、报告同步和三术合参。',
     heading: '产品路线',
-    summary: '工具站已上线，AI 解读和本地积分进入体验版，下一步接云端账户与正式支付。',
+    summary: '排盘工具、AI 解读和体验积分已上线，下一步完善报告同步、正式支付和三术合参。',
     priority: '0.4',
   },
 ];

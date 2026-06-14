@@ -7,12 +7,12 @@ export default function Roadmap() {
     <div className={styles.page}>
       <Seo
         title="产品路线 · 工具站到 DeepSeek AI 解读 · 易解"
-        description="易解产品路线：稳定工具站、DeepSeek AI 解读体验版、本地积分账户，以及后续云端报告和正式支付接入。"
+        description="易解产品路线：稳定排盘工具、AI 解读报告、积分账户、报告同步和三术合参。"
         path="/roadmap"
       />
       <p className={styles.eyebrow}>ROADMAP</p>
       <h1 className={styles.title}>产品路线</h1>
-      <p className={styles.updated}>工具站已上线，AI 解读和本地积分进入体验版，下一步接云端账户与正式支付。</p>
+      <p className={styles.updated}>排盘工具、AI 解读和体验积分已上线，下一步完善报告同步、正式支付和三术合参。</p>
 
       <div className={styles.roadmap}>
         {APP_ROADMAP.map((item) => (
@@ -31,8 +31,8 @@ export default function Roadmap() {
       </div>
 
       <section className={styles.section}>
-        <h2>技术方向</h2>
-        <p>当前继续使用 Vercel 部署。DeepSeek API 放在服务端接口中调用，前端只提交排盘上下文和解读风格，避免把密钥暴露给浏览器。登录、云端报告、订单和积分记录建议后续接 Supabase 或同级别托管数据库。</p>
+        <h2>下一步</h2>
+        <p>我们会优先完善账户同步、报告找回、积分消耗记录和正式支付流程，让 AI 解读从单次体验逐步变成可长期保存的个人报告库。</p>
       </section>
     </div>
   );

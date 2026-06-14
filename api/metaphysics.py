@@ -146,7 +146,7 @@ class handler(BaseHTTPRequestHandler):
             payload = parse_body(self)
             mode = payload.get("mode", "bazi")
             if mode != "bazi":
-                raise ApiError(400, "unsupported_mode", "当前服务端增强先支持八字")
+                raise ApiError(400, "unsupported_mode", "当前校时排盘先支持八字")
             send_json(self, 200, analyze_bazi(payload))
         except ApiError as error:
             send_json(self, error.status, {

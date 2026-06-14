@@ -55,7 +55,7 @@ export default function Reports() {
         <div>
           <p className={styles.kicker}>AI 报告</p>
           <h1>把每一次解读沉淀成报告</h1>
-          <p>当前先保存本地 AI 报告。接入云端账户后，报告会随账户同步，并按积分扣费。</p>
+          <p>当前报告保存在本设备。账户同步开放后，可在不同设备继续查看。</p>
         </div>
         <div className={styles.heroActions}>
           <Link to="/liuyao/cast">生成六爻报告</Link>
@@ -77,14 +77,14 @@ export default function Reports() {
       </section>
 
       <section className={styles.cloudPanel}>
-        <h2>云端保存准备</h2>
+        <h2>报告同步规划</h2>
         <div>
-          <span>账户鉴权</span>
-          <span>服务端积分</span>
+          <span>账户同步</span>
+          <span>积分保护</span>
           <span>报告归档</span>
           <span>风控限流</span>
         </div>
-        <p>数据库建表脚本已经放入项目，配置 Supabase 后即可把本地报告迁移到云端。</p>
+        <p>后续将支持跨设备保存、报告找回和积分消耗记录查询。</p>
       </section>
 
       <section className={styles.listSection}>

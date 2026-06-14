@@ -127,7 +127,7 @@ export default function QiMenHome() {
 
         <div className={styles.actions}>
           <button type="submit" className={styles.btn}>奇门遁甲起局</button>
-          <button type="button" className={styles.btnOutline} onClick={useCurrentTime}>本地时间起局</button>
+          <button type="button" className={styles.btnOutline} onClick={useCurrentTime}>当前时间起局</button>
         </div>
       </form>
     </div>

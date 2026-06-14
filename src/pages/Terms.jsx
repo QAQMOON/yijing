@@ -34,7 +34,7 @@ export default function Terms() {
 
       <section className={styles.section}>
         <h2>积分与支付</h2>
-        <p>AI 深度解读按次消耗积分。当前体验账号和演示充值保存在浏览器本地，不代表真实收款或真实订单。接入正式支付后，会补充积分购买、消耗、退款、异常订单、报告保存、账户注销等细则。</p>
+        <p>AI 深度解读按次消耗积分。当前体验账号和体验积分记录保存在浏览器本地，不代表真实收款或真实订单。接入正式支付后，会补充积分购买、消耗、退款、异常订单、报告保存、账户注销等细则。</p>
       </section>
 
       <section className={styles.section}>

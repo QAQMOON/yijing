@@ -156,7 +156,7 @@ export default function InputBirthData() {
         </div>
       </form>
 
-      <p className={styles.note}>年份范围：1900 - 2100。出生地用于服务端真太阳时校正，可填城市名或经度。</p>
+      <p className={styles.note}>年份范围：1900 - 2100。出生地用于真太阳时校正，可填城市名或经度。</p>
     </div>
   );
 }

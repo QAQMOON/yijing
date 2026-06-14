@@ -84,14 +84,14 @@ function StewardPanel({ status, data, error }) {
     <section className={styles.stewardPanel}>
       <div className={styles.stewardHead}>
         <div>
-          <p>Metaphysics Steward</p>
-          <h2>服务端增强</h2>
+          <p>出生地校时</p>
+          <h2>真太阳时与起运校准</h2>
         </div>
-        <span>{status === 'ready' ? '已校正' : '校验中'}</span>
+        <span>{status === 'ready' ? '已完成' : '校准中'}</span>
       </div>
 
       {status === 'loading' && (
-        <p className={styles.stewardState}>正在校验真太阳时、经度与精确起运。</p>
+        <p className={styles.stewardState}>正在校准出生地、真太阳时与精确起运。</p>
       )}
 
       {status === 'error' && (
@@ -117,14 +117,14 @@ function StewardPanel({ status, data, error }) {
               <small>{yun?.start_time || config.lunarDate}</small>
             </div>
           </div>
-          <div className={styles.stewardLuck} aria-label="服务端大运">
+          <div className={styles.stewardLuck} aria-label="校准后大运">
             {daYun.map((item) => (
               <span key={`${item.index}-${item.pillar}`}>
                 {item.pillar}<small>{item.start_age}岁</small>
               </span>
             ))}
           </div>
-          <p className={styles.stewardFoot}>这层数据会作为八字 AI 报告的排盘依据，不替换当前浏览器排盘。</p>
+          <p className={styles.stewardFoot}>校准结果用于核对时辰、大运和后续 AI 报告依据。</p>
         </>
       )}
     </section>
@@ -213,13 +213,13 @@ export default function BaZiChart() {
     })
       .then(async (response) => {
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(getApiError(data, '服务端增强暂不可用', response.status));
+        if (!response.ok) throw new Error(getApiError(data, '校时数据暂不可用', response.status));
         setStewardData(data);
         setStewardStatus('ready');
       })
       .catch((err) => {
         if (err.name === 'AbortError') return;
-        setStewardError(err.message || '服务端增强暂不可用');
+        setStewardError(err.message || '校时数据暂不可用');
         setStewardStatus('error');
       });
 

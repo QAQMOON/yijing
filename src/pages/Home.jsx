@@ -99,7 +99,7 @@ export default function Home() {
       <section className={styles.matrixSection}>
         <div className={styles.sectionHead}>
           <h2>功能矩阵</h2>
-          <p>工具免费可用，AI 深度解读按积分消耗，三术合参作为后续付费报告。</p>
+          <p>工具免费可用，AI 深度解读按积分消耗，三术合参用于深度报告。</p>
         </div>
         <div className={styles.cardGrid}>
           {FEATURE_MATRIX.map((item) => (
@@ -149,7 +149,7 @@ export default function Home() {
       <section className={styles.triplePanel}>
         <div>
           <h2>三术合参</h2>
-          <p>把长期命盘、宫位叙事和当下问事放到同一份 AI 报告里，这是后续付费核心。</p>
+          <p>把长期命盘、宫位叙事和当下问事放到同一份 AI 报告里，用于更完整的综合判断。</p>
         </div>
         <div className={styles.tripleGrid}>
           <span>八字</span>

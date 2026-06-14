@@ -63,7 +63,7 @@ function zhouyiFor(hex) {
 }
 
 function getLineXiang(hex, zhouyi, index) {
-  return zhouyi.yaoImage?.[index] || hex.yaoImage?.[index] || '爻象原文待补录。';
+  return zhouyi.yaoImage?.[index] || hex.yaoImage?.[index] || '爻象原文整理中。';
 }
 
 function getLinePosition(line, index) {
@@ -74,7 +74,7 @@ function getLinePosition(line, index) {
 }
 
 function endWithPeriod(text) {
-  if (!text) return '爻辞原文待补录。';
+  if (!text) return '爻辞原文整理中。';
   return /[。！？；]$/.test(text) ? text : `${text}。`;
 }
 
@@ -110,8 +110,8 @@ function ZhouyiBlock({ hexagram, title }) {
       <article className={styles.classicBlock}>
         <h3>《周易》：{fullName} {hexagram.upperTrigram}上{hexagram.lowerTrigram}下</h3>
         <p>{hexagram.judgment}</p>
-        <p><strong>彖曰：</strong>{zhouyi.tuan || '彖传原文待补录。'}</p>
-        <p><strong>象曰：</strong>{zhouyi.image || hexagram.image || '象传原文待补录。'}</p>
+        <p><strong>彖曰：</strong>{zhouyi.tuan || '彖传原文整理中。'}</p>
+        <p><strong>象曰：</strong>{zhouyi.image || hexagram.image || '象传原文整理中。'}</p>
       </article>
     </section>
   );

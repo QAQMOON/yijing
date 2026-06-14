@@ -78,13 +78,13 @@ test('local account can sign in and top up demo credits', async ({ page }) => {
   await expect(page.getByRole('link', { name: /8积分/ })).toBeVisible();
 
   await page.goto('/pricing');
-  await page.getByRole('button', { name: '演示充值' }).nth(1).click();
+  await page.getByRole('button', { name: '领取积分' }).nth(1).click();
 
   await expect(page.getByText('已为当前体验账号增加 68 积分。')).toBeVisible();
   await expect(page.getByRole('link', { name: /76积分/ })).toBeVisible();
 });
 
-test('bazi result loads metaphysics steward enhancement', async ({ page }) => {
+test('bazi result loads true solar time calibration', async ({ page }) => {
   let requestBody;
   await page.route('**/api/metaphysics', async (route) => {
     const request = route.request();
@@ -117,7 +117,7 @@ test('bazi result loads metaphysics steward enhancement', async ({ page }) => {
   });
 
   await page.goto('/bazi/result?dt=1990-05-08T12%3A00&calendar=solar&gender=male&birthplace=%E5%8C%97%E4%BA%AC&mode=custom');
-  await expect(page.getByText('服务端增强')).toBeVisible();
+  await expect(page.getByText('真太阳时与起运校准')).toBeVisible();
   await expect(page.getByText('1990-05-08 11:49')).toBeVisible();
   await expect(page.getByText('9年7个月0天起运')).toBeVisible();
   expect(requestBody.birthplace).toBe('北京');

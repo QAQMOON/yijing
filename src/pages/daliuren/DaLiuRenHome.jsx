@@ -32,7 +32,7 @@ export default function DaLiuRenHome() {
         天地人三盘叠合，十二天将各司其位，信息量最为丰富，细腻解析事物发展脉络。
       </p>
       <form className={styles.panel} onSubmit={submitCustom}>
-        <button type="button" className={styles.btn} onClick={useCurrentTime}>本地时间起课</button>
+        <button type="button" className={styles.btn} onClick={useCurrentTime}>当前时间起课</button>
         <label className={styles.timeRow}>
           <span>自定义时间</span>
           <input

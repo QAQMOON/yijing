@@ -138,7 +138,7 @@ export default function ZiWeiHome() {
 
         <div className={styles.actions}>
           <button type="submit" className={styles.btn}>紫微斗数排盘</button>
-          <button type="button" className={styles.btnOutline} onClick={useCurrentTime}>本地时间起盘</button>
+          <button type="button" className={styles.btnOutline} onClick={useCurrentTime}>当前时间起盘</button>
         </div>
       </form>
     </div>
