@@ -124,6 +124,21 @@ test('bazi result loads true solar time calibration', async ({ page }) => {
   expect(requestBody.mode).toBe('bazi');
 });
 
+test('bazi birthplace selector starts empty and can switch options', async ({ page }) => {
+  await page.goto('/bazi/chart');
+  await page.waitForLoadState('networkidle');
+
+  const birthplace = page.getByLabel('出生地');
+  await expect(birthplace).toHaveValue('');
+  await expect(page.locator('#birthplace option')).toHaveCount(35);
+
+  await birthplace.selectOption('北京');
+  await expect(birthplace).toHaveValue('北京');
+
+  await birthplace.selectOption('湖南');
+  await expect(birthplace).toHaveValue('湖南');
+});
+
 test('AI reading flow is saved with mocked DeepSeek response', async ({ page }) => {
   await page.route('**/api/liuyao-reading', async (route) => {
     await route.fulfill({

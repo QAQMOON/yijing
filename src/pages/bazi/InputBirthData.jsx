@@ -19,7 +19,7 @@ export default function InputBirthData() {
   const [gender, setGender] = useState('male');
   const [calendar, setCalendar] = useState('solar');
   const [dateTime, setDateTime] = useState(toDateTimeInputValue(now));
-  const [birthplace, setBirthplace] = useState('北京');
+  const [birthplace, setBirthplace] = useState('');
   const [lunar, setLunar] = useState({
     year: now.getFullYear(),
     month: now.getMonth() + 1,
@@ -30,7 +30,7 @@ export default function InputBirthData() {
 
   const buildCommonParams = () => ({
     gender,
-    birthplace: birthplace.trim() || '120.0',
+    ...(birthplace ? { birthplace } : {}),
   });
 
   const handleSubmit = (e) => {
@@ -140,19 +140,17 @@ export default function InputBirthData() {
         )}
 
         <div className={styles.row}>
-          <label className={styles.label}>出生地</label>
+          <label className={styles.label} htmlFor="birthplace">出生地</label>
           <div>
-            <input
-              type="text"
+            <select
+              id="birthplace"
               className={styles.input}
               value={birthplace}
-              list="birthplace-options"
-              placeholder="北京 / 湖南 / 116.4"
               onChange={e => setBirthplace(e.target.value)}
-            />
-            <datalist id="birthplace-options">
-              {PLACE_OPTIONS.map((place) => <option key={place} value={place} />)}
-            </datalist>
+            >
+              <option value="">待选择位置</option>
+              {PLACE_OPTIONS.map((place) => <option key={place} value={place}>{place}</option>)}
+            </select>
           </div>
         </div>
 
@@ -162,7 +160,7 @@ export default function InputBirthData() {
         </div>
       </form>
 
-      <p className={styles.note}>年份范围：1900 - 2100。出生地用于真太阳时校正，可填省份、城市名或经度。</p>
+      <p className={styles.note}>年份范围：1900 - 2100。出生地用于真太阳时校正，省级地区按代表城市经度近似校准。</p>
     </div>
   );
 }
