@@ -5,7 +5,17 @@ import { toDateTimeInputValue } from '../../utils/dateTime.js';
 import styles from './InputBirthData.module.css';
 
 const pad = (value) => String(value).padStart(2, '0');
-const PLACE_OPTIONS = ['北京', '上海', '广州', '深圳', '杭州', '成都', '重庆', '武汉', '西安', '南京', '乌鲁木齐', '拉萨'];
+const PLACE_OPTIONS = [
+  '北京', '上海', '天津', '重庆', '广州', '深圳', '杭州', '成都', '武汉', '西安',
+  '南京', '长沙', '郑州', '沈阳', '昆明', '南宁', '哈尔滨', '乌鲁木齐', '拉萨',
+  '海口', '兰州', '贵阳', '福州', '南昌', '合肥', '济南', '太原', '石家庄',
+  '呼和浩特', '银川', '西宁', '香港', '澳门', '台北',
+  '河北', '山西', '辽宁', '吉林', '黑龙江', '江苏', '浙江', '安徽', '福建',
+  '江西', '山东', '河南', '湖北', '湖南', '广东', '海南', '四川', '贵州',
+  '云南', '陕西', '甘肃', '青海', '台湾', '内蒙古', '广西', '西藏', '宁夏', '新疆',
+  '宁波', '温州', '无锡', '苏州', '常州', '南通', '徐州', '扬州', '佛山',
+  '东莞', '珠海', '中山', '惠州', '汕头', '厦门', '泉州', '青岛', '大连',
+];
 
 export default function InputBirthData() {
   const navigate = useNavigate();
@@ -141,7 +151,7 @@ export default function InputBirthData() {
               className={styles.input}
               value={birthplace}
               list="birthplace-options"
-              placeholder="北京 或 116.4"
+              placeholder="北京 / 湖南 / 116.4"
               onChange={e => setBirthplace(e.target.value)}
             />
             <datalist id="birthplace-options">
@@ -156,7 +166,7 @@ export default function InputBirthData() {
         </div>
       </form>
 
-      <p className={styles.note}>年份范围：1900 - 2100。出生地用于真太阳时校正，可填城市名或经度。</p>
+      <p className={styles.note}>年份范围：1900 - 2100。出生地用于真太阳时校正，可填省份、城市名或经度。</p>
     </div>
   );
 }
