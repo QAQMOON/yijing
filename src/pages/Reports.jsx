@@ -48,7 +48,7 @@ export default function Reports() {
     <div className={styles.page}>
       <Seo
         title="AI 报告历史 · 三术合参 · 易解"
-        description="易解 AI 报告历史入口，保存六爻解读，并提供八字、紫微、六爻三术合参综合报告入口。"
+        description="易解 AI 报告历史入口，保存六爻、八字、紫微解读，并提供八字与六爻双术合参综合报告入口。"
         path="/reports"
       />
 
@@ -61,7 +61,7 @@ export default function Reports() {
         <div className={styles.heroActions}>
           <Link to="/liuyao/cast">生成六爻报告</Link>
           <Link to="/bazi/chart">生成八字报告</Link>
-          <Link to="/ziwei">生成紫微报告</Link>
+          <Link to="/reports/combined">双术合参</Link>
           <Link to="/pricing">查看积分</Link>
         </div>
       </section>
@@ -69,14 +69,15 @@ export default function Reports() {
       <section className={styles.comboPanel}>
         <div>
           <h2>三术合参综合报告</h2>
-          <p>八字看长期结构，紫微看宫位叙事，六爻看当下问题，合成一份更完整的参考报告。</p>
+          <p>首版先合八字与六爻：八字看长期结构，六爻看当下问题，紫微作为后续扩展。</p>
         </div>
         <div className={styles.comboGrid}>
           <span>八字结构</span>
-          <span>紫微宫位</span>
           <span>六爻问事</span>
+          <span>紫微后续</span>
           <strong>综合判断</strong>
         </div>
+        <Link to="/reports/combined" className={styles.comboAction}>生成双术合参报告</Link>
       </section>
 
       <section className={styles.cloudPanel}>

@@ -104,7 +104,7 @@ function normalizePayload(payload) {
     throw new ValidationError('请求内容格式无效');
   }
 
-  const domain = ['liuyao', 'bazi', 'ziwei'].includes(payload.domain) ? payload.domain : '';
+  const domain = ['liuyao', 'bazi', 'ziwei', 'combined'].includes(payload.domain) ? payload.domain : '';
   if (!domain) {
     throw new ValidationError('当前 AI 解读暂不支持该排盘类型');
   }
@@ -124,6 +124,20 @@ function normalizePayload(payload) {
 
   if (domain === 'ziwei' && (!Array.isArray(chart.palaces) || chart.palaces.length < 12 || !chart.lifePalace?.name)) {
     throw new ValidationError('缺少紫微命盘宫位信息');
+  }
+
+  if (
+    domain === 'combined'
+    && (
+      !chart.bazi?.pillars?.year?.full
+      || !chart.bazi?.pillars?.month?.full
+      || !chart.bazi?.pillars?.day?.full
+      || !chart.bazi?.pillars?.hour?.full
+      || !chart.liuyao?.baseHex?.name
+      || !chart.liuyao?.changedHex?.name
+    )
+  ) {
+    throw new ValidationError('缺少双术合参排盘信息');
   }
 
   const style = ['plain', 'scholar'].includes(payload.style) ? payload.style : 'plain';
@@ -258,6 +272,21 @@ function buildSystemPrompt({ domain, style, depth }) {
       ];
     }
 
+    if (domain === 'combined') {
+      return [
+        '你是“易解”的双术合参报告助手。',
+        '首版合参只包含八字与六爻：八字用于观察长期结构、性格倾向、资源禀赋和阶段节奏；六爻用于观察用户所问事项的当前格局、动变方向和短期建议。紫微斗数未进入本次 MVP，不得假装已经分析紫微命盘。',
+        '你只根据用户提供的八字排盘和六爻卦盘上下文做传统文化解读和决策参考，不做绝对化断言。',
+        '在正式解读前，必须先在内部确认资料是否完整：出生时间、性别、四柱、日主、大运、所问事项、起卦时间、本卦、变卦、动爻、干支、空亡、纳甲、六亲、六神、世应信息。若八字四柱或六爻本变卦缺失，先输出【需要补充的信息】，不要强行断。',
+        '分析时必须分层推进：先用八字说明长期结构和阶段底色，再用六爻说明当下问事的局面和变化，再对两者一致或冲突的地方做合参，最后落到行动建议。',
+        '合参时要避免把八字长期倾向直接当作具体事件结果，也不要用六爻短期卦象否定整个命局结构。必须说明“长期结构”和“当下问事”的边界。',
+        '结论要清楚，可以使用“长期适合、当前阻力、可小步推进、宜守不宜进、先补条件、等待节点”等判断，但不得说成百分百确定。',
+        '建议必须现实可执行，并分别说明对应的八字依据、六爻依据和合参依据。',
+        '不得编造用户未提供的出生信息、现实经历、紫微信息、古籍原文或额外神煞。',
+        '涉及健康只能谈作息、压力、情绪、运动等生活习惯倾向，不得诊断疾病；涉及财务只能谈风险偏好和节奏，不得给投资指令。',
+      ];
+    }
+
     return [
         '你是“易解”的六爻解读助手。',
         '你只根据用户提供的六爻排盘上下文做传统文化解读和决策参考，不做绝对化断言。',
@@ -321,6 +350,17 @@ function buildUserPrompt(payload) {
       bodyPalace: chart.bodyPalace,
       horoscope: chart.horoscope,
       palaces: chart.palaces,
+    }, null, 2);
+  }
+
+  if (payload.domain === 'combined') {
+    return JSON.stringify({
+      question: question || chart.question || '',
+      scope: chart.scope || '',
+      mode: chart.mode || 'bazi_liuyao',
+      bazi: chart.bazi,
+      liuyao: chart.liuyao,
+      extensions: chart.extensions || null,
     }, null, 2);
   }
 

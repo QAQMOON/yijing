@@ -103,10 +103,10 @@ function buildStructuredData({ canonical, description, pathname, title }) {
         },
         {
           '@type': 'Question',
-          name: '三术合参报告是什么？',
+          name: '双术合参报告是什么？',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: '三术合参把八字长期结构、紫微宫位叙事和六爻当下问事放进同一份综合报告。',
+            text: '双术合参 MVP 把八字长期结构和六爻当下问事放进同一份综合报告，紫微作为后续扩展。',
           },
         },
       ],

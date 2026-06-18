@@ -76,9 +76,17 @@ export const SEO_PAGES = [
   {
     path: '/reports',
     title: 'AI 报告历史 · 三术合参 · 易解',
-    description: '易解 AI 报告历史入口，保存六爻解读，并提供八字、紫微、六爻三术合参综合报告入口。',
+    description: '易解 AI 报告历史入口，保存六爻、八字、紫微解读，并提供八字与六爻双术合参综合报告入口。',
     heading: 'AI 报告',
-    summary: '保存 AI 解读历史，查看八字、紫微、六爻三术合参深度报告。',
+    summary: '保存 AI 解读历史，查看八字与六爻双术合参深度报告。',
+    priority: '0.6',
+  },
+  {
+    path: '/reports/combined',
+    title: '双术合参报告 · 八字与六爻 · 易解',
+    description: '易解双术合参报告结合八字长期结构与六爻当下问事，生成可保存的 AI 综合参考报告。',
+    heading: '双术合参',
+    summary: '八字看长期结构，六爻看当下问事，生成一份可保存的综合报告。',
     priority: '0.6',
   },
   {

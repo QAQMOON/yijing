@@ -64,8 +64,8 @@ export const APP_ROADMAP = [
   {
     stage: '综合报告',
     title: '三术合参',
-    status: '即将开放',
-    points: ['八字长期结构', '紫微宫位叙事', '六爻当下问事', '综合报告'],
+    status: 'MVP 已上线',
+    points: ['八字长期结构', '六爻当下问事', '双术合参报告', '紫微后续扩展'],
   },
 ];
 

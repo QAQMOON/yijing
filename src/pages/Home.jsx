@@ -38,9 +38,9 @@ const FEATURE_MATRIX = [
   },
   {
     icon: '合',
-    title: '三术合参',
-    description: '八字看长期结构，紫微看宫位叙事，六爻看当下问题。',
-    to: '/reports',
+    title: '双术合参',
+    description: '八字看长期结构，六爻看当下问题，紫微后续扩展。',
+    to: '/reports/combined',
     meta: '综合报告',
     tags: ['综合报告', 'AI 解读'],
   },
@@ -99,7 +99,7 @@ export default function Home() {
       <section className={styles.matrixSection}>
         <div className={styles.sectionHead}>
           <h2>功能矩阵</h2>
-          <p>工具免费可用，AI 深度解读按积分消耗，三术合参用于深度报告。</p>
+          <p>工具免费可用，AI 深度解读按积分消耗，双术合参用于深度报告。</p>
         </div>
         <div className={styles.cardGrid}>
           {FEATURE_MATRIX.map((item) => (
@@ -148,13 +148,13 @@ export default function Home() {
 
       <section className={styles.triplePanel}>
         <div>
-          <h2>三术合参</h2>
-          <p>把长期命盘、宫位叙事和当下问事放到同一份 AI 报告里，用于更完整的综合判断。</p>
+          <h2>双术合参</h2>
+          <p>把八字长期结构和六爻当下问事放到同一份 AI 报告里，紫微作为后续扩展。</p>
         </div>
         <div className={styles.tripleGrid}>
           <span>八字</span>
-          <span>紫微</span>
           <span>六爻</span>
+          <span>紫微后续</span>
           <strong>综合报告</strong>
         </div>
       </section>

@@ -10,6 +10,7 @@ const PUBLIC_ROUTES = [
   { path: '/qimen', title: /奇门遁甲排盘/, h1: /奇门遁甲/ },
   { path: '/classics', title: /藏经阁与术语库/, h1: /古籍依据/ },
   { path: '/reports', title: /AI 报告历史/, h1: /报告/ },
+  { path: '/reports/combined', title: /双术合参报告/, h1: /八字看长期结构/ },
   { path: '/tools', title: /百宝袋/, h1: /排盘前/ },
   { path: '/account', title: /我的账户/, h1: /登录易解/ },
   { path: '/pricing', title: /积分套餐/, h1: /AI 解读按次消耗积分/ },
@@ -281,4 +282,45 @@ test('ziwei AI reading flow is saved with mocked DeepSeek response', async ({ pa
   await page.goto('/reports');
   await expect(page.getByText('紫微 AI 解读')).toBeVisible();
   await expect(page.getByText('这是紫微 mock AI 解读').first()).toBeVisible();
+});
+
+test('combined bazi and liuyao AI report is saved with mocked DeepSeek response', async ({ page }) => {
+  await page.route('**/api/deepseek-reading', async (route) => {
+    const request = route.request();
+    const body = request.postDataJSON();
+    expect(request.method()).toBe('POST');
+    expect(request.headers()['x-yijie-account-id']).toMatch(/^acct_/);
+    expect(body.domain).toBe('combined');
+    expect(body.chart.mode).toBe('bazi_liuyao');
+    expect(body.chart.bazi.pillars.year.full).toBeTruthy();
+    expect(body.chart.liuyao.baseHex.name).toBeTruthy();
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        provider: 'deepseek',
+        model: 'mock-model',
+        text: '【结论】这是双术合参 mock 报告。\n\n【合参依据】八字看长期结构，六爻看当下问事。',
+        cost: 2,
+      }),
+    });
+  });
+
+  await page.goto('/account');
+  await page.getByLabel('手机号或邮箱').fill('combined-ai@example.com');
+  await page.getByLabel('称呼').fill('合参测试');
+  await page.getByRole('button', { name: '登录并领取积分' }).click();
+
+  await page.goto('/reports/combined');
+  await page.getByLabel('出生时间').fill('1990-05-08T12:00');
+  await page.getByLabel('起卦时间').fill('2026-06-18T09:30');
+  await page.getByLabel('所问事项').fill('现在是否适合推进新项目？');
+  await page.getByRole('button', { name: '生成双术合参报告' }).click();
+  await expect(page.getByText('正在核对八字结构')).toBeVisible();
+  await expect(page.getByText('这是双术合参 mock 报告')).toBeVisible();
+
+  await page.goto('/reports');
+  const combinedReport = page.getByRole('article').filter({ hasText: '现在是否适合推进新项目？' });
+  await expect(combinedReport.getByText('双术合参', { exact: true })).toBeVisible();
+  await expect(combinedReport.getByText('这是双术合参 mock 报告').first()).toBeVisible();
 });

@@ -2,7 +2,7 @@
 
 ## 当前决策
 
-- 产品节奏：稳定工具站已完成，DeepSeek AI 解读和本地积分进入体验版，下一步接云端账户和正式支付。
+- 产品节奏：稳定工具站已完成，DeepSeek AI 解读、本地积分和双术合参 MVP 进入体验版，下一步接云端账户和正式支付。
 - 部署平台：继续使用 Vercel。
 - AI 供应商：DeepSeek。
 - 当前代码形态：Vite + React 应用，排盘逻辑主要在浏览器本地运行，AI 解读通过 Vercel 服务端接口调用。
@@ -30,7 +30,7 @@ POST /api/deepseek-reading
 
 请求包含：
 
-- `domain`: `liuyao`、`bazi`、`ziwei`、`qimen`、`daliuren`
+- `domain`: `liuyao`、`bazi`、`ziwei`、`combined`
 - `chart`: 结构化排盘结果
 - `question`: 用户问题，可选
 - `style`: `scholar` 或 `plain`
@@ -61,6 +61,16 @@ POST /api/deepseek-reading
 - AI 解读按次消耗积分。
 - 付费前展示消耗数量。
 - 异常失败不扣积分，或自动回滚。
+
+## 阶段三点五：双术合参报告 MVP
+
+首版先做八字 + 六爻，不把紫微纳入 MVP。
+
+- 八字负责长期结构：四柱、日主、十神、旺衰、神煞、大运。
+- 六爻负责当下问事：本卦、变卦、动爻、干支、空亡、六神、纳甲、六亲、世应。
+- DeepSeek 接口使用 `domain=combined`，只传结构化排盘上下文。
+- 前端入口为 `/reports/combined`，生成后保存到本地报告历史。
+- 紫微作为第二阶段扩展，避免首版规格和测试样例过重。
 
 ## 阶段四：正式支付
 
