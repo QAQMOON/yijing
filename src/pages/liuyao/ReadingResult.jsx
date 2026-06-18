@@ -3,7 +3,6 @@ import { useParams, Link, useSearchParams } from 'react-router-dom';
 import Seo from '../../components/Seo.jsx';
 import SaveReading from '../../components/SaveReading.jsx';
 import { CREDIT_COSTS } from '../../data/creditPlans.js';
-import { useAiReports } from '../../hooks/useAiReports.js';
 import { useAccount } from '../../hooks/useAccount.js';
 import { useReadingHistory } from '../../hooks/useReadingHistory.js';
 import { HEXAGRAMS } from '../../data/hexagrams.js';
@@ -22,6 +21,7 @@ import {
   getSixGods,
   getVoidBranches,
 } from '../../utils/liuyaoMeta.js';
+import { apiErrorMessage, authHeaders } from '../../utils/apiAuth.js';
 import styles from './ReadingResult.module.css';
 
 const LINE_NAMES = ['初爻', '二爻', '三爻', '四爻', '五爻', '上爻'];
@@ -205,8 +205,7 @@ function ExternalReading({ payload }) {
 }
 
 function DeepSeekReading({ payload, question }) {
-  const { account, refundCredits, spendCredits } = useAccount();
-  const { saveReport } = useAiReports();
+  const { account, refreshAccount, session } = useAccount();
   const [style, setStyle] = useState('plain');
   const [depth, setDepth] = useState('brief');
   const [status, setStatus] = useState('idle');
@@ -215,54 +214,27 @@ function DeepSeekReading({ payload, question }) {
   const cost = CREDIT_COSTS.aiReading;
 
   const requestReading = async () => {
-    let charged = false;
     setError('');
     setStatus('loading');
 
     try {
-      spendCredits(cost, '六爻 AI 深度解读');
-      charged = true;
-
       const response = await fetch('/api/deepseek-reading', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Yijie-Client': 'browser',
-          ...(account?.id ? { 'X-Yijie-Account-Id': account.id } : {}),
-        },
+        headers: authHeaders(session),
         body: JSON.stringify({
           domain: 'liuyao',
+          title: `${payload.baseHex.name}之${payload.changedHex.name}`,
           chart: payload,
           question,
           style,
           depth,
         }),
       });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(getApiError(data, 'AI 解读失败', response.status));
+      const data = await apiErrorMessage(response, getApiError({}, 'AI 解读失败', response.status));
       setResult(data.text);
-      saveReport({
-        domain: 'liuyao',
-        domainLabel: '六爻 AI 解读',
-        title: `${payload.baseHex.name}之${payload.changedHex.name}`,
-        question,
-        style,
-        depth,
-        provider: data.provider,
-        model: data.model,
-        cost: data.cost || cost,
-        text: data.text,
-        chart: {
-          baseHex: payload.baseHex,
-          changedHex: payload.changedHex,
-          movingLines: payload.movingLines,
-          pillars: payload.pillars,
-          classicContext: payload.classicContext,
-        },
-      });
+      await refreshAccount();
       setStatus('ready');
     } catch (err) {
-      if (charged) refundCredits(cost, 'AI 解读失败退回');
       setError(err.message || 'AI 解读失败');
       setStatus('error');
     }

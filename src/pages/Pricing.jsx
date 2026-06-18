@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo.jsx';
 import { CREDIT_PLANS } from '../data/creditPlans.js';
@@ -6,18 +5,7 @@ import { useAccount } from '../hooks/useAccount.js';
 import styles from './Pricing.module.css';
 
 export default function Pricing() {
-  const { account, addCredits } = useAccount();
-  const [message, setMessage] = useState('');
-
-  const topUp = (plan) => {
-    setMessage('');
-    try {
-      addCredits(plan.credits, `${plan.name}试用积分`, plan.name);
-      setMessage(`已为当前账号增加 ${plan.credits} 积分。`);
-    } catch (err) {
-      setMessage(err.message || '充值失败，请先登录。');
-    }
-  };
+  const { account } = useAccount();
 
   return (
     <div className={styles.page}>
@@ -31,7 +19,7 @@ export default function Pricing() {
         <p className={styles.kicker}>积分套餐</p>
         <h1>AI 解读按次消耗积分</h1>
         <p>
-          排盘工具保持免费。AI 深度解读按次扣积分，购买通道开放前可先领取试用额度。
+          排盘工具保持免费。AI 深度解读由服务端校验并扣积分，新账号自动获得试用额度。
         </p>
       </section>
 
@@ -44,8 +32,8 @@ export default function Pricing() {
             <p className={styles.credits}>{plan.credits} 积分</p>
             <p className={styles.description}>{plan.description}</p>
             {account ? (
-              <button className={styles.primaryButton} type="button" onClick={() => topUp(plan)}>
-                领取积分
+              <button className={styles.primaryButton} type="button" disabled>
+                支付待开放
               </button>
             ) : (
               <Link className={styles.primaryButton} to="/account">登录后领取</Link>
@@ -53,8 +41,6 @@ export default function Pricing() {
           </article>
         ))}
       </section>
-
-      {message && <p className={styles.message}>{message}</p>}
 
       <section className={styles.setupPanel}>
         <h2>购买通道即将开放</h2>

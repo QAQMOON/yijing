@@ -1,6 +1,6 @@
 # 易解
 
-易解是一套面向中国术数文化的在线工具站。当前阶段已经完成公开排盘工具、DeepSeek AI 解读入口、本地体验账号与积分体系，后续再接入云端账户、正式支付和报告历史。
+易解是一套面向中国术数文化的在线工具站。当前阶段已经完成公开排盘工具、DeepSeek AI 解读入口、Supabase 云端账号、服务端积分校验扣减与云端 AI 报告历史；真实支付仍预留为后续接入。
 
 在线地址：<https://yijing-pi.vercel.app>
 
@@ -12,9 +12,10 @@
 - 大六壬天地人三盘、四课三传展示
 - 奇门遁甲九宫排盘
 - 本地卦历记录、导入与导出
-- 体验账号、积分余额、积分流水和套餐页
-- 六爻结果页 DeepSeek AI 深度解读入口
+- Supabase 邮箱验证码登录、云端积分余额、积分流水和套餐页
+- 六爻、八字、紫微和双术合参 DeepSeek AI 深度解读入口
 - 双术合参报告 MVP：八字长期结构 + 六爻当下问事
+- 服务端检查积分、成功后扣减并保存 AI 报告到 `ai_reports`
 - 隐私政策、服务条款、产品路线与页面 SEO 基础
 - robots、sitemap、manifest 与公开路由静态 HTML 生成
 
@@ -23,8 +24,8 @@
 1. 工具站：稳定排盘工具、独立 SEO、Vercel 部署和合规入口。
 2. DeepSeek AI 解读：通过服务端接口调用 DeepSeek，支持严谨版和通俗版解读。
 3. 双术合参报告：首版先合八字与六爻，紫微作为后续扩展。
-4. 体验账号与积分：本地登录、本地积分流水、体验额度领取和 AI 解读扣减。
-5. 正式商业化：接云端数据库、支付回调、订单表、积分账本和云端报告历史。
+4. 商业化基础闭环：Supabase Auth、云端 profile、积分账本、云端报告历史、服务端扣费。
+5. 正式支付：接微信支付、支付宝或 Stripe 回调，订单支付成功后发放积分。
 
 更详细的路线见 [docs/product-roadmap.md](docs/product-roadmap.md)。
 
@@ -68,7 +69,16 @@ DEEPSEEK_API_KEY  填你的 DeepSeek Key
 DEEPSEEK_MODEL=deepseek-chat
 ```
 
-当前账户和积分为浏览器本地体验版。正式支付前还需要准备数据库、支付商户、支付回调密钥和订单状态处理。
+商业化基础闭环还需要在 Vercel 项目环境变量中配置：
+
+```text
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+```
+
+上线前必须按顺序应用 Supabase migrations：`0001_accounts_credits_reports.sql`、`0002_commercial_mvp_rpc.sql`、`0003_ai_report_idempotency.sql`。当前不接真实微信、支付宝或 Stripe 支付；`/pricing` 只保留套餐说明和后续支付入口。
 
 八字真太阳时校准使用 `api/metaphysics.py`，并在 `api/metaphysics_core/` 中 vendored `superzhang21/metaphysics-steward` 的八字相关 MIT 子集。Vercel Python 函数依赖见 `requirements.txt`。
 

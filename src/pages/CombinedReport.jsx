@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import Seo from '../components/Seo.jsx';
 import { CREDIT_COSTS } from '../data/creditPlans.js';
 import { useAccount } from '../hooks/useAccount.js';
-import { useAiReports } from '../hooks/useAiReports.js';
 import { buildCombinedReportChart } from '../utils/combinedReport.js';
 import { parseLocalDateTime, toDateTimeInputValue } from '../utils/dateTime.js';
+import { apiErrorMessage, authHeaders } from '../utils/apiAuth.js';
 import styles from './CombinedReport.module.css';
 
 const SCOPE_OPTIONS = [
@@ -71,8 +71,7 @@ function Snapshot({ chart }) {
 
 export default function CombinedReport() {
   const nowValue = useMemo(() => toDateTimeInputValue(new Date()), []);
-  const { account, refundCredits, spendCredits } = useAccount();
-  const { saveReport } = useAiReports();
+  const { account, refreshAccount, session } = useAccount();
   const [birthDateTime, setBirthDateTime] = useState('1990-05-08T12:00');
   const [gender, setGender] = useState('male');
   const [birthplace, setBirthplace] = useState('北京');
@@ -98,7 +97,7 @@ export default function CombinedReport() {
     setResult('');
 
     if (!account) {
-      setError('请先登录并领取积分。');
+      setError('请先登录后再生成报告。');
       return;
     }
 
@@ -112,49 +111,29 @@ export default function CombinedReport() {
       return;
     }
 
-    let charged = false;
     setStatus('loading');
     setSubmittedChart(previewChart);
 
     try {
-      spendCredits(cost, '双术合参 AI 报告');
-      charged = true;
       const response = await fetch('/api/deepseek-reading', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-yijie-account-id': account.id,
-        },
+        headers: authHeaders(session),
         body: JSON.stringify({
           domain: 'combined',
+          title: `双术合参：${question.trim().slice(0, 24)}`,
           question: question.trim(),
           style,
           depth,
           chart: previewChart,
         }),
       });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(data.error?.message || data.error || '双术合参报告生成失败');
-      }
+      const data = await apiErrorMessage(response, '双术合参报告生成失败');
 
       const text = data.text || '';
       setResult(text);
       setStatus('ready');
-      saveReport({
-        domain: 'combined',
-        domainLabel: '双术合参',
-        title: `双术合参：${question.trim().slice(0, 24)}`,
-        question: question.trim(),
-        focusLabel: scope,
-        text,
-        provider: data.provider,
-        model: data.model,
-        cost: data.cost || cost,
-        chart: previewChart,
-      });
+      await refreshAccount();
     } catch (err) {
-      if (charged) refundCredits(cost, '双术合参失败退回');
       setStatus('error');
       setError(err.message || '双术合参报告生成失败');
     }
@@ -271,7 +250,7 @@ export default function CombinedReport() {
         <section className={styles.actions}>
           {!account && (
             <p>
-              <Link to="/account">登录领取积分</Link> 后可生成并保存报告。
+              <Link to="/account">登录</Link> 后可生成并保存报告。
             </p>
           )}
           {error && <p className={styles.error}>{error}</p>}

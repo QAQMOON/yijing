@@ -23,7 +23,7 @@ function formatDate(value) {
 }
 
 function LoginPanel() {
-  const { signIn } = useAccount();
+  const { authEnabled, authError, authMessage, signIn, status } = useAccount();
   const [form, setForm] = useState({ identifier: '', displayName: '' });
   const [error, setError] = useState('');
 
@@ -32,10 +32,10 @@ function LoginPanel() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
     try {
-      signIn(form);
+      await signIn(form);
     } catch (err) {
       setError(err.message || '登录失败');
     }
@@ -47,17 +47,18 @@ function LoginPanel() {
         <p className={styles.kicker}>我的账号</p>
         <h1>登录易解</h1>
         <p className={styles.lead}>
-          登录后可使用 AI 解读，并获得 {STARTER_CREDITS} 积分试用额度。
+          使用邮箱验证码登录后可生成 AI 报告，并获得 {STARTER_CREDITS} 积分试用额度。
         </p>
       </div>
 
       <form className={styles.form} onSubmit={submit}>
         <label className={styles.field}>
-          <span>手机号或邮箱</span>
+          <span>邮箱</span>
           <input
             value={form.identifier}
-            autoComplete="username"
-            placeholder="例如 13800000000"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
             onChange={(event) => update('identifier', event.target.value)}
           />
         </label>
@@ -70,15 +71,19 @@ function LoginPanel() {
             onChange={(event) => update('displayName', event.target.value)}
           />
         </label>
-        {error && <p className={styles.error}>{error}</p>}
-        <button className={styles.primaryButton} type="submit">登录并领取积分</button>
+        {!authEnabled && <p className={styles.error}>Supabase 尚未配置，暂时无法登录。</p>}
+        {(error || authError) && <p className={styles.error}>{error || authError}</p>}
+        {authMessage && <p className={styles.empty}>{authMessage}</p>}
+        <button className={styles.primaryButton} type="submit" disabled={!authEnabled || status === 'loading'}>
+          {status === 'loading' ? '正在处理' : '发送登录验证码'}
+        </button>
       </form>
     </section>
   );
 }
 
 function AccountPanel() {
-  const { account, signOut } = useAccount();
+  const { account, refreshAccount, signOut, status } = useAccount();
 
   return (
     <div className={styles.accountGrid}>
@@ -91,7 +96,8 @@ function AccountPanel() {
           <strong>{account.credits}</strong>
         </div>
         <div className={styles.summaryActions}>
-          <Link className={styles.primaryButton} to="/pricing">购买积分</Link>
+          <Link className={styles.primaryButton} to="/pricing">查看套餐</Link>
+          <button className={styles.secondaryButton} type="button" onClick={() => refreshAccount()} disabled={status === 'loading'}>刷新账户</button>
           <button className={styles.secondaryButton} type="button" onClick={signOut}>退出登录</button>
         </div>
       </section>
@@ -133,7 +139,7 @@ function AccountPanel() {
 }
 
 export default function Account() {
-  const { account } = useAccount();
+  const { account, status } = useAccount();
 
   return (
     <div className={styles.page}>
@@ -142,7 +148,7 @@ export default function Account() {
         description="登录易解账号，查看 AI 解读积分余额、积分消耗记录与充值入口。"
         path="/account"
       />
-      {account ? <AccountPanel /> : <LoginPanel />}
+      {status === 'loading' && !account ? <p className={styles.empty}>正在读取账户...</p> : account ? <AccountPanel /> : <LoginPanel />}
     </div>
   );
 }

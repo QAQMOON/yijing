@@ -36,7 +36,7 @@ export default function Privacy() {
 
       <section className={styles.section}>
         <h2>支付与云端账户</h2>
-        <p>当前套餐页提供试用积分领取，不会创建真实订单。购买通道开放后，会补充账户资料、支付记录、报告历史、数据导出与删除方式等说明，并在付费和生成报告前展示必要提示。</p>
+        <p>当前套餐页只展示套餐说明，不会创建真实订单。云端账户会保存积分流水和 AI 报告历史；购买通道开放后，会补充支付记录、数据导出与删除方式等说明，并在付费和生成报告前展示必要提示。</p>
       </section>
 
       <section className={styles.section}>

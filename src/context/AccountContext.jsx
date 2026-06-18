@@ -1,179 +1,154 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AccountContext } from './accountContext.js';
-import { STARTER_CREDITS } from '../data/creditPlans.js';
-import { getStorageItem, removeStorageItem, setStorageItem } from '../utils/safeStorage.js';
+import { isSupabaseConfigured, supabase } from '../lib/supabaseClient.js';
 
-const ACCOUNT_STORAGE_KEY = 'yijie-account-v1';
-const MAX_LEDGER_ITEMS = 50;
-
-function nowIso() {
-  return new Date().toISOString();
+function normalizeEmail(value) {
+  return String(value || '').trim().toLowerCase().slice(0, 120);
 }
 
-function makeId(prefix) {
-  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function normalizeIdentifier(value) {
-  return String(value || '').trim().slice(0, 80);
-}
-
-function normalizeName(value, identifier) {
+function normalizeName(value, email) {
   const clean = String(value || '').trim().slice(0, 24);
   if (clean) return clean;
-  return identifier.includes('@') ? identifier.split('@')[0] : identifier;
+  return email.includes('@') ? email.split('@')[0] : '';
 }
 
-function readStoredAccount() {
-  const raw = getStorageItem(ACCOUNT_STORAGE_KEY);
-  if (!raw) return null;
+async function fetchAccount(session) {
+  const token = session?.access_token;
+  if (!token) return null;
 
-  try {
-    const account = JSON.parse(raw);
-    if (!account || typeof account !== 'object') return null;
-    if (!account.id || !account.identifier) return null;
-    return {
-      id: String(account.id),
-      identifier: String(account.identifier),
-      displayName: String(account.displayName || account.identifier),
-      credits: Number.isFinite(Number(account.credits)) ? Number(account.credits) : 0,
-      plan: String(account.plan || '基础账号'),
-      createdAt: account.createdAt || nowIso(),
-      ledger: Array.isArray(account.ledger) ? account.ledger.slice(0, MAX_LEDGER_ITEMS) : [],
-    };
-  } catch {
-    return null;
-  }
-}
-
-function persistAccount(account) {
-  if (account) setStorageItem(ACCOUNT_STORAGE_KEY, JSON.stringify(account));
-  else removeStorageItem(ACCOUNT_STORAGE_KEY);
-}
-
-function appendLedger(account, entry) {
-  return {
-    ...account,
-    ledger: [
-      {
-        id: makeId('ledger'),
-        createdAt: nowIso(),
-        ...entry,
-      },
-      ...account.ledger,
-    ].slice(0, MAX_LEDGER_ITEMS),
-  };
-}
-
-function createAccount({ identifier, displayName }) {
-  const cleanIdentifier = normalizeIdentifier(identifier);
-  if (!cleanIdentifier) {
-    throw new Error('请输入手机号或邮箱');
-  }
-
-  const account = {
-    id: makeId('acct'),
-    identifier: cleanIdentifier,
-    displayName: normalizeName(displayName, cleanIdentifier),
-    credits: STARTER_CREDITS,
-    plan: '基础账号',
-    createdAt: nowIso(),
-    ledger: [],
-  };
-
-  return appendLedger(account, {
-    type: 'grant',
-    amount: STARTER_CREDITS,
-    reason: '新账户试用积分',
+  const response = await fetch('/api/account', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'X-Yijie-Client': 'browser',
+    },
   });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error?.message || data.error || '账户数据读取失败');
+  }
+  return data.account;
 }
 
 export function AccountProvider({ children }) {
-  const [account, setAccount] = useState(() => readStoredAccount());
-  const accountRef = useRef(account);
+  const [session, setSession] = useState(null);
+  const [account, setAccount] = useState(null);
+  const [status, setStatus] = useState(isSupabaseConfigured ? 'loading' : 'ready');
+  const [authMessage, setAuthMessage] = useState('');
+  const [authError, setAuthError] = useState('');
+  const sessionRef = useRef(null);
 
-  const commitAccount = useCallback((next) => {
-    accountRef.current = next;
-    persistAccount(next);
-    setAccount(next);
-    return next;
+  const commitSession = useCallback((nextSession) => {
+    sessionRef.current = nextSession;
+    setSession(nextSession);
   }, []);
 
-  const signIn = useCallback((form) => {
-    const next = createAccount(form);
-    return commitAccount(next);
-  }, [commitAccount]);
-
-  const signOut = useCallback(() => {
-    commitAccount(null);
-  }, [commitAccount]);
-
-  const addCredits = useCallback((amount, reason = '积分充值', plan = '积分包') => {
-    const numericAmount = Number(amount);
-    if (!Number.isInteger(numericAmount) || numericAmount <= 0) {
-      throw new Error('积分数量无效');
+  const refreshAccount = useCallback(async (nextSession = sessionRef.current) => {
+    if (!isSupabaseConfigured || !nextSession) {
+      setAccount(null);
+      setStatus('ready');
+      return null;
     }
-    const current = accountRef.current;
-    if (!current) throw new Error('请先登录');
 
-    const next = appendLedger({
-      ...current,
-      credits: current.credits + numericAmount,
-      plan,
-    }, {
-      type: 'charge',
-      amount: numericAmount,
-      reason,
+    setStatus('loading');
+    const nextAccount = await fetchAccount(nextSession);
+    setAccount(nextAccount);
+    setStatus('ready');
+    return nextAccount;
+  }, []);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return undefined;
+
+    let active = true;
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!active) return;
+      const nextSession = data.session || null;
+      commitSession(nextSession);
+      try {
+        await refreshAccount(nextSession);
+      } catch (error) {
+        if (!active) return;
+        setAuthError(error.message || '账户数据读取失败');
+        setAccount(null);
+        setStatus('ready');
+      }
     });
-    return commitAccount(next);
-  }, [commitAccount]);
 
-  const spendCredits = useCallback((amount, reason = 'AI 解读') => {
-    const numericAmount = Number(amount);
-    if (!Number.isInteger(numericAmount) || numericAmount <= 0) {
-      throw new Error('积分数量无效');
+    const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+      if (!active) return;
+      commitSession(nextSession);
+      setAuthMessage('');
+      setAuthError('');
+      try {
+        await refreshAccount(nextSession);
+      } catch (error) {
+        if (!active) return;
+        setAuthError(error.message || '账户数据读取失败');
+        setAccount(null);
+        setStatus('ready');
+      }
+    });
+
+    return () => {
+      active = false;
+      subscription.subscription.unsubscribe();
+    };
+  }, [commitSession, refreshAccount]);
+
+  const signIn = useCallback(async ({ identifier, displayName }) => {
+    setAuthMessage('');
+    setAuthError('');
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase 尚未配置，无法登录');
     }
-    const current = accountRef.current;
-    if (!current) throw new Error('请先登录');
-    if (current.credits < numericAmount) throw new Error('积分不足');
 
-    const next = appendLedger({
-      ...current,
-      credits: current.credits - numericAmount,
-    }, {
-      type: 'consume',
-      amount: -numericAmount,
-      reason,
+    const email = normalizeEmail(identifier);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new Error('请输入有效邮箱');
+    }
+
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/account`,
+        data: {
+          display_name: normalizeName(displayName, email),
+        },
+      },
     });
-    return commitAccount(next);
-  }, [commitAccount]);
 
-  const refundCredits = useCallback((amount, reason = '失败退回') => {
-    const numericAmount = Number(amount);
-    if (!Number.isInteger(numericAmount) || numericAmount <= 0) return null;
-    const current = accountRef.current;
-    if (!current) return null;
+    if (error) throw new Error(error.message || '验证码发送失败');
+    setAuthMessage('验证码邮件已发送，请在邮箱中完成登录。');
+  }, []);
 
-    const next = appendLedger({
-      ...current,
-      credits: current.credits + numericAmount,
-    }, {
-      type: 'refund',
-      amount: numericAmount,
-      reason,
-    });
-    return commitAccount(next);
-  }, [commitAccount]);
+  const signOut = useCallback(async () => {
+    setAuthMessage('');
+    setAuthError('');
+    if (isSupabaseConfigured) await supabase.auth.signOut();
+    commitSession(null);
+    setAccount(null);
+    setStatus('ready');
+  }, [commitSession]);
+
+  const unavailable = useCallback(() => {
+    throw new Error('积分由服务端校验和扣减');
+  }, []);
 
   const value = useMemo(() => ({
     account,
-    isSignedIn: Boolean(account),
+    session,
+    status,
+    authEnabled: isSupabaseConfigured,
+    authMessage,
+    authError,
+    isSignedIn: Boolean(account && session),
     signIn,
     signOut,
-    addCredits,
-    spendCredits,
-    refundCredits,
-  }), [account, addCredits, refundCredits, signIn, signOut, spendCredits]);
+    refreshAccount,
+    addCredits: unavailable,
+    spendCredits: unavailable,
+    refundCredits: unavailable,
+  }), [account, authError, authMessage, refreshAccount, session, signIn, signOut, status, unavailable]);
 
   return (
     <AccountContext.Provider value={value}>

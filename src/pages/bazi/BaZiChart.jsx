@@ -3,10 +3,10 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Seo from '../../components/Seo.jsx';
 import { CREDIT_COSTS } from '../../data/creditPlans.js';
-import { useAiReports } from '../../hooks/useAiReports.js';
 import { useAccount } from '../../hooks/useAccount.js';
 import { calculateBaZiFromDate, calculateBaZiFromLunar } from '../../utils/baziCalc.js';
 import { dateFromSearchParams } from '../../utils/dateTime.js';
+import { apiErrorMessage, authHeaders } from '../../utils/apiAuth.js';
 import styles from './BaZiChart.module.css';
 
 const PILLARS = [
@@ -236,8 +236,7 @@ function StewardPanel({ status, data, error }) {
 }
 
 function BaZiAiReading({ baZi, stewardData, birthplace }) {
-  const { account, refundCredits, spendCredits } = useAccount();
-  const { saveReport } = useAiReports();
+  const { account, refreshAccount, session } = useAccount();
   const [focus, setFocus] = useState('overall');
   const [style, setStyle] = useState('plain');
   const [depth, setDepth] = useState('brief');
@@ -255,48 +254,27 @@ function BaZiAiReading({ baZi, stewardData, birthplace }) {
   const reportTitle = `${payload.pillars.year.full}${payload.pillars.month.full}${payload.pillars.day.full}${payload.pillars.hour.full} 八字报告`;
 
   const requestReading = async () => {
-    let charged = false;
     setError('');
     setStatus('loading');
 
     try {
-      spendCredits(cost, '八字 AI 深度解读');
-      charged = true;
-
       const response = await fetch('/api/deepseek-reading', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Yijie-Client': 'browser',
-          ...(account?.id ? { 'X-Yijie-Account-Id': account.id } : {}),
-        },
+        headers: authHeaders(session),
         body: JSON.stringify({
           domain: 'bazi',
+          title: reportTitle,
           chart: payload,
           question: focusLabel,
           style,
           depth,
         }),
       });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(getApiError(data, 'AI 解读失败', response.status));
+      const data = await apiErrorMessage(response, getApiError({}, 'AI 解读失败', response.status));
       setResult(data.text);
-      saveReport({
-        domain: 'bazi',
-        domainLabel: '八字 AI 解读',
-        title: reportTitle,
-        focusLabel,
-        style,
-        depth,
-        provider: data.provider,
-        model: data.model,
-        cost: data.cost || cost,
-        text: data.text,
-        chart: payload,
-      });
+      await refreshAccount();
       setStatus('ready');
     } catch (err) {
-      if (charged) refundCredits(cost, 'AI 解读失败退回');
       setError(err.message || 'AI 解读失败');
       setStatus('error');
     }

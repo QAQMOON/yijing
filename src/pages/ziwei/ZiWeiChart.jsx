@@ -4,7 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { calculateZiWei, paramsToZiWeiOptions } from '../../utils/ziweiCalc.js';
 import { CREDIT_COSTS } from '../../data/creditPlans.js';
 import { useAccount } from '../../hooks/useAccount.js';
-import { useAiReports } from '../../hooks/useAiReports.js';
+import { apiErrorMessage, authHeaders } from '../../utils/apiAuth.js';
 import styles from './ZiWeiChart.module.css';
 
 const MUTAGEN_LABELS = ['禄', '权', '科', '忌'];
@@ -186,8 +186,7 @@ function errorMessage(payload, fallback) {
 }
 
 function ZiWeiAiReading({ chart }) {
-  const { account, spendCredits, refundCredits } = useAccount();
-  const { saveReport } = useAiReports();
+  const { account, refreshAccount, session } = useAccount();
   const [focus, setFocus] = useState('overall');
   const [style, setStyle] = useState('plain');
   const [depth, setDepth] = useState('brief');
@@ -200,46 +199,26 @@ function ZiWeiAiReading({ chart }) {
   const title = `${chart.solarDate} ${chart.gender}命紫微报告`;
 
   const generate = async () => {
-    let spent = false;
     setError('');
     setStatus('loading');
     try {
-      spendCredits(cost, '紫微 AI 深度解读');
-      spent = true;
       const response = await fetch('/api/deepseek-reading', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Yijie-Client': 'browser',
-          ...(account?.id ? { 'X-Yijie-Account-Id': account.id } : {}),
-        },
+        headers: authHeaders(session),
         body: JSON.stringify({
           domain: 'ziwei',
+          title,
           chart: payload,
           question: focusLabel,
           style,
           depth,
         }),
       });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(errorMessage(data, 'AI 解读失败'));
+      const data = await apiErrorMessage(response, errorMessage({}, 'AI 解读失败'));
       setResult(data.text);
-      saveReport({
-        domain: 'ziwei',
-        domainLabel: '紫微 AI 解读',
-        title,
-        focusLabel,
-        style,
-        depth,
-        provider: data.provider,
-        model: data.model,
-        cost: data.cost || cost,
-        text: data.text,
-        chart: payload,
-      });
+      await refreshAccount();
       setStatus('ready');
     } catch (requestError) {
-      if (spent) refundCredits(cost, 'AI 解读失败退回');
       setError(requestError.message || 'AI 解读失败');
       setStatus('error');
     }

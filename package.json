@@ -9,7 +9,7 @@
     "sitemap": "node scripts/generate-sitemap.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node scripts/baziCalc.test.mjs && node scripts/dailyHexagram.test.mjs && node scripts/qimenCalc.test.mjs && node scripts/ziweiCalc.test.mjs && node scripts/combinedReport.test.mjs",
+    "test": "node scripts/baziCalc.test.mjs && node scripts/dailyHexagram.test.mjs && node scripts/qimenCalc.test.mjs && node scripts/ziweiCalc.test.mjs && node scripts/combinedReport.test.mjs && node scripts/commercialFlow.test.mjs",
     "test:bazi": "node scripts/baziCalc.test.mjs",
     "test:daily": "node scripts/dailyHexagram.test.mjs",
     "test:qimen": "node scripts/qimenCalc.test.mjs",
@@ -17,6 +17,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
     "iztro": "^2.5.8",
     "lunar-javascript": "^1.7.7",
     "react": "^19.2.6",

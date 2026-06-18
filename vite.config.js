@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import liuyaoReadingHandler from './api/liuyao-reading.js'
 import deepseekReadingHandler from './api/deepseek-reading.js'
+import accountHandler from './api/account.js'
+import reportsHandler from './api/reports.js'
 
 const API_PROXY_TARGET = process.env.VITE_API_PROXY_TARGET
   || process.env.VITE_APP_BASE_URL
@@ -57,7 +59,7 @@ function localApiPlugin() {
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         const pathname = new URL(req.url || '/', 'http://localhost').pathname
-        if (!['/api/liuyao-reading', '/api/deepseek-reading', '/api/metaphysics'].includes(pathname)) {
+        if (!['/api/liuyao-reading', '/api/deepseek-reading', '/api/metaphysics', '/api/account', '/api/reports'].includes(pathname)) {
           next()
           return
         }
@@ -70,6 +72,16 @@ function localApiPlugin() {
 
           if (pathname === '/api/metaphysics') {
             await proxyToProduction(req, res, pathname)
+            return
+          }
+
+          if (pathname === '/api/account') {
+            await accountHandler(req, res)
+            return
+          }
+
+          if (pathname === '/api/reports') {
+            await reportsHandler(req, res)
             return
           }
 

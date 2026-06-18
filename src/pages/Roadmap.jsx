@@ -12,7 +12,7 @@ export default function Roadmap() {
       />
       <p className={styles.eyebrow}>UPDATE</p>
       <h1 className={styles.title}>更新计划</h1>
-      <p className={styles.updated}>排盘工具、AI 解读和试用积分已上线，下一步完善报告同步、购买通道和三术合参。</p>
+      <p className={styles.updated}>排盘工具、AI 解读、云端积分和报告历史已上线，下一步完善真实支付和订单回调。</p>
 
       <div className={styles.roadmap}>
         {APP_ROADMAP.map((item) => (
@@ -32,7 +32,7 @@ export default function Roadmap() {
 
       <section className={styles.section}>
         <h2>下一步</h2>
-        <p>我们会优先完善账户同步、报告找回、积分消耗记录和购买流程，让 AI 解读逐步变成可长期保存的个人报告库。</p>
+        <p>我们会优先完善真实支付、订单回调和对账流程，让 AI 解读逐步变成可长期保存的个人报告库。</p>
       </section>
     </div>
   );

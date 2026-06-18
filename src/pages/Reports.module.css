@@ -158,6 +158,29 @@
   margin-bottom: var(--space-md);
 }
 
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.filterBar button {
+  min-height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #fffdf8;
+  color: var(--color-text-secondary);
+  font: inherit;
+  padding: 0 var(--space-md);
+}
+
+.filterBar .activeFilter {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+}
+
 .reportList {
   display: grid;
   gap: var(--space-md);

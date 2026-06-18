@@ -1,54 +1,77 @@
-import { useCallback, useState } from 'react';
-import { getStorageItem, setStorageItem } from '../utils/safeStorage.js';
+import { useCallback, useEffect, useState } from 'react';
+import { useAccount } from './useAccount.js';
 
-const STORAGE_KEY = 'yijie-ai-reports-v1';
-const MAX_REPORTS = 80;
-
-function makeId() {
-  return `report_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+function domainQuery(domain) {
+  return domain && domain !== 'all' ? `?domain=${encodeURIComponent(domain)}` : '';
 }
 
-function readStoredReports() {
-  try {
-    const raw = getStorageItem(STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed.slice(0, MAX_REPORTS) : [];
-  } catch {
-    return [];
+async function parseApiResponse(response, fallback) {
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error?.message || data.error || fallback);
   }
+  return data;
 }
 
-function persistReports(reports) {
-  setStorageItem(STORAGE_KEY, JSON.stringify(reports.slice(0, MAX_REPORTS)));
-}
+export function useAiReports(domain = 'all') {
+  const { session } = useAccount();
+  const [reports, setReports] = useState([]);
+  const [status, setStatus] = useState('idle');
+  const [error, setError] = useState('');
 
-export function useAiReports() {
-  const [reports, setReports] = useState(readStoredReports);
+  const reload = useCallback(async () => {
+    if (!session?.access_token) {
+      setReports([]);
+      setStatus('ready');
+      return [];
+    }
 
-  const saveReport = useCallback((report) => {
-    const entry = {
-      id: makeId(),
-      createdAt: new Date().toISOString(),
-      cloudStatus: 'local',
-      ...report,
-    };
+    setStatus('loading');
+    setError('');
+    try {
+      const response = await fetch(`/api/reports${domainQuery(domain)}`, {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          'X-Yijie-Client': 'browser',
+        },
+      });
+      const data = await parseApiResponse(response, '报告历史读取失败');
+      setReports(data.reports || []);
+      setStatus('ready');
+      return data.reports || [];
+    } catch (err) {
+      setError(err.message || '报告历史读取失败');
+      setStatus('error');
+      return [];
+    }
+  }, [domain, session]);
 
-    setReports((prev) => {
-      const next = [entry, ...prev].slice(0, MAX_REPORTS);
-      persistReports(next);
-      return next;
+  useEffect(() => {
+    queueMicrotask(() => {
+      reload();
     });
+  }, [reload]);
 
-    return entry;
-  }, []);
-
-  const deleteReport = useCallback((id) => {
-    setReports((prev) => {
-      const next = prev.filter((report) => report.id !== id);
-      persistReports(next);
-      return next;
+  const deleteReport = useCallback(async (id) => {
+    if (!session?.access_token) throw new Error('请先登录');
+    const response = await fetch('/api/reports', {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+        'X-Yijie-Client': 'browser',
+      },
+      body: JSON.stringify({ id }),
     });
-  }, []);
+    await parseApiResponse(response, '报告删除失败');
+    await reload();
+  }, [reload, session]);
 
-  return { reports, saveReport, deleteReport };
+  return {
+    reports,
+    status,
+    error,
+    reload,
+    deleteReport,
+  };
 }

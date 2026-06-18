@@ -1,9 +1,24 @@
+import {
+  AI_READING_COST,
+  CommercialError,
+  assertSufficientCredits,
+  buildPayloadCacheKey,
+  buildReportIdempotencyKey,
+  buildReportRecord,
+} from './_commercial.js';
+import {
+  authenticateRequest,
+  ensureProfileAndStarterCredits,
+  getCreditBalance,
+  getProcessedAiReportByIdempotencyKey,
+  getSupabaseServiceClient,
+} from './_supabase.js';
+
 const DEEPSEEK_URL = 'https://api.deepseek.com/chat/completions';
 const REQUEST_TIMEOUT_MS = 25000;
 const CACHE_TTL_MS = 60 * 60 * 1000;
 const MAX_CACHE_ITEMS = 120;
 const MAX_BODY_BYTES = 128 * 1024;
-const AI_READING_COST = 2;
 const RATE_LIMIT_WINDOW_MS = Number(process.env.AI_RATE_LIMIT_WINDOW_MS || 10 * 60 * 1000);
 const RATE_LIMIT_MAX = Number(process.env.AI_RATE_LIMIT_MAX || 8);
 const DAILY_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -51,12 +66,16 @@ function sendJson(res, status, payload, headers = {}) {
 }
 
 function sendError(res, error) {
-  const status = error instanceof HttpError
+  const status = error instanceof CommercialError
+    ? error.status
+    : error instanceof HttpError
     ? error.status
     : error.name === 'AbortError'
       ? 504
       : 502;
-  const code = error instanceof HttpError
+  const code = error instanceof CommercialError
+    ? error.code
+    : error instanceof HttpError
     ? error.code
     : error.name === 'AbortError'
       ? 'upstream_timeout'
@@ -147,6 +166,7 @@ function normalizePayload(payload) {
     domain,
     style,
     depth,
+    title: cleanText(payload.title, 80),
     question: cleanText(payload.question, 160),
     chart,
   };
@@ -170,32 +190,52 @@ function setCachedResult(key, result) {
   globalState.responseCache.set(key, { createdAt: Date.now(), result });
 }
 
-function getHeader(req, name) {
-  const value = req.headers[name.toLowerCase()];
-  return Array.isArray(value) ? value[0] : value;
+function mapRpcError(error) {
+  const message = error?.message || '';
+  if (message.includes('insufficient_credits')) {
+    return new CommercialError(402, 'insufficient_credits', `积分不足，需要 ${AI_READING_COST} 积分`);
+  }
+  return new CommercialError(500, 'report_save_failed', '报告保存或积分扣减失败');
 }
 
-function getClientIp(req) {
-  const forwarded = getHeader(req, 'x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0].trim();
-  return req.socket?.remoteAddress || 'unknown';
-}
+async function consumeCreditAndSaveReport({ userId, payload, result, idempotencyKey }) {
+  const supabase = getSupabaseServiceClient();
+  const record = buildReportRecord({
+    userId,
+    payload,
+    result,
+    title: payload.title,
+    cost: AI_READING_COST,
+  });
 
-function getRequester(req) {
-  const accountId = cleanText(getHeader(req, 'x-yijie-account-id'), 80);
-  if (accountId && !/^acct_[a-z0-9]+_[a-z0-9]+$/i.test(accountId)) {
-    throw new HttpError(401, 'invalid_account_context', '账户上下文无效');
+  const { data, error } = await supabase.rpc('consume_credit_and_save_ai_report', {
+    target_user_id: record.user_id,
+    report_domain: record.domain,
+    report_title: record.title,
+    report_question: record.question,
+    report_style: record.style,
+    report_depth: record.depth,
+    report_provider: record.provider,
+    report_model: record.model,
+    report_cost: record.cost,
+    report_content: record.content,
+    report_chart: record.chart,
+    report_usage: record.usage,
+    ledger_reason: `${record.title} · AI 报告`,
+    ledger_idempotency_key: idempotencyKey,
+  });
+
+  if (error) throw mapRpcError(error);
+  const saved = Array.isArray(data) ? data[0] : data;
+  if (!saved?.report_id) {
+    throw new CommercialError(500, 'report_save_failed', '报告保存结果无效');
   }
 
-  const requiredToken = process.env.YIJIE_API_ACCESS_TOKEN;
-  if (requiredToken) {
-    const auth = getHeader(req, 'authorization') || '';
-    if (auth !== `Bearer ${requiredToken}`) {
-      throw new HttpError(401, 'unauthorized', '访问验证未通过');
-    }
-  }
-
-  return accountId ? `acct:${accountId}` : `ip:${getClientIp(req)}`;
+  return {
+    reportId: saved.report_id,
+    balanceAfter: Number(saved.balance_after || 0),
+    alreadyProcessed: Boolean(saved.already_processed),
+  };
 }
 
 function hitBucket(key, max, windowMs) {
@@ -472,18 +512,48 @@ export default async function handler(req, res) {
   try {
     const raw = await readBody(req);
     const payload = normalizePayload(raw ? JSON.parse(raw) : {});
-    const requester = getRequester(req);
-    const cacheKey = JSON.stringify(payload);
-    const cached = getCachedResult(cacheKey);
-    if (cached) {
-      sendJson(res, 200, { ...cached, cached: true }, { 'X-Yijie-Cache': 'hit' });
+    const { user } = await authenticateRequest(req);
+    await ensureProfileAndStarterCredits(user);
+    const cacheKey = buildPayloadCacheKey(payload);
+    const idempotencyKey = buildReportIdempotencyKey({ userId: user.id, cacheKey });
+    const processed = await getProcessedAiReportByIdempotencyKey({
+      userId: user.id,
+      idempotencyKey,
+    });
+    if (processed) {
+      sendJson(res, 200, processed, { 'X-Yijie-Idempotency': 'hit' });
       return;
     }
 
+    const balance = await getCreditBalance(user.id);
+    assertSufficientCredits(balance, AI_READING_COST);
+    const requester = `user:${user.id}`;
+    const cached = getCachedResult(cacheKey);
     const rateHeaders = checkRateLimit(requester);
-    const result = await requestDeepSeek(payload);
-    setCachedResult(cacheKey, result);
-    sendJson(res, 200, result, rateHeaders);
+    const result = cached || await requestDeepSeek(payload);
+    if (!cached) setCachedResult(cacheKey, result);
+    const saved = await consumeCreditAndSaveReport({
+      userId: user.id,
+      payload,
+      result,
+      idempotencyKey,
+    });
+    if (saved.alreadyProcessed) {
+      const processedAfterRace = await getProcessedAiReportByIdempotencyKey({
+        userId: user.id,
+        idempotencyKey,
+      });
+      if (processedAfterRace) {
+        sendJson(res, 200, processedAfterRace, { ...rateHeaders, 'X-Yijie-Idempotency': 'hit' });
+        return;
+      }
+    }
+    sendJson(res, 200, {
+      ...result,
+      ...saved,
+      cached: Boolean(cached),
+      cost: AI_READING_COST,
+    }, cached ? { ...rateHeaders, 'X-Yijie-Cache': 'hit' } : rateHeaders);
   } catch (error) {
     if (error instanceof SyntaxError) {
       sendError(res, new ValidationError('请求 JSON 格式无效'));

@@ -95,6 +95,13 @@
   color: #fff;
 }
 
+.primaryButton:disabled {
+  cursor: not-allowed;
+  border-color: var(--color-border);
+  background: var(--color-bg-dark);
+  color: var(--color-text-secondary);
+}
+
 .message {
   margin: var(--space-lg) 0 0;
   padding: var(--space-md);
