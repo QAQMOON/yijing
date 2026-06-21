@@ -9,7 +9,7 @@
     "sitemap": "node scripts/generate-sitemap.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node scripts/baziCalc.test.mjs && node scripts/dailyHexagram.test.mjs && node scripts/qimenCalc.test.mjs && node scripts/ziweiCalc.test.mjs && node scripts/combinedReport.test.mjs && node scripts/commercialFlow.test.mjs && node scripts/reportsApi.test.mjs && node scripts/releaseGate.test.mjs",
+    "test": "node scripts/baziCalc.test.mjs && node scripts/dailyHexagram.test.mjs && node scripts/qimenCalc.test.mjs && node scripts/ziweiCalc.test.mjs && node scripts/combinedReport.test.mjs && node scripts/commercialFlow.test.mjs && node scripts/reportsApi.test.mjs && node scripts/logRedaction.test.mjs && node scripts/releaseGate.test.mjs",
     "test:bazi": "node scripts/baziCalc.test.mjs",
     "test:daily": "node scripts/dailyHexagram.test.mjs",
     "test:qimen": "node scripts/qimenCalc.test.mjs",

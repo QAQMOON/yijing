@@ -14,6 +14,7 @@
   - `npm run test:e2e`
 - 本地发布前建议同样执行以上命令；`npm run test:e2e` 会自动构建、启动 Vite preview、运行 Playwright 并关闭本地服务。
 - 部署后建议执行 `SMOKE_BASE_URL=https://your-domain npm run smoke:prod` 检查公开页面和未登录 API 边界。
+- 真实 Supabase + DeepSeek 链路验收按 [production-smoke-test.md](production-smoke-test.md) 执行；可选鉴权 smoke 支持 `SMOKE_AUTH_TOKEN`，可选 AI 幂等 smoke 支持 `SMOKE_AI_PAYLOAD_FILE`。
 
 ## 2. Vercel 环境变量
 
@@ -68,6 +69,8 @@ supabase/migrations/0003_ai_report_idempotency.sql
 
 - 首页、六爻、八字、紫微、奇门、大六壬、双术合参页面可打开。
 - `SMOKE_BASE_URL=https://your-domain npm run smoke:prod` 通过。
+- 如使用测试 access token，`SMOKE_AUTH_TOKEN=<token> npm run smoke:prod` 通过。
+- 如要验证真实 AI 幂等，`SMOKE_AUTH_TOKEN=<token> SMOKE_AI_PAYLOAD_FILE=docs/smoke-ai-payload.example.json npm run smoke:prod` 通过；首次新 payload 会消耗 2 积分。
 - 未登录访问 AI 报告入口有明确登录引导。
 - Supabase 邮箱验证码登录可发起。
 - 登录后余额、积分流水、报告历史可读取。

@@ -1,0 +1,38 @@
+{
+  "domain": "combined",
+  "style": "plain",
+  "depth": "brief",
+  "title": "生产冒烟双术合参",
+  "question": "生产冒烟测试：当前是否适合推进一个小范围试用？",
+  "chart": {
+    "mode": "bazi_liuyao",
+    "scope": "smoke",
+    "bazi": {
+      "birth": {
+        "calendar": "solar",
+        "datetime": "1990-05-08T12:00",
+        "gender": "male"
+      },
+      "dayMaster": "癸水",
+      "pillars": {
+        "year": { "full": "庚午" },
+        "month": { "full": "辛巳" },
+        "day": { "full": "癸亥" },
+        "hour": { "full": "戊午" }
+      },
+      "luck": {
+        "current": "癸未"
+      }
+    },
+    "liuyao": {
+      "baseHex": { "name": "乾为天" },
+      "changedHex": { "name": "天风姤" },
+      "movingLines": [1],
+      "date": "2026-06-21",
+      "pillars": {
+        "day": "甲子"
+      },
+      "najaRows": []
+    }
+  }
+}

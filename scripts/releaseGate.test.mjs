@@ -33,6 +33,7 @@ for (const expected of ['.env', '.env.*', '!.env.example']) {
 
 const readme = read('README.md');
 assert.ok(readme.includes('docs/deployment-checklist.md'), 'README should link the deployment checklist');
+assert.ok(readme.includes('docs/production-smoke-test.md'), 'README should link the production smoke test guide');
 
 const e2eRunner = read('scripts/run-e2e.mjs');
 for (const expected of [
@@ -46,12 +47,12 @@ for (const expected of [
 }
 
 const packageJson = read('package.json');
-for (const expected of ['reportsApi.test.mjs', '"smoke:prod": "node scripts/smoke-check.mjs"']) {
+for (const expected of ['reportsApi.test.mjs', 'logRedaction.test.mjs', '"smoke:prod": "node scripts/smoke-check.mjs"']) {
   assert.ok(packageJson.includes(expected), `package scripts should include ${expected}`);
 }
 
 const smokeCheck = read('scripts/smoke-check.mjs');
-for (const expected of ['SMOKE_BASE_URL', '/api/account', '/api/reports', 'expectedStatus: 401']) {
+for (const expected of ['SMOKE_BASE_URL', 'SMOKE_AUTH_TOKEN', 'SMOKE_AI_PAYLOAD_FILE', 'SMOKE_SKIP_API', '/api/account', '/api/reports', '/api/deepseek-reading', 'expectedStatus: 401']) {
   assert.ok(smokeCheck.includes(expected), `smoke check should include ${expected}`);
 }
 
@@ -68,8 +69,26 @@ for (const expected of [
   '0003_ai_report_idempotency.sql',
   '不包含真实微信、支付宝或 Stripe 支付',
   'npm run smoke:prod',
+  'production-smoke-test.md',
+  'SMOKE_AI_PAYLOAD_FILE',
 ]) {
   assert.ok(checklist.includes(expected), `deployment checklist should include ${expected}`);
 }
+
+const productionSmoke = read('docs/production-smoke-test.md');
+for (const expected of [
+  'Magic Link',
+  'SMOKE_AUTH_TOKEN',
+  'SMOKE_AI_PAYLOAD_FILE',
+  'credit_ledger_user_idempotency_key_idx',
+  'consume_credit_and_save_ai_report',
+  '不包含真实微信、支付宝或 Stripe 支付',
+]) {
+  assert.ok(productionSmoke.includes(expected), `production smoke guide should include ${expected}`);
+}
+
+const smokePayload = JSON.parse(read('docs/smoke-ai-payload.example.json'));
+assert.equal(smokePayload.domain, 'combined');
+assert.equal(smokePayload.chart.mode, 'bazi_liuyao');
 
 console.log('releaseGate unit tests passed');
