@@ -54,7 +54,7 @@ npm run build
 npm run test:e2e
 ```
 
-`npm run build` 会先执行 Vite 构建，再运行 `scripts/prerender-static.mjs`，为公开路由生成带独立 title、description、canonical 和基础正文的静态 HTML。
+`npm run build` 会先生成 sitemap，再执行 Vite 构建，最后运行 `scripts/prerender-static.mjs`，为公开路由生成带独立 title、description、canonical 和基础正文的静态 HTML。`npm run test:e2e` 会自动构建、启动 Vite preview、运行 Playwright smoke tests，并在结束后关闭本地服务。部署后可用 `SMOKE_BASE_URL=https://your-domain npm run smoke:prod` 做公开站冒烟。
 
 本地 `npm run dev` 会直接处理 `/api/liuyao-reading`；`/api/deepseek-reading` 如果本地没有配置 `DEEPSEEK_API_KEY`，会代理到线上 Vercel 接口，方便在本地预览时测试 AI 解读。`/api/metaphysics` 是 Vercel Python 函数，本地开发时同样代理到线上接口。若要完全本地调用 DeepSeek，请在本机环境变量或 `.env.local` 中配置服务端密钥，不要使用 `VITE_` 前缀。
 
@@ -67,6 +67,9 @@ AI 解读需要在 Vercel 项目环境变量中配置：
 ```text
 DEEPSEEK_API_KEY  填你的 DeepSeek Key
 DEEPSEEK_MODEL=deepseek-chat
+AI_RATE_LIMIT_WINDOW_MS=600000
+AI_RATE_LIMIT_MAX=8
+AI_DAILY_LIMIT_MAX=40
 ```
 
 商业化基础闭环还需要在 Vercel 项目环境变量中配置：
@@ -87,3 +90,5 @@ SUPABASE_SERVICE_ROLE_KEY
 项目继续使用 Vercel。`vercel.json` 已配置 SPA 路由 fallback 和基础安全头，直接访问 `/bazi`、`/privacy`、`/qimen/display` 等前端路由时会回落到 `index.html`。
 
 `public/robots.txt`、`public/sitemap.xml` 和 `public/manifest.webmanifest` 会作为真实静态文件发布，不参与 SPA fallback。
+
+发布前检查清单见 [docs/deployment-checklist.md](docs/deployment-checklist.md)。GitHub Actions `CI` 会在 `main` / `master` 的 push 和 pull request 上执行测试、lint、构建、sitemap 稳定性检查、高危依赖审计和 Playwright E2E。

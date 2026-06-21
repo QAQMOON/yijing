@@ -98,6 +98,10 @@ POST /api/deepseek-reading
 - `npm run lint`
 - `npm run build`
 - `npm run test:e2e`
+- `SMOKE_BASE_URL=https://your-domain npm run smoke:prod`
+- GitHub Actions `CI` 通过
 - Vercel 环境变量已配置
+- Supabase migrations 已按 `0001`、`0002`、`0003` 顺序应用
 - 隐私政策和服务条款已更新到实际数据处理方式
 - DeepSeek key 未出现在前端 bundle 中
+- 详细步骤见 `docs/deployment-checklist.md`

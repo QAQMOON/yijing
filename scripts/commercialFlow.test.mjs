@@ -127,9 +127,12 @@ function createFakeProcessor(initialBalance) {
     contentCache: new Map(),
   };
 
-  function generateText(cacheKey) {
+  function generateText(cacheKey, failModel = false) {
     if (state.contentCache.has(cacheKey)) return { ...state.contentCache.get(cacheKey), cached: true };
     state.modelCalls += 1;
+    if (failModel) {
+      throw new Error('deepseek_failed');
+    }
     const result = {
       provider: 'deepseek',
       model: 'mock-model',
@@ -141,7 +144,7 @@ function createFakeProcessor(initialBalance) {
     return { ...result, cached: false };
   }
 
-  function process({ key, cacheKey, payload, checkExistingFirst = true }) {
+  function process({ key, cacheKey, payload, checkExistingFirst = true, failModel = false, failSave = false }) {
     const existing = state.ledger.find((item) => item.idempotencyKey === key);
     if (existing && checkExistingFirst) {
       const report = state.reports.find((item) => item.id === existing.reportId);
@@ -152,7 +155,10 @@ function createFakeProcessor(initialBalance) {
     }
 
     assertSufficientCredits(state.balance, AI_READING_COST);
-    const result = generateText(cacheKey);
+    const result = generateText(cacheKey, failModel);
+    if (failSave) {
+      throw new CommercialError(500, 'report_save_failed', '报告保存或积分扣减失败');
+    }
     const existingAfterCache = state.ledger.find((item) => item.idempotencyKey === key);
     if (existingAfterCache) {
       const report = state.reports.find((item) => item.id === existingAfterCache.reportId);
@@ -228,5 +234,32 @@ assert.throws(() => {
 }, /积分不足/);
 assert.equal(insufficientProcessor.state.ledger.length, 0);
 assert.equal(insufficientProcessor.state.reports.length, 0);
+
+const upstreamFailureProcessor = createFakeProcessor(8);
+assert.throws(() => {
+  upstreamFailureProcessor.process({
+    key: idempotencyKey,
+    cacheKey: cacheKeyA,
+    payload: payloadA,
+    failModel: true,
+  });
+}, /deepseek_failed/);
+assert.equal(upstreamFailureProcessor.state.balance, 8);
+assert.equal(upstreamFailureProcessor.state.ledger.length, 0);
+assert.equal(upstreamFailureProcessor.state.reports.length, 0);
+
+const saveFailureProcessor = createFakeProcessor(8);
+assert.throws(() => {
+  saveFailureProcessor.process({
+    key: idempotencyKey,
+    cacheKey: cacheKeyA,
+    payload: payloadA,
+    failSave: true,
+  });
+}, /报告保存或积分扣减失败/);
+assert.equal(saveFailureProcessor.state.balance, 8);
+assert.equal(saveFailureProcessor.state.ledger.length, 0);
+assert.equal(saveFailureProcessor.state.reports.length, 0);
+assert.equal(saveFailureProcessor.state.modelCalls, 1);
 
 console.log('commercialFlow unit tests passed');
