@@ -42,9 +42,15 @@ for (const expected of [
   'Preview server exited early',
   'is already in use',
   'stopPreview(server)',
+  'VITE_SUPABASE_URL',
+  'https://e2e.supabase.co',
 ]) {
   assert.ok(e2eRunner.includes(expected), `E2E runner should include ${expected}`);
 }
+
+const e2eSmoke = read('tests/e2e/smoke.spec.js');
+assert.ok(!e2eSmoke.includes('test.skip'), 'local E2E smoke tests should not contain test.skip');
+assert.ok(e2eSmoke.includes('setupSignedInCommercialMocks'), 'local E2E should cover signed-in commercial flows with route mocks');
 
 const packageJson = read('package.json');
 for (const expected of ['reportsApi.test.mjs', 'logRedaction.test.mjs', '"smoke:prod": "node scripts/smoke-check.mjs"']) {

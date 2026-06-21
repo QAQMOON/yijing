@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import {
+  createMockReport,
+  mockSupabaseOtp,
+  setupSignedInCommercialMocks,
+} from './helpers/commercialMock.js';
 
 const PUBLIC_ROUTES = [
   { path: '/', title: /易解 · 古籍依据 AI 解读/, h1: /.+/ },
@@ -67,13 +72,16 @@ test('footer legal links work', async ({ page }) => {
 });
 
 test('account page uses Supabase email sign in', async ({ page }) => {
+  await mockSupabaseOtp(page);
   await page.goto('/account');
   await page.waitForLoadState('networkidle');
 
   await expect(page.getByLabel('邮箱')).toBeVisible();
   await expect(page.getByRole('button', { name: '发送登录验证码' })).toBeVisible();
   await expect(page.getByText(/使用邮箱验证码登录/)).toBeVisible();
-  await expect(page.getByText('Supabase 尚未配置，暂时无法登录。')).toBeVisible();
+  await page.getByLabel('邮箱').fill('login-e2e@example.com');
+  await page.getByRole('button', { name: '发送登录验证码' }).click();
+  await expect(page.getByText('验证码邮件已发送，请在邮箱中完成登录。')).toBeVisible();
 });
 
 test('bazi result loads true solar time calibration', async ({ page }) => {
@@ -131,7 +139,11 @@ test('bazi birthplace selector starts empty and can switch options', async ({ pa
   await expect(birthplace).toHaveValue('湖南');
 });
 
-test.skip('AI reading flow is saved with mocked DeepSeek response', async ({ page }) => {
+test('AI reading flow is saved with mocked DeepSeek response', async ({ page }) => {
+  await setupSignedInCommercialMocks(page, {
+    aiText: '【结论】这是六爻本地 mock AI 解读。\n\n【古籍依据】依据传入的卦辞与动爻上下文。',
+  });
+
   await page.route('**/api/liuyao-reading', async (route) => {
     await route.fulfill({
       contentType: 'application/json',
@@ -143,39 +155,23 @@ test.skip('AI reading flow is saved with mocked DeepSeek response', async ({ pag
     });
   });
 
-  await page.route('**/api/deepseek-reading', async (route) => {
-    const request = route.request();
-    expect(request.method()).toBe('POST');
-    expect(request.headers().authorization).toMatch(/^Bearer /);
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    await route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({
-        provider: 'deepseek',
-        model: 'mock-model',
-        text: '【结论】这是 mock AI 解读。\n\n【古籍依据】依据传入的卦辞与动爻上下文。',
-        cost: 2,
-      }),
-    });
-  });
-
-  await page.goto('/account');
-  await page.getByLabel('邮箱').fill('ai-test@example.com');
-  await page.getByLabel('称呼').fill('AI 测试');
-  await page.getByRole('button', { name: '发送登录验证码' }).click();
-
   await page.goto('/liuyao/reading/1?lines=111111&values=7,7,7,7,7,7&source=random&question=%E5%B7%A5%E4%BD%9C%E9%80%89%E6%8B%A9');
   await expect(page.getByText('古籍依据会随请求传入')).toBeVisible();
   await page.getByRole('button', { name: '生成 AI 解读' }).click();
   await expect(page.getByText('正在推演卦象，请稍候')).toBeVisible();
-  await expect(page.getByText('这是 mock AI 解读')).toBeVisible();
+  await expect(page.getByText('这是六爻本地 mock AI 解读')).toBeVisible();
+  await expect(page.getByRole('link', { name: '6积分' })).toBeVisible();
 
   await page.goto('/reports');
   await expect(page.getByText('乾为天之乾为天')).toBeVisible();
-  await expect(page.getByText('这是 mock AI 解读').first()).toBeVisible();
+  await expect(page.getByText('这是六爻本地 mock AI 解读').first()).toBeVisible();
 });
 
-test.skip('bazi AI reading flow is saved with mocked DeepSeek response', async ({ page }) => {
+test('bazi AI reading flow is saved with mocked DeepSeek response', async ({ page }) => {
+  await setupSignedInCommercialMocks(page, {
+    aiText: '【结论】这是八字本地 mock AI 解读。\n\n【依据】依据传入的四柱、十神和大运上下文。',
+  });
+
   await page.route('**/api/metaphysics', async (route) => {
     await route.fulfill({
       contentType: 'application/json',
@@ -201,106 +197,39 @@ test.skip('bazi AI reading flow is saved with mocked DeepSeek response', async (
     });
   });
 
-  await page.route('**/api/deepseek-reading', async (route) => {
-    const request = route.request();
-    const body = request.postDataJSON();
-    expect(request.method()).toBe('POST');
-    expect(request.headers().authorization).toMatch(/^Bearer /);
-    expect(body.domain).toBe('bazi');
-    expect(body.chart.pillars.year.full).toBeTruthy();
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    await route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({
-        provider: 'deepseek',
-        model: 'mock-model',
-        text: '【结论】这是八字 mock AI 解读。\n\n【依据】依据传入的四柱、十神和大运上下文。',
-        cost: 2,
-      }),
-    });
-  });
-
-  await page.goto('/account');
-  await page.getByLabel('邮箱').fill('bazi-ai@example.com');
-  await page.getByLabel('称呼').fill('八字 AI 测试');
-  await page.getByRole('button', { name: '发送登录验证码' }).click();
-
   await page.goto('/bazi/result?dt=1990-05-08T12%3A00&calendar=solar&gender=male&birthplace=%E5%8C%97%E4%BA%AC&mode=custom');
   await expect(page.getByText('八字 AI 深度解读')).toBeVisible();
   await expect(page.getByText('报告依据会随请求传入')).toBeVisible();
   await page.getByRole('button', { name: '生成八字 AI 解读' }).click();
   await expect(page.getByText('正在推演命盘，请稍候')).toBeVisible();
-  await expect(page.getByText('这是八字 mock AI 解读')).toBeVisible();
+  await expect(page.getByText('这是八字本地 mock AI 解读')).toBeVisible();
 
   await page.goto('/reports');
   await expect(page.getByText('八字 AI 解读')).toBeVisible();
-  await expect(page.getByText('这是八字 mock AI 解读').first()).toBeVisible();
+  await expect(page.getByText('这是八字本地 mock AI 解读').first()).toBeVisible();
 });
 
-test.skip('ziwei AI reading flow is saved with mocked DeepSeek response', async ({ page }) => {
-  await page.route('**/api/deepseek-reading', async (route) => {
-    const request = route.request();
-    const body = request.postDataJSON();
-    expect(request.method()).toBe('POST');
-    expect(request.headers().authorization).toMatch(/^Bearer /);
-    expect(body.domain).toBe('ziwei');
-    expect(body.chart.lifePalace.name).toBe('命宫');
-    expect(body.chart.palaces).toHaveLength(12);
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    await route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({
-        provider: 'deepseek',
-        model: 'mock-model',
-        text: '【结论】这是紫微 mock AI 解读。\n\n【依据】依据传入的命身宫、星曜四化和大限流年上下文。',
-        cost: 2,
-      }),
-    });
+test('ziwei AI reading flow is saved with mocked DeepSeek response', async ({ page }) => {
+  await setupSignedInCommercialMocks(page, {
+    aiText: '【结论】这是紫微本地 mock AI 解读。\n\n【依据】依据传入的命身宫、星曜四化和大限流年上下文。',
   });
-
-  await page.goto('/account');
-  await page.getByLabel('邮箱').fill('ziwei-ai@example.com');
-  await page.getByLabel('称呼').fill('紫微 AI 测试');
-  await page.getByRole('button', { name: '发送登录验证码' }).click();
 
   await page.goto('/ziwei/chart?calendar=solar&year=1990&month=5&day=8&hour=12&minute=0&gender=male&astroType=heaven');
   await expect(page.getByText('紫微 AI 深度解读')).toBeVisible();
   await expect(page.getByText('解读依据会随请求传入')).toBeVisible();
   await page.getByRole('button', { name: '生成紫微 AI 解读' }).click();
   await expect(page.getByText('正在推演紫微命盘，请稍候')).toBeVisible();
-  await expect(page.getByText('这是紫微 mock AI 解读')).toBeVisible();
+  await expect(page.getByText('这是紫微本地 mock AI 解读')).toBeVisible();
 
   await page.goto('/reports');
   await expect(page.getByText('紫微 AI 解读')).toBeVisible();
-  await expect(page.getByText('这是紫微 mock AI 解读').first()).toBeVisible();
+  await expect(page.getByText('这是紫微本地 mock AI 解读').first()).toBeVisible();
 });
 
-test.skip('combined bazi and liuyao AI report is saved with mocked DeepSeek response', async ({ page }) => {
-  await page.route('**/api/deepseek-reading', async (route) => {
-    const request = route.request();
-    const body = request.postDataJSON();
-    expect(request.method()).toBe('POST');
-    expect(request.headers().authorization).toMatch(/^Bearer /);
-    expect(body.domain).toBe('combined');
-    expect(body.chart.mode).toBe('bazi_liuyao');
-    expect(body.chart.bazi.pillars.year.full).toBeTruthy();
-    expect(body.chart.liuyao.baseHex.name).toBeTruthy();
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    await route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({
-        provider: 'deepseek',
-        model: 'mock-model',
-        text: '【结论】这是双术合参 mock 报告。\n\n【合参依据】八字看长期结构，六爻看当下问事。',
-        cost: 2,
-      }),
-    });
+test('combined bazi and liuyao AI report is saved with mocked DeepSeek response', async ({ page }) => {
+  await setupSignedInCommercialMocks(page, {
+    aiText: '【结论】这是双术合参本地 mock 报告。\n\n【合参依据】八字看长期结构，六爻看当下问事。',
   });
-
-  await page.goto('/account');
-  await page.getByLabel('邮箱').fill('combined-ai@example.com');
-  await page.getByLabel('称呼').fill('合参测试');
-  await page.getByRole('button', { name: '发送登录验证码' }).click();
 
   await page.goto('/reports/combined');
   await page.getByLabel('出生时间').fill('1990-05-08T12:00');
@@ -308,10 +237,62 @@ test.skip('combined bazi and liuyao AI report is saved with mocked DeepSeek resp
   await page.getByLabel('所问事项').fill('现在是否适合推进新项目？');
   await page.getByRole('button', { name: '生成双术合参报告' }).click();
   await expect(page.getByText('正在核对八字结构')).toBeVisible();
-  await expect(page.getByText('这是双术合参 mock 报告')).toBeVisible();
+  await expect(page.getByText('这是双术合参本地 mock 报告')).toBeVisible();
+  await expect(page.getByRole('link', { name: '6积分' })).toBeVisible();
+
+  await page.getByRole('button', { name: '生成双术合参报告' }).click();
+  await expect(page.getByText('这是双术合参本地 mock 报告')).toBeVisible();
+  await expect(page.getByRole('link', { name: '6积分' })).toBeVisible();
 
   await page.goto('/reports');
   const combinedReport = page.getByRole('article').filter({ hasText: '现在是否适合推进新项目？' });
   await expect(combinedReport.getByText('双术合参', { exact: true })).toBeVisible();
-  await expect(combinedReport.getByText('这是双术合参 mock 报告').first()).toBeVisible();
+  await expect(combinedReport.getByText('这是双术合参本地 mock 报告').first()).toBeVisible();
+});
+
+test('signed-in reports page shows balance and deletes own report', async ({ page }) => {
+  await setupSignedInCommercialMocks(page, {
+    reports: [
+      createMockReport({
+        id: '33333333-3333-4333-8333-333333333333',
+        domain: 'combined',
+        title: '双术合参：删除测试',
+        question: '是否删除报告？',
+        text: '【结论】这是一份可删除的本地报告。',
+      }),
+    ],
+  });
+
+  await page.goto('/reports');
+  await expect(page.getByRole('link', { name: '8积分' })).toBeVisible();
+  await expect(page.getByText('删除测试')).toBeVisible();
+  await page.getByRole('button', { name: '删除报告' }).click();
+  await expect(page.getByText('还没有 AI 报告。')).toBeVisible();
+});
+
+test('insufficient credits shows a clear message and does not save report', async ({ page }) => {
+  await setupSignedInCommercialMocks(page, { credits: 1 });
+
+  await page.goto('/reports/combined');
+  await page.getByLabel('所问事项').fill('积分不足时是否保存报告？');
+  await page.getByRole('button', { name: '生成双术合参报告' }).click();
+  await expect(page.getByText('积分不足，需要 2 积分')).toBeVisible();
+  await expect(page.getByRole('link', { name: '1积分' })).toBeVisible();
+
+  await page.goto('/reports');
+  await expect(page.getByText('还没有 AI 报告。')).toBeVisible();
+});
+
+test('AI API failure shows an error and does not save report', async ({ page }) => {
+  const mocks = await setupSignedInCommercialMocks(page);
+  mocks.failNextAi();
+
+  await page.goto('/reports/combined');
+  await page.getByLabel('所问事项').fill('AI 失败时是否扣费？');
+  await page.getByRole('button', { name: '生成双术合参报告' }).click();
+  await expect(page.getByText('AI 解读暂时不可用，请稍后再试')).toBeVisible();
+  await expect(page.getByRole('link', { name: '8积分' })).toBeVisible();
+
+  await page.goto('/reports');
+  await expect(page.getByText('还没有 AI 报告。')).toBeVisible();
 });

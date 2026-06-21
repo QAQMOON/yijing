@@ -12,6 +12,12 @@ const viteBin = path.join(rootDir, 'node_modules', 'vite', 'bin', 'vite.js');
 const playwrightCli = path.join(rootDir, 'node_modules', '@playwright', 'test', 'cli.js');
 const generateSitemapScript = path.join(rootDir, 'scripts', 'generate-sitemap.mjs');
 const prerenderScript = path.join(rootDir, 'scripts', 'prerender-static.mjs');
+const localE2eEnv = usesExternalBaseUrl
+  ? {}
+  : {
+      VITE_SUPABASE_URL: 'https://e2e.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'e2e-anon-key',
+    };
 
 class CommandError extends Error {
   constructor(message, exitCode = 1) {
@@ -57,14 +63,17 @@ function startPreview() {
   ], {
     cwd: rootDir,
     stdio: ['ignore', 'inherit', 'inherit'],
-    env: process.env,
+    env: {
+      ...process.env,
+      ...localE2eEnv,
+    },
   });
 }
 
 async function runBuild() {
-  await runCommand(process.execPath, [generateSitemapScript]);
-  await runCommand(process.execPath, [viteBin, 'build']);
-  await runCommand(process.execPath, [prerenderScript]);
+  await runCommand(process.execPath, [generateSitemapScript], { env: localE2eEnv });
+  await runCommand(process.execPath, [viteBin, 'build'], { env: localE2eEnv });
+  await runCommand(process.execPath, [prerenderScript], { env: localE2eEnv });
 }
 
 async function waitForServer(url, timeoutMs = 30000) {

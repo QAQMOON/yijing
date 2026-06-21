@@ -12,7 +12,7 @@
   - `git diff --exit-code -- public/sitemap.xml`
   - `npm audit --audit-level=high`
   - `npm run test:e2e`
-- 本地发布前建议同样执行以上命令；`npm run test:e2e` 会自动构建、启动 Vite preview、运行 Playwright 并关闭本地服务。
+- 本地发布前建议同样执行以上命令；`npm run test:e2e` 会自动构建、注入本地 fake Supabase 客户端配置、启动 Vite preview、运行 Playwright mock 测试并关闭本地服务，不依赖真实 Supabase 或 DeepSeek。
 - 部署后建议执行 `SMOKE_BASE_URL=https://your-domain npm run smoke:prod` 检查公开页面和未登录 API 边界。
 - 真实 Supabase + DeepSeek 链路验收按 [production-smoke-test.md](production-smoke-test.md) 执行；可选鉴权 smoke 支持 `SMOKE_AUTH_TOKEN`，可选 AI 幂等 smoke 支持 `SMOKE_AI_PAYLOAD_FILE`。
 
