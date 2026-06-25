@@ -30,7 +30,7 @@ jobs:
           printf '%s\n' "${{ secrets.NEKOPARE_MIRROR_KEY }}" > ~/.ssh/nekopare_mirror_key
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-      - name: Mirror repository
+      - name: Mirror branches and tags
         shell: bash
         env:
           SOURCE_REPO: QAQMOON/yijing
@@ -40,4 +40,6 @@ jobs:
           git clone --mirror "https://x-access-token:${{ github.token }}@github.com/${SOURCE_REPO}.git" repo.git
           cd repo.git
           GIT_SSH_COMMAND="ssh -i ~/.ssh/nekopare_mirror_key -o IdentitiesOnly=yes" \
-            git push --mirror "git@github.com:${TARGET_REPO}.git"
+            git push --prune "git@github.com:${TARGET_REPO}.git" \
+              "+refs/heads/*:refs/heads/*" \
+              "+refs/tags/*:refs/tags/*"
